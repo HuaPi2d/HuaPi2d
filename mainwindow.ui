@@ -1,0 +1,742 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>814</width>
+    <height>599</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>画皮2D</string>
+  </property>
+  <property name="windowIcon">
+   <iconset resource="resource.qrc">
+    <normaloff>:/icon/resources/icons/MaterialSymbols18UpRatingOutline.png</normaloff>:/icon/resources/icons/MaterialSymbols18UpRatingOutline.png</iconset>
+  </property>
+  <property name="styleSheet">
+   <string notr="true"/>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <layout class="QVBoxLayout" name="verticalLayout">
+    <item>
+     <widget class="QWidget" name="mutiWindowWidget" native="true">
+      <layout class="QHBoxLayout" name="horizontalLayout_2">
+       <item>
+        <widget class="QMdiArea" name="functionArea">
+         <property name="styleSheet">
+          <string notr="true"/>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <layout class="QVBoxLayout" name="processBarControlVerticalLayout">
+         <item>
+          <widget class="QPushButton" name="processBarControlPushButton">
+           <property name="styleSheet">
+            <string notr="true">QPushButton {
+    border: none; 
+width: 10px;
+height:40px;
+}
+</string>
+           </property>
+           <property name="text">
+            <string/>
+           </property>
+           <property name="icon">
+            <iconset resource="resource.qrc">
+             <normaloff>:/icon/resources/icons/leftLeft.svg</normaloff>:/icon/resources/icons/leftLeft.svg</iconset>
+           </property>
+           <property name="iconSize">
+            <size>
+             <width>12</width>
+             <height>12</height>
+            </size>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <spacer name="processButtonVerticalSpacer">
+           <property name="orientation">
+            <enum>Qt::Orientation::Vertical</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>20</width>
+             <height>40</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+        </layout>
+       </item>
+      </layout>
+     </widget>
+    </item>
+    <item>
+     <widget class="QWidget" name="mainWidget" native="true">
+      <layout class="QVBoxLayout" name="verticalLayout_2">
+       <item>
+        <widget class="QWidget" name="randomSentenceWidget" native="true">
+         <property name="maximumSize">
+          <size>
+           <width>16777215</width>
+           <height>60</height>
+          </size>
+         </property>
+         <layout class="QHBoxLayout" name="horizontalLayout">
+          <item>
+           <widget class="QScrollArea" name="scrollArea">
+            <property name="maximumSize">
+             <size>
+              <width>16777215</width>
+              <height>55</height>
+             </size>
+            </property>
+            <property name="widgetResizable">
+             <bool>true</bool>
+            </property>
+            <widget class="QWidget" name="scrollAreaWidgetContents">
+             <property name="geometry">
+              <rect>
+               <x>0</x>
+               <y>0</y>
+               <width>694</width>
+               <height>40</height>
+              </rect>
+             </property>
+             <layout class="QHBoxLayout" name="horizontalLayout_3">
+              <item>
+               <widget class="QLabel" name="randomSentenceLabel">
+                <property name="styleSheet">
+                 <string notr="true">QLabel{
+    font-family: '黑体';
+    font-size: 16px;
+    font-weight: bold;
+}</string>
+                </property>
+                <property name="text">
+                 <string>愿你我共勉</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </widget>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="copySentencePushButton">
+            <property name="maximumSize">
+             <size>
+              <width>40</width>
+              <height>25</height>
+             </size>
+            </property>
+            <property name="styleSheet">
+             <string notr="true">QPushButton {
+    border: none; 
+}
+QPushButton:hover {
+border: 2px solid blue;
+}
+QPushButton:pressed {
+ border: 2px solid red; 
+ }</string>
+            </property>
+            <property name="text">
+             <string/>
+            </property>
+            <property name="icon">
+             <iconset resource="resource.qrc">
+              <normaloff>:/icon/resources/icons/MdiContentCopy.svg</normaloff>:/icon/resources/icons/MdiContentCopy.svg</iconset>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="getRandomSentencePushButton">
+            <property name="maximumSize">
+             <size>
+              <width>40</width>
+              <height>25</height>
+             </size>
+            </property>
+            <property name="styleSheet">
+             <string notr="true">QPushButton {
+    border: none; 
+}
+QPushButton:hover {
+border: 2px solid blue;
+}
+QPushButton:pressed {
+ border: 2px solid red; 
+ }</string>
+            </property>
+            <property name="text">
+             <string/>
+            </property>
+            <property name="icon">
+             <iconset resource="resource.qrc">
+              <normaloff>:/icon/resources/icons/MdiRefresh.svg</normaloff>:/icon/resources/icons/MdiRefresh.svg</iconset>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <widget class="QGroupBox" name="net_groupBox">
+         <property name="title">
+          <string>网络工具</string>
+         </property>
+         <layout class="QGridLayout" name="gridLayout">
+          <item row="1" column="0">
+           <spacer name="verticalSpacer">
+            <property name="orientation">
+             <enum>Qt::Orientation::Vertical</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>20</width>
+              <height>40</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item row="0" column="1">
+           <widget class="QPushButton" name="music_pushButton">
+            <property name="toolTip">
+             <string>听你享听</string>
+            </property>
+            <property name="text">
+             <string> 音乐盒</string>
+            </property>
+            <property name="icon">
+             <iconset resource="resource.qrc">
+              <normaloff>:/icon/resources/icons/MaterialSymbolsGenresOutline.svg</normaloff>:/icon/resources/icons/MaterialSymbolsGenresOutline.svg</iconset>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="3">
+           <spacer name="horizontalSpacer">
+            <property name="orientation">
+             <enum>Qt::Orientation::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item row="0" column="0">
+           <widget class="QPushButton" name="video_pushButton">
+            <property name="toolTip">
+             <string>b站,YouTube等视频网站解析</string>
+            </property>
+            <property name="text">
+             <string> 视频解析</string>
+            </property>
+            <property name="icon">
+             <iconset resource="resource.qrc">
+              <normaloff>:/icon/resources/icons/MaterialSymbolsMediaLinkOutline.svg</normaloff>:/icon/resources/icons/MaterialSymbolsMediaLinkOutline.svg</iconset>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="2">
+           <widget class="QPushButton" name="textTransitionPushButton">
+            <property name="toolTip">
+             <string>文字转语音工具</string>
+            </property>
+            <property name="text">
+             <string>墨韵声扬</string>
+            </property>
+            <property name="icon">
+             <iconset resource="resource.qrc">
+              <normaloff>:/icon/resources/icons/textTransition.png</normaloff>:/icon/resources/icons/textTransition.png</iconset>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <widget class="QGroupBox" name="files_groupBox">
+         <property name="title">
+          <string>文件处理</string>
+         </property>
+         <layout class="QGridLayout" name="gridLayout_2">
+          <item row="0" column="0">
+           <widget class="QPushButton" name="filesConvertPushButton">
+            <property name="toolTip">
+             <string>视频，文档，图片格式转换</string>
+            </property>
+            <property name="text">
+             <string>格式转换</string>
+            </property>
+            <property name="icon">
+             <iconset resource="resource.qrc">
+              <normaloff>:/icon/resources/icons/filesConvert.svg</normaloff>:/icon/resources/icons/filesConvert.svg</iconset>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <spacer name="horizontalSpacerOfFiles">
+            <property name="orientation">
+             <enum>Qt::Orientation::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <widget class="QGroupBox" name="learning_groupBox">
+         <property name="title">
+          <string>学习工具</string>
+         </property>
+         <layout class="QHBoxLayout" name="horizontalLayout_4">
+          <item>
+           <widget class="QPushButton" name="randomLearningPushButton">
+            <property name="toolTip">
+             <string>英一靠它过的</string>
+            </property>
+            <property name="text">
+             <string>随机复习</string>
+            </property>
+            <property name="icon">
+             <iconset resource="resource.qrc">
+              <normaloff>:/icon/resources/icons/randomLearning.png</normaloff>:/icon/resources/icons/randomLearning.png</iconset>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="aaPushButton">
+            <property name="toolTip">
+             <string>数值仿真与模拟</string>
+            </property>
+            <property name="text">
+             <string>航空航天</string>
+            </property>
+            <property name="icon">
+             <iconset resource="resource.qrc">
+              <normaloff>:/icon/resources/icons/global.svg</normaloff>:/icon/resources/icons/global.svg</iconset>
+            </property>
+            <property name="iconSize">
+             <size>
+              <width>16</width>
+              <height>16</height>
+             </size>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="hardwareDevelopmentPushButton">
+            <property name="text">
+             <string>硬件开发</string>
+            </property>
+            <property name="icon">
+             <iconset resource="resource.qrc">
+              <normaloff>:/icon/resources/icons/Chip.svg</normaloff>:/icon/resources/icons/Chip.svg</iconset>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <spacer name="horizontalSpacerOfLearning">
+            <property name="orientation">
+             <enum>Qt::Orientation::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <widget class="QGroupBox" name="gameGroupBox">
+         <property name="title">
+          <string>游戏专区</string>
+         </property>
+         <layout class="QGridLayout" name="gridLayout_3">
+          <item row="0" column="0">
+           <widget class="QPushButton" name="ssjjPushButton">
+            <property name="text">
+             <string>生死狙击</string>
+            </property>
+            <property name="icon">
+             <iconset resource="resource.qrc">
+              <normaloff>:/icon/resources/icons/ico.ico</normaloff>:/icon/resources/icons/ico.ico</iconset>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <spacer name="horizontalSpacer_2">
+            <property name="orientation">
+             <enum>Qt::Orientation::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+         </layout>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </item>
+    <item>
+     <widget class="QQuickWidget" name="quickWidget">
+      <property name="resizeMode">
+       <enum>QQuickWidget::ResizeMode::SizeRootObjectToView</enum>
+      </property>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>814</width>
+     <height>33</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menu_themes">
+    <property name="title">
+     <string>主题</string>
+    </property>
+    <widget class="QMenu" name="menu_styles">
+     <property name="title">
+      <string>风格</string>
+     </property>
+     <property name="icon">
+      <iconset resource="resource.qrc">
+       <normaloff>:/icon/resources/icons/MdiThemeLightDark.svg</normaloff>:/icon/resources/icons/MdiThemeLightDark.svg</iconset>
+     </property>
+    </widget>
+    <widget class="QMenu" name="menu_qss">
+     <property name="title">
+      <string>主题文件(.qss)</string>
+     </property>
+     <property name="icon">
+      <iconset resource="resource.qrc">
+       <normaloff>:/icon/resources/icons/customizeTheme.png</normaloff>:/icon/resources/icons/customizeTheme.png</iconset>
+     </property>
+    </widget>
+    <addaction name="menu_styles"/>
+    <addaction name="menu_qss"/>
+   </widget>
+   <widget class="QMenu" name="menu_settings">
+    <property name="title">
+     <string>配置</string>
+    </property>
+    <addaction name="reset_theme_action"/>
+   </widget>
+   <widget class="QMenu" name="function_menu">
+    <property name="title">
+     <string>功能</string>
+    </property>
+    <addaction name="video_action"/>
+    <addaction name="music_action"/>
+    <addaction name="textTransitionAction"/>
+    <addaction name="filesConvert_action"/>
+    <addaction name="ranLearning_action"/>
+    <addaction name="aa_action"/>
+    <addaction name="hardwareDevelopment_action"/>
+    <addaction name="ssjj_action"/>
+    <addaction name="separator"/>
+    <addaction name="home_action"/>
+    <addaction name="function_action"/>
+   </widget>
+   <widget class="QMenu" name="aboutMenu">
+    <property name="title">
+     <string>关于</string>
+    </property>
+    <addaction name="aboutMakerAction"/>
+    <addaction name="aboutSoftwareAction"/>
+   </widget>
+   <addaction name="function_menu"/>
+   <addaction name="menu_settings"/>
+   <addaction name="menu_themes"/>
+   <addaction name="aboutMenu"/>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+  <widget class="QToolBar" name="processToolBar">
+   <property name="windowTitle">
+    <string>toolBar</string>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">QToolBar{background-color:rgb(231, 234, 248);}</string>
+   </property>
+   <property name="movable">
+    <bool>false</bool>
+   </property>
+   <property name="allowedAreas">
+    <set>Qt::ToolBarArea::RightToolBarArea</set>
+   </property>
+   <attribute name="toolBarArea">
+    <enum>RightToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>false</bool>
+   </attribute>
+  </widget>
+  <action name="actiondark_amber">
+   <property name="text">
+    <string>dark_amber</string>
+   </property>
+  </action>
+  <action name="actiondark_blue">
+   <property name="text">
+    <string>dark_blue</string>
+   </property>
+  </action>
+  <action name="actiondark_cyan">
+   <property name="text">
+    <string>dark_cyan</string>
+   </property>
+  </action>
+  <action name="actiondark_lightgreen">
+   <property name="text">
+    <string>dark_lightgreen</string>
+   </property>
+  </action>
+  <action name="actiondark_pink">
+   <property name="text">
+    <string>dark_pink</string>
+   </property>
+  </action>
+  <action name="actiondark_purple">
+   <property name="text">
+    <string>dark_purple</string>
+   </property>
+  </action>
+  <action name="actiondark_red">
+   <property name="text">
+    <string>dark_red</string>
+   </property>
+  </action>
+  <action name="actiondark_teal">
+   <property name="text">
+    <string>dark_teal</string>
+   </property>
+  </action>
+  <action name="actiondark_yellow">
+   <property name="text">
+    <string>dark_yellow</string>
+   </property>
+  </action>
+  <action name="actionlight_amber">
+   <property name="text">
+    <string>light_amber</string>
+   </property>
+  </action>
+  <action name="actionlight_blue">
+   <property name="text">
+    <string>light_blue</string>
+   </property>
+  </action>
+  <action name="actionlight_cyan">
+   <property name="text">
+    <string>light_cyan</string>
+   </property>
+  </action>
+  <action name="actionlight_cyan_500">
+   <property name="text">
+    <string>light_cyan_500</string>
+   </property>
+  </action>
+  <action name="actionlight_lightgreen">
+   <property name="text">
+    <string>light_lightgreen</string>
+   </property>
+  </action>
+  <action name="actionlight_pink">
+   <property name="text">
+    <string>light_pink</string>
+   </property>
+  </action>
+  <action name="actionlight_purple">
+   <property name="text">
+    <string>light_purple</string>
+   </property>
+  </action>
+  <action name="actionlight_red">
+   <property name="text">
+    <string>light_red</string>
+   </property>
+  </action>
+  <action name="actionlight_teal">
+   <property name="text">
+    <string>light_teal</string>
+   </property>
+  </action>
+  <action name="actionlight_yellow">
+   <property name="text">
+    <string>light_yellow</string>
+   </property>
+  </action>
+  <action name="reset_theme_action">
+   <property name="icon">
+    <iconset resource="resource.qrc">
+     <normaloff>:/icon/resources/icons/MaterialSymbolsRuleSettings.svg</normaloff>:/icon/resources/icons/MaterialSymbolsRuleSettings.svg</iconset>
+   </property>
+   <property name="text">
+    <string>恢复默认配置</string>
+   </property>
+  </action>
+  <action name="video_action">
+   <property name="icon">
+    <iconset resource="resource.qrc">
+     <normaloff>:/icon/resources/icons/MaterialSymbolsMediaLinkOutline.svg</normaloff>:/icon/resources/icons/MaterialSymbolsMediaLinkOutline.svg</iconset>
+   </property>
+   <property name="text">
+    <string>视频解析</string>
+   </property>
+  </action>
+  <action name="music_action">
+   <property name="icon">
+    <iconset resource="resource.qrc">
+     <normaloff>:/icon/resources/icons/MaterialSymbolsGenresOutline.svg</normaloff>:/icon/resources/icons/MaterialSymbolsGenresOutline.svg</iconset>
+   </property>
+   <property name="text">
+    <string>音乐盒</string>
+   </property>
+  </action>
+  <action name="home_action">
+   <property name="icon">
+    <iconset resource="resource.qrc">
+     <normaloff>:/icon/resources/icons/MaterialSymbolsHomeOutline.svg</normaloff>:/icon/resources/icons/MaterialSymbolsHomeOutline.svg</iconset>
+   </property>
+   <property name="text">
+    <string>回到主界面</string>
+   </property>
+  </action>
+  <action name="aboutMakerAction">
+   <property name="icon">
+    <iconset resource="resource.qrc">
+     <normaloff>:/icon/resources/icons/MdiPencilCircleOutline.svg</normaloff>:/icon/resources/icons/MdiPencilCircleOutline.svg</iconset>
+   </property>
+   <property name="text">
+    <string>作者</string>
+   </property>
+  </action>
+  <action name="aboutSoftwareAction">
+   <property name="icon">
+    <iconset resource="resource.qrc">
+     <normaloff>:/icon/resources/icons/MdiPuzzleOutline.svg</normaloff>:/icon/resources/icons/MdiPuzzleOutline.svg</iconset>
+   </property>
+   <property name="text">
+    <string>软件</string>
+   </property>
+  </action>
+  <action name="return_action">
+   <property name="icon">
+    <iconset resource="resource.qrc">
+     <normaloff>:/icon/resources/icons/IconamoonArrowRight5Circle.svg</normaloff>:/icon/resources/icons/IconamoonArrowRight5Circle.svg</iconset>
+   </property>
+   <property name="text">
+    <string>转到功能界面</string>
+   </property>
+  </action>
+  <action name="function_action">
+   <property name="icon">
+    <iconset resource="resource.qrc">
+     <normaloff>:/icon/resources/icons/IconamoonArrowRight5Circle.svg</normaloff>:/icon/resources/icons/IconamoonArrowRight5Circle.svg</iconset>
+   </property>
+   <property name="text">
+    <string>转到工作界面</string>
+   </property>
+  </action>
+  <action name="textTransitionAction">
+   <property name="icon">
+    <iconset resource="resource.qrc">
+     <normaloff>:/icon/resources/icons/textTransition.png</normaloff>:/icon/resources/icons/textTransition.png</iconset>
+   </property>
+   <property name="text">
+    <string>墨韵声扬</string>
+   </property>
+  </action>
+  <action name="ranLearning_action">
+   <property name="icon">
+    <iconset resource="resource.qrc">
+     <normaloff>:/icon/resources/icons/randomLearning.png</normaloff>:/icon/resources/icons/randomLearning.png</iconset>
+   </property>
+   <property name="text">
+    <string>随机复习</string>
+   </property>
+  </action>
+  <action name="ssjj_action">
+   <property name="icon">
+    <iconset resource="resource.qrc">
+     <normaloff>:/icon/resources/icons/ico.ico</normaloff>:/icon/resources/icons/ico.ico</iconset>
+   </property>
+   <property name="text">
+    <string>生死狙击</string>
+   </property>
+  </action>
+  <action name="action_qss_2">
+   <property name="text">
+    <string>主题文件(.qss)</string>
+   </property>
+  </action>
+  <action name="aa_action">
+   <property name="icon">
+    <iconset resource="resource.qrc">
+     <normaloff>:/icon/resources/icons/global.svg</normaloff>:/icon/resources/icons/global.svg</iconset>
+   </property>
+   <property name="text">
+    <string>航空航天</string>
+   </property>
+  </action>
+  <action name="hardwareDevelopment_action">
+   <property name="icon">
+    <iconset resource="resource.qrc">
+     <normaloff>:/icon/resources/icons/Chip.svg</normaloff>:/icon/resources/icons/Chip.svg</iconset>
+   </property>
+   <property name="text">
+    <string>硬件开发</string>
+   </property>
+  </action>
+  <action name="filesConvert_action">
+   <property name="icon">
+    <iconset resource="resource.qrc">
+     <normaloff>:/icon/resources/icons/filesConvert.svg</normaloff>:/icon/resources/icons/filesConvert.svg</iconset>
+   </property>
+   <property name="text">
+    <string>格式转换</string>
+   </property>
+  </action>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>QQuickWidget</class>
+   <extends>QWidget</extends>
+   <header location="global">QtQuickWidgets/QQuickWidget</header>
+  </customwidget>
+ </customwidgets>
+ <resources>
+  <include location="resource.qrc"/>
+ </resources>
+ <connections/>
+</ui>
