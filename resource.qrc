@@ -56,6 +56,8 @@
         <file>resources/icons/module.svg</file>
         <file>resources/icons/Chip.svg</file>
         <file>resources/icons/filesConvert.svg</file>
+        <file>resources/icons/nodeEditor.svg</file>
+        <file>resources/icons/RightArrow.svg</file>
     </qresource>
     <qresource prefix="/pic/defaultPic">
         <file>resources/pic/defaultPic/defaultMusicPic.jpg</file>

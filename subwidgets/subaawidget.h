@@ -4,8 +4,11 @@
 #include <QDoubleValidator>
 #include <QLineEdit>
 #include <QTableWidgetItem>
+#include <QSettings>
 #include "ui_subaawidget.h"
 #include "Aerospace/air/standardairmodel.h"
+#include "Aerospace/universal/coordinate.h"
+
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class SubAAWidgetClass; };
@@ -20,7 +23,6 @@ public:
 	~SubAAWidget();
 
 public slots:
-	
 
 public: signals:
 	void widgetClosed();
@@ -28,4 +30,9 @@ public: signals:
 
 private:
 	Ui::SubAAWidgetClass *ui;
+
+	void saveSettigs();
+	void loadSettings();
+	void createRemindText();
+	void calculateEulerRotationMatrix();
 };

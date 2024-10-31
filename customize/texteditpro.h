@@ -1,4 +1,4 @@
-#ifndef TEXTEDITPRO_H
+﻿#ifndef TEXTEDITPRO_H
 #define TEXTEDITPRO_H
 
 #include <QObject>
@@ -9,7 +9,12 @@ class TextEditPro : public QTextEdit {
     Q_OBJECT
 
 public:
-    TextEditPro(QWidget *parent = nullptr) : QTextEdit(parent) {}
+    TextEditPro(QWidget *parent = nullptr) : QTextEdit(parent) {
+        connect(this, &QTextEdit::textChanged, this, &TextEditPro::updatePlaceholderText);
+    }
+
+    QString currentText; // 当前文本
+    QString placeholderText; // 占位符文本
 
 protected:
     // 重载 keyPressEvent 函数，监听键盘事件
@@ -33,6 +38,47 @@ protected:
         }
         // 传递其他按键事件
         QTextEdit::keyPressEvent(event);
+    }
+
+    void focusInEvent(QFocusEvent *event) override {
+        // 获得焦点时，更新占位符文本
+        updatePlaceholderText();
+        QTextEdit::focusInEvent(event);
+    }
+
+    void focusOutEvent(QFocusEvent *event) override {
+        // 失去焦点时，更新占位符文本
+        updatePlaceholderText();
+        QTextEdit::focusOutEvent(event);
+    }
+
+private:
+    void updatePlaceholderText() 
+    {
+        // 若当前没有焦点且文本框内容与placholderText不同，则显示占位符文本
+        if (hasFocus() == true) 
+        {
+            if (currentText == placeholderText) 
+            {
+                currentText = "";
+                this->clear();
+            }
+        }
+        else 
+        {
+            if (currentText != placeholderText) {
+                if (this->toPlainText().isEmpty() == true) {
+                    currentText = placeholderText;
+                    this->setHtml(placeholderText);
+                }
+            }
+        }
+    }
+
+public slots:
+    void receivePlacholderText(QString text) {
+        placeholderText = QString("<p style='color:gray;'>%1</p>").arg(text.replace("\n", "<br>"));
+        emit updatePlaceholderText();
     }
 };
 

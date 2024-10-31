@@ -197,12 +197,93 @@ QPushButton:pressed {
         </layout>
        </widget>
       </item>
+      <item>
+       <widget class="QGroupBox" name="coordinateGroupBox">
+        <property name="title">
+         <string>坐标相关</string>
+        </property>
+        <layout class="QGridLayout" name="gridLayout_2">
+         <item row="1" column="0">
+          <widget class="TextEditPro" name="eulerRotationParamsTextEdit">
+           <property name="placeholderText">
+            <string/>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="0">
+          <widget class="QLabel" name="eulerRotationLabel">
+           <property name="text">
+            <string>欧拉坐标转换矩阵计算</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="1">
+          <widget class="QPushButton" name="changePushButton">
+           <property name="text">
+            <string/>
+           </property>
+           <property name="icon">
+            <iconset resource="../resource.qrc">
+             <normaloff>:/icon/resources/icons/RightArrow.svg</normaloff>:/icon/resources/icons/RightArrow.svg</iconset>
+           </property>
+           <property name="iconSize">
+            <size>
+             <width>24</width>
+             <height>24</height>
+            </size>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="2">
+          <widget class="QTableWidget" name="eulerResultTableWidget">
+           <row>
+            <property name="text">
+             <string>x</string>
+            </property>
+           </row>
+           <row>
+            <property name="text">
+             <string>y</string>
+            </property>
+           </row>
+           <row>
+            <property name="text">
+             <string>z</string>
+            </property>
+           </row>
+           <column>
+            <property name="text">
+             <string>x</string>
+            </property>
+           </column>
+           <column>
+            <property name="text">
+             <string>y</string>
+            </property>
+           </column>
+           <column>
+            <property name="text">
+             <string>z</string>
+            </property>
+           </column>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </item>
      </layout>
     </widget>
    </item>
   </layout>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
+ <customwidgets>
+  <customwidget>
+   <class>TextEditPro</class>
+   <extends>QTextEdit</extends>
+   <header>customize/texteditpro.h</header>
+  </customwidget>
+ </customwidgets>
  <resources>
   <include location="../resource.qrc"/>
  </resources>

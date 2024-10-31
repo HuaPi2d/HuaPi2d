@@ -632,48 +632,70 @@ void SubMusicWidget::playIndexNetMusic(const QModelIndex &index)
 
             /* 更新图片 */
             setMainPixmap();
+
+            /* 提取歌曲地址 */
+            /* 获取id参数 */
+            xmlDocPtr doc = get_html_doc(htmlContent.toStdString());
+            xmlXPathObjectPtr xpathObj = get_xpath_nodeset(doc, (const xmlChar*)"//script[@type='text/javascript']");
+            xmlNodeSetPtr nodeset = xpathObj->nodesetval;
+
+            xmlNodePtr node = nodeset->nodeTab[0];
+            xmlChar* content = xmlNodeGetContent(node); // 获取节点内容
+
+            QString contentStr;
+            if (content != NULL) {
+                contentStr = QString::fromUtf8((const char*)content);
+                xmlFree(content); // 释放获取到的内容
+            }
+            else {
+                sendStateInfo("获取script节点内容失败");
+                return;
+            }
+
+            QRegularExpression regex("window\\.play_id\\s*=\\s*'(.*?)'");
+            QRegularExpressionMatch match = regex.match(contentStr);
+            QString play_id;
+
+            if (match.hasMatch()) {
+                play_id = match.captured(1);
+            }
+            else {
+                sendStateInfo("获取id参数失败");
+                return;
+            }
+
+            /* 获取歌曲播放地址 */
+            RequestPro* requestPro = new RequestPro();
+            QJsonObject headers;
+            QJsonObject params;
+            params["id"] = play_id;
+            QUrl api("https://www.gequbao.com/api/play-url");
+
+            QObject::connect(requestPro, &RequestPro::requestCompleted, [=](const QJsonObject& response) {
+                QUrl playUrl = response.find("data")->toObject().find("url")->toString();
+                currentSong.filePath = playUrl.toString();
+                emit sendStateInfo(api.toString());
+                playMusic();
+                emit changeMusicProcessFinish();
+                });
+
+            QObject::connect(requestPro, &RequestPro::requestError, [=]() {
+                emit sendStateInfo("获取歌曲播放链接失败");
+                emit changeMusicProcessFinish();
+                });
+
+            requestPro->sendRequest(headers, params, api, "POST");
         });
 
         /* 请求失败 */
         connect(getSongDetailInfo, &GetNetWork::sendError, this, [=](){
-            emit sendStateInfo("歌曲封面加载失败");
+            emit sendStateInfo("歌曲详细网址信息内容获取失败");
             currentSong.coverPath = ":/pic/defaultPic/resources/pic/defaultPic/defaultMusicPic.svg";
             setMainPixmap();
         });
 
         emit sendStateInfo(songDetailInfoUrl);
         getSongDetailInfo->getData(songDetailInfoUrl);
-
-        /* 获取歌曲播放地址 */
-        GetNetWork *getSong = new GetNetWork(this);
-        QRegularExpression regex("https://www\\.gequbao\\.com/music/(\\d+)");
-        QRegularExpressionMatch match = regex.match(songDetailInfoUrl);
-        QUrl api("https://www.gequbao.com/api/play_url");
-        QUrlQuery query;
-        query.addQueryItem("id", match.captured(1));
-        query.addQueryItem("json", "1");
-        api.setQuery(query);
-
-        /* 请求成功 */
-        connect(getSong, &GetNetWork::sendData, this, [=](QByteArray byteArrayData){
-            QJsonObject jsonReply = QJsonDocument::fromJson(byteArrayData).object();
-            QUrl songUrl = jsonReply.find("data")->toObject().find("url")->toString();
-            currentSong.filePath = songUrl.toString();
-            emit sendStateInfo(api.toString());
-
-            playMusic();
-
-            emit changeMusicProcessFinish();
-        });
-
-        /* 请求失败 */
-        connect(getSong, &GetNetWork::sendError, this, [=](){
-            emit sendStateInfo("获取歌曲播放链接失败");
-            emit changeMusicProcessFinish();
-        });
-
-        getSong->getData(api);
-        emit sendStateInfo(api.toString());
     }
     else if(index.data(Qt::UserRole + 5).toString().contains("kuwo") == true)
     {
@@ -771,12 +793,16 @@ bool SubMusicWidget::isLocal()
 /* 下载 */
 void SubMusicWidget::on_downloadPushButton_clicked()
 {
+    if (QDir("music/audio").exists() == false) {
+        QDir().mkpath("music/audio");
+    }
+    if (QDir("music/cover").exists() == false) {
+        QDir().mkpath("music/cover");
+    }
 
     if(currentSong.filePath != "")
     {
         mainPixmap.save("music/cover/"+ currentSong.title + "-" + currentSong.artist + ".png");
-
-        // emit sendDownloadInfo(currentSong.title, currentSong.filePath, "music/audio/" + currentSong.title + "-" + currentSong.artist + ".mp3", "audio");
 
         SingleDownloadFrame *downloadFrame = new SingleDownloadFrame(currentSong.title, currentSong.filePath, "music/audio/" + currentSong.title + "-" + currentSong.artist + ".mp3", "audio");
 

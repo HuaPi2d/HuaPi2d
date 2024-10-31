@@ -29,10 +29,14 @@ SubSSJJWidget::SubSSJJWidget(QWidget *parent)
     widgetList.append(ui->scriptWidget);
     widgetList.append(ui->settingWidget);
     widgetList.append(ui->writeScriptWidget);
+    widgetList.append(ui->nodeEditorWidget);
     currentWidget = ui->scriptWidget;
     updateScreen();
     /* 搭建脚本编辑界面 */
     createScriptEditor();
+
+    /* 搭建图形编辑器 */
+    createNodeEditor();
 
     /* 脚本框设置 */
     ui->remindTextEdit->setReadOnly(true);
@@ -200,6 +204,12 @@ void SubSSJJWidget::on_scriptPushButton_clicked()
 void SubSSJJWidget::on_writePushButton_clicked()
 {
     currentWidget = ui->writeScriptWidget;
+    updateScreen();
+}
+
+void SubSSJJWidget::on_nodeEditorPushButton_clicked()
+{
+    currentWidget = ui->nodeEditorWidget;
     updateScreen();
 }
 
@@ -437,4 +447,10 @@ void SubSSJJWidget::createScriptEditor()
     scriptEditor = new QsciScintilla(this);
     ui->qsciWidget->setLayout(qsciLayout);
     qsciLayout->addWidget(scriptEditor);
+}
+
+void SubSSJJWidget::createNodeEditor()
+{
+    QGraphicsScene* graphicsScene;
+
 }

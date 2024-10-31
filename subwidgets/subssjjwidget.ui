@@ -49,6 +49,35 @@ QPushButton:pressed {
       </widget>
      </item>
      <item>
+      <widget class="QPushButton" name="nodeEditorPushButton">
+       <property name="styleSheet">
+        <string notr="true">QPushButton {
+    border: none; 
+width: 20px; height: 50px;
+}
+QPushButton:hover {
+border: 2px solid blue;
+}
+QPushButton:pressed {
+ border: 2px solid red; 
+ }</string>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+       <property name="icon">
+        <iconset resource="../resource.qrc">
+         <normaloff>:/icon/resources/icons/nodeEditor.svg</normaloff>:/icon/resources/icons/nodeEditor.svg</iconset>
+       </property>
+       <property name="iconSize">
+        <size>
+         <width>36</width>
+         <height>36</height>
+        </size>
+       </property>
+      </widget>
+     </item>
+     <item>
       <widget class="QPushButton" name="scriptPushButton">
        <property name="minimumSize">
         <size>
@@ -201,6 +230,21 @@ QPushButton:pressed {
        <layout class="QVBoxLayout" name="verticalLayout_6">
         <item>
          <widget class="QWidget" name="qsciWidget" native="true"/>
+        </item>
+       </layout>
+      </widget>
+     </item>
+     <item>
+      <widget class="QWidget" name="nodeEditorWidget" native="true">
+       <property name="minimumSize">
+        <size>
+         <width>0</width>
+         <height>0</height>
+        </size>
+       </property>
+       <layout class="QHBoxLayout" name="horizontalLayout_3">
+        <item>
+         <widget class="QGraphicsView" name="nodeEditorGraphicsView"/>
         </item>
        </layout>
       </widget>
