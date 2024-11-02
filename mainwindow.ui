@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>画皮2D</string>
+   <string>画皮的百宝箱</string>
   </property>
   <property name="windowIcon">
    <iconset resource="resource.qrc">

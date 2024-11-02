@@ -7,6 +7,7 @@
 #include <QtNodes/internal/GraphicsView.hpp>
 
 #include "thread/script/ssjjmainthread.h"
+#include "thread/weapons/weaponbonusthread.h"
 
 class QsciScintilla;
 
@@ -36,6 +37,7 @@ private:
     SingleTask currentTask;
     SSJJMainThread* ssjjMainThread;
     QsciScintilla* scriptEditor;
+    WeaponBonusThread* weaponBonusThread;
 
 private: signals:
     void widgetClosed();
@@ -55,12 +57,14 @@ private slots:
     void on_scriptPushButton_clicked();
     void on_writePushButton_clicked();
     void on_nodeEditorPushButton_clicked();
+    void on_bonusPushButton_clicked();
     void updateScreen();
     void on_chooseLauncherPathPushButton_clicked();
     void on_addTaskPushButton_clicked();
     void on_chooseLDScriptPathPushButton_clicked();
     void on_startPushButton_clicked();
     void on_endPushButton_clicked();
+    void on_singleBonusPushButton_clicked();
     void getSingleTask();
     void receiveRemindInfo(QString remindInfo);
     void sendNextTask(SSJJRunState res);
@@ -68,6 +72,8 @@ private slots:
     void clearRow(QTableWidgetItem *item);
     void createScriptEditor();
     void createNodeEditor();
+    void updateCurrentWeaponList();
+    void getBounsWeaponList();
 };
 
 #endif // SUBSSJJWIDGET_H

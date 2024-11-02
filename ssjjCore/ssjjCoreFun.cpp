@@ -1,5 +1,5 @@
 #include "ssjjCoreFun.h"
-#include "universal/mouseKeyboradControl.h"
+#include "universal/script/simulate/mouseKeyboradControl.h"
 
 cv::Point findAndClick(QString picPath, int timeLimit, int interval)
 {

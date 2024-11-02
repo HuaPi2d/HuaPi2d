@@ -3,13 +3,27 @@
 #include "thread/script/startssjjthread.h"
 #include "thread/script/initializegamethread.h"
 #include "universal/programController.h"
-#include "universal/findPicPro.h"
+#include "universal/script/image/findPicPro.h"
 #include "QHotkey/qhotkey.h"
+#include "thread/weapons/mainWeapons/huguang.h"
+#include "thread/weapons/mainWeapons/shenyu.h"
+#include "thread/weapons/mainWeapons/limingzhiguang.h"
+#include "thread/weapons/secondaryWeapons/feisuo.h"
+#include "thread/weapons/secondaryWeapons/nengfang.h"
+#include "thread/weapons/meleeWeapons/anshuijing.h"
+#include "thread/weapons/tacticalWeapons/huihe.h"
+#include "thread/weapons/throwingWeapons/liangyi.h"
+#include "thread/weapons/throwingWeapons/anshi.h"
+#include "thread/weapons/character/liubi.h"
+#include "thread/weapons/character/taikesix.h"
+#include "thread/weapons/longQi/hundunbaofa.h"
+
 
 #include <QSettings>
 #include <QFileDialog>
 #include <QMessageBox>
 #include <QIntValidator>
+#include <QComboBox>
 #include <QScrollBar>
 #include <Qsci/qsciscintilla.h>
 #include <qlayout.h>
@@ -30,6 +44,7 @@ SubSSJJWidget::SubSSJJWidget(QWidget *parent)
     widgetList.append(ui->settingWidget);
     widgetList.append(ui->writeScriptWidget);
     widgetList.append(ui->nodeEditorWidget);
+    widgetList.append(ui->bonusWidget);
     currentWidget = ui->scriptWidget;
     updateScreen();
     /* 搭建脚本编辑界面 */
@@ -58,7 +73,22 @@ SubSSJJWidget::SubSSJJWidget(QWidget *parent)
     QObject::connect(F10, &QHotkey::activated, ui->startPushButton, &QPushButton::click);
     QHotkey* F11 = new QHotkey(QKeySequence("F11"),true);
     QObject::connect(F11, &QHotkey::activated, ui->endPushButton, &QPushButton::click);
+    QHotkey* Ctrl_F = new QHotkey(QKeySequence("Ctrl+F"),true);
+    QObject::connect(Ctrl_F, &QHotkey::activated, ui->singleBonusPushButton, &QPushButton::click);
     runningState = 0;
+
+    /* 连接combox更新信号 */
+    connect(ui->mainWeaponComboBox, &QComboBox::currentIndexChanged, this, &SubSSJJWidget::updateCurrentWeaponList);
+    connect(ui->secondaryWeaponComboBox, &QComboBox::currentIndexChanged, this, &SubSSJJWidget::updateCurrentWeaponList);
+    connect(ui->meleeWeaponComboBox, &QComboBox::currentIndexChanged, this, &SubSSJJWidget::updateCurrentWeaponList);
+    connect(ui->throwingWeaponComboBox, &QComboBox::currentIndexChanged, this, &SubSSJJWidget::updateCurrentWeaponList);
+    connect(ui->tacticalWeaponComboBox, &QComboBox::currentIndexChanged, this, &SubSSJJWidget::updateCurrentWeaponList);
+    connect(ui->characterComboBox, &QComboBox::currentIndexChanged, this, &SubSSJJWidget::updateCurrentWeaponList);
+    connect(ui->longQiComboBox, &QComboBox::currentIndexChanged, this, &SubSSJJWidget::updateCurrentWeaponList);
+
+    /* 设置控件属性 */
+    // 列表内元素可拖动
+    ui->currentWeaponListWidget->setDragDropMode(QAbstractItemView::InternalMove);
 
     /* 清楚表格 */
     connect(ui->taskTableWidget, &QTableWidget::itemClicked, this, &SubSSJJWidget::clearRow);
@@ -93,6 +123,21 @@ void SubSSJJWidget::saveSettings()
     setting.setValue("LDScriptPath", ui->LDScriptPathLineEdit->text());
     setting.setValue("singleScriptTime", ui->singleScriptTimeLineEdit->text());
     setting.setValue("loadingTime", ui->loadingTimeLineEdit->text());
+    setting.beginGroup("bonusWeapenList");
+    setting.setValue("mainWeaponList", ui->mainWeaponComboBox->currentText());
+    setting.setValue("secondaryWeaponList", ui->secondaryWeaponComboBox->currentText());
+    setting.setValue("meleeWeaponList", ui->meleeWeaponComboBox->currentText());
+    setting.setValue("throwingWeaponList", ui->throwingWeaponComboBox->currentText());
+    setting.setValue("tacticalWeaponList", ui->tacticalWeaponComboBox->currentText());
+    setting.setValue("characterList", ui->characterComboBox->currentText());
+    setting.setValue("longQiList", ui->longQiComboBox->currentText());
+    QStringList weaponList;
+    for (int i = 0; i < ui->currentWeaponListWidget->count(); i++)
+    {
+        weaponList.append(ui->currentWeaponListWidget->item(i)->text());
+    }
+    setting.setValue("currentWeaponList", weaponList);
+    setting.endGroup();
     setting.endGroup();
 }
 
@@ -145,6 +190,101 @@ void SubSSJJWidget::loadSettings()
     else{
         ui->loadingTimeLineEdit->setText("18");
     }
+    setting.beginGroup("bonusWeapenList");
+     // 加载 combox 内容
+    if (setting.value("mainWeaponList").toString() != "") {
+        ui->mainWeaponComboBox->setCurrentText(setting.value("mainWeaponList").toString());
+    }
+    if (setting.value("secondaryWeaponList").toString() != "") {
+        ui->secondaryWeaponComboBox->setCurrentText(setting.value("secondaryWeaponList").toString());
+    }
+    if (setting.value("meleeWeaponList").toString() != "") {
+        ui->meleeWeaponComboBox->setCurrentText(setting.value("meleeWeaponList").toString());
+    }
+    if (setting.value("throwingWeaponList").toString() != "") {
+        ui->throwingWeaponComboBox->setCurrentText(setting.value("throwingWeaponList").toString());
+    }
+    if (setting.value("tacticalWeaponList").toString() != "") {
+        ui->tacticalWeaponComboBox->setCurrentText(setting.value("tacticalWeaponList").toString());
+    }
+    if (setting.value("characterList").toString() != "") {
+        ui->characterComboBox->setCurrentText(setting.value("characterList").toString());
+    }
+    if (setting.value("longQiList").toString() != "")
+    {
+        ui->longQiComboBox->setCurrentText(setting.value("longQiList").toString());
+    }
+    if (setting.value("currentWeaponList").toStringList() != QStringList()) {
+        for (QString str : setting.value("currentWeaponList").toStringList()) {
+            ui->currentWeaponListWidget->addItem(str);
+        }
+        for (int i = 0; i < 7; i++)
+        {
+            int currentWeaponNum = ui->currentWeaponListWidget->count();
+            for (int j = 0; j < currentWeaponNum + 1; j++) {
+                if (i == 0 && j < currentWeaponNum) {
+                    if(ui->currentWeaponListWidget->item(j)->text().contains("主武器"))break;
+                }
+                else if(i == 0 && j >= currentWeaponNum){
+                    ui->currentWeaponListWidget->addItem("主武器");
+                    break;
+                }
+                else if(i == 1 && j < currentWeaponNum) {
+                    if(ui->currentWeaponListWidget->item(j)->text().contains("副武器"))break;
+                }
+                else if(i == 1 && j >= currentWeaponNum){
+                    ui->currentWeaponListWidget->addItem("副武器");
+                    break;
+                }
+                else if(i == 2 && j < currentWeaponNum) {
+                    if(ui->currentWeaponListWidget->item(j)->text().contains("近战武器"))break;
+                }
+                else if(i == 2 && j >= currentWeaponNum){
+                    ui->currentWeaponListWidget->addItem("近战武器");
+                    break;
+                }
+                else if(i == 3 && j < currentWeaponNum) {
+                    if(ui->currentWeaponListWidget->item(j)->text().contains("投掷武器"))break;
+                }
+                else if(i == 3 && j >= currentWeaponNum){
+                    ui->currentWeaponListWidget->addItem("投掷武器");
+                    break;
+                }
+                else if(i == 4 && j < currentWeaponNum) {
+                    if(ui->currentWeaponListWidget->item(j)->text().contains("战术武器"))break;
+                }
+                else if(i == 4 && j >= currentWeaponNum){
+                    ui->currentWeaponListWidget->addItem("战术武器");
+                    break;
+                }
+                else if(i == 5 && j < currentWeaponNum) {
+                    if(ui->currentWeaponListWidget->item(j)->text().contains("角色"))break;
+                }
+                else if(i == 5 && j >= currentWeaponNum){
+                    ui->currentWeaponListWidget->addItem("角色");
+                    break;
+                }  
+                else if(i == 6 && j < currentWeaponNum) {
+                    if(ui->currentWeaponListWidget->item(j)->text().contains("龙骑兵"))break;
+                }
+                else if(i == 6 && j >= currentWeaponNum){
+                    qDebug() << "龙骑兵";
+                    ui->currentWeaponListWidget->addItem("龙骑兵");
+                    break;
+                    qDebug() << "龙骑兵";
+                }
+            }
+        }
+    }
+    else {
+        ui->currentWeaponListWidget->addItem("主武器");
+        ui->currentWeaponListWidget->addItem("副武器");
+        ui->currentWeaponListWidget->addItem("近战武器");
+        ui->currentWeaponListWidget->addItem("投掷武器");
+        ui->currentWeaponListWidget->addItem("战术武器");
+        ui->currentWeaponListWidget->addItem("角色");
+    }
+    setting.endGroup();
     setting.endGroup();
 }
 
@@ -210,6 +350,12 @@ void SubSSJJWidget::on_writePushButton_clicked()
 void SubSSJJWidget::on_nodeEditorPushButton_clicked()
 {
     currentWidget = ui->nodeEditorWidget;
+    updateScreen();
+}
+
+void SubSSJJWidget::on_bonusPushButton_clicked()
+{
+    currentWidget = ui->bonusWidget;
     updateScreen();
 }
 
@@ -380,6 +526,38 @@ void SubSSJJWidget::on_endPushButton_clicked()
     writeRemindInfo("<p><span style=\"color:lightgreen;\"><b>脚本运行已结束</b></span></p><br>");
 }
 
+/* 执行单次加成任务 */
+void SubSSJJWidget::on_singleBonusPushButton_clicked()
+{
+    if (ui->singleBonusPushButton->isEnabled() == false) {
+        return;
+    }
+
+    ui->singleBonusPushButton->setEnabled(false);
+    
+    /* 创建加成主线程 */
+    weaponBonusThread = new WeaponBonusThread(this);
+
+    /* 获取加成武器线程列表,并传入主线程 */
+    getBounsWeaponList();
+
+    /* 设置加成类型为单次加成 */
+    weaponBonusThread->setBonusType(0);
+
+    /* 接收线程执行情况信息 */
+    // 成功结束
+    connect(weaponBonusThread, &QThread::finished, this, [=]() {
+        ui->singleBonusPushButton->setEnabled(true);
+        });
+    // 线程意外终止
+    connect(weaponBonusThread, &QThread::destroyed, this, [=]() {
+        ui->singleBonusPushButton->setEnabled(true);
+        });
+
+    /* 开启主线程 */
+    weaponBonusThread->start();
+}
+
 void SubSSJJWidget::getSingleTask()
 {
     for(int i = 0; i < ui->taskTableWidget->rowCount(); i++){
@@ -453,4 +631,136 @@ void SubSSJJWidget::createNodeEditor()
 {
     QGraphicsScene* graphicsScene;
 
+}
+
+/* 更新武器列表 */
+void SubSSJJWidget::updateCurrentWeaponList()
+{
+    for (int i = 0; i < ui->currentWeaponListWidget->count(); i++) 
+    {
+        if (ui->currentWeaponListWidget->item(i)->text().contains("主武器"))
+        {
+            ui->currentWeaponListWidget->item(i)->setText("主武器-" + ui->mainWeaponComboBox->currentText());
+        }
+        if (ui->currentWeaponListWidget->item(i)->text().contains("副武器"))
+        {
+            ui->currentWeaponListWidget->item(i)->setText("副武器-" + ui->secondaryWeaponComboBox->currentText());
+        }
+        if (ui->currentWeaponListWidget->item(i)->text().contains("近战武器"))
+        {
+            ui->currentWeaponListWidget->item(i)->setText("近战武器-" + ui->meleeWeaponComboBox->currentText());
+        }
+        if (ui->currentWeaponListWidget->item(i)->text().contains("投掷武器"))
+        {
+            ui->currentWeaponListWidget->item(i)->setText("投掷武器-" + ui->throwingWeaponComboBox->currentText());
+        }
+        if (ui->currentWeaponListWidget->item(i)->text().contains("战术武器"))
+        {
+            ui->currentWeaponListWidget->item(i)->setText("战术武器-" + ui->tacticalWeaponComboBox->currentText());
+        }
+        if (ui->currentWeaponListWidget->item(i)->text().contains("角色"))
+        {
+            ui->currentWeaponListWidget->item(i)->setText("角色-" + ui->characterComboBox->currentText());
+        }
+        if (ui->currentWeaponListWidget->item(i)->text().contains("龙骑兵"))
+        {
+            ui->currentWeaponListWidget->item(i)->setText("龙骑兵-" + ui->longQiComboBox->currentText());
+        }
+    }
+}
+
+/* 获取加成武器线程列表 */
+void SubSSJJWidget::getBounsWeaponList()
+{
+    for (int i = 0; i < ui->currentWeaponListWidget->count(); i++)
+    {
+        if (ui->currentWeaponListWidget->item(i)->text().contains("主武器"))
+        {
+            // 主武器
+            if (ui->mainWeaponComboBox->currentText() == "弧光")
+            {
+                // 弧光
+                weaponBonusThread->addBonusWeapon(new HuGuang(weaponBonusThread));
+            }
+            if (ui->mainWeaponComboBox->currentText() == "神谕")
+            {
+                // 神谕
+                weaponBonusThread->addBonusWeapon(new ShenYu(weaponBonusThread));
+            }
+            if (ui->mainWeaponComboBox->currentText() == "黎明之光")
+            {
+                // 黎明之光
+                weaponBonusThread->addBonusWeapon(new LiMingZhiGuang(weaponBonusThread));
+            }
+        }
+        if (ui->currentWeaponListWidget->item(i)->text().contains("副武器"))
+        {
+            // 副武器
+            if (ui->secondaryWeaponComboBox->currentText() == "飞梭")
+            {
+                // 飞梭
+                weaponBonusThread->addBonusWeapon(new FeiSuo(weaponBonusThread));
+            }
+            if (ui->secondaryWeaponComboBox->currentText() == "能防")
+            {
+                // 能防
+                weaponBonusThread->addBonusWeapon(new NengFang(weaponBonusThread));
+            }
+        }
+        if (ui->currentWeaponListWidget->item(i)->text().contains("近战武器"))
+        {
+            // 近战武器
+            if (ui->meleeWeaponComboBox->currentText() == "黯水晶")
+            {
+                // 黯水晶
+                weaponBonusThread->addBonusWeapon(new AnShuiJing(weaponBonusThread));
+            }
+        }
+        if (ui->currentWeaponListWidget->item(i)->text().contains("投掷武器"))
+        {
+            // 投掷武器
+            if (ui->throwingWeaponComboBox->currentText() == "两仪")
+            {
+                // 两仪
+                weaponBonusThread->addBonusWeapon(new LiangYi(weaponBonusThread));
+            }
+            if (ui->throwingWeaponComboBox->currentText() == "暗蚀")
+            {
+                // 暗蚀
+                weaponBonusThread->addBonusWeapon(new AnShi(weaponBonusThread));
+            }
+        }
+        if (ui->currentWeaponListWidget->item(i)->text().contains("战术武器"))
+        {
+            // 战术武器
+            if (ui->tacticalWeaponComboBox->currentText() == "灰核")
+            {
+                // 灰核
+                weaponBonusThread->addBonusWeapon(new HuiHe(weaponBonusThread));
+            }
+        }
+        if (ui->currentWeaponListWidget->item(i)->text().contains("角色"))
+        {
+            // 角色
+            if (ui->characterComboBox->currentText() == "六臂魔童（无中键）")
+            {
+                // 六臂魔童（无中键）
+                weaponBonusThread->addBonusWeapon(new LiuBi(weaponBonusThread));
+            }
+            if (ui->characterComboBox->currentText() == "泰克斯（有X）")
+            {
+                // 泰克斯（有X）
+                weaponBonusThread->addBonusWeapon(new TaiKeSiX(weaponBonusThread));
+            }
+        }
+        if (ui->currentWeaponListWidget->item(i)->text().contains("龙骑兵"))
+        {
+            // 龙骑兵
+            if (ui->longQiComboBox->currentText() == "混沌爆发")
+            {
+                // 混沌爆发
+                weaponBonusThread->addBonusWeapon(new HunDunBaoFa(weaponBonusThread));
+            }
+        }
+    }
 }

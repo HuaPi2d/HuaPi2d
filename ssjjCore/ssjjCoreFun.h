@@ -2,7 +2,7 @@
 #define SSJJCOREFUN_H
 
 #include "universal/programController.h"
-#include "universal/findPicPro.h"
+#include "universal/script/image/findPicPro.h"
 
 struct SSJJRunState
 {

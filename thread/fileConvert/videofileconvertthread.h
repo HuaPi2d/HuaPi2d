@@ -6,7 +6,7 @@
 #include <QFileInfo>
 #include <QRegularExpression>
 
-#include "universal/ffmpegpro.h"
+#include "universal/media/ffmpegpro.h"
 
 class VideoFileConvertThread  : public QThread
 {
