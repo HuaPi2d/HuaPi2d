@@ -5,6 +5,12 @@
 #include <QTableWidgetItem>
 #include <QtNodes/internal/NodeData.hpp>
 #include <QtNodes/internal/GraphicsView.hpp>
+#include <QJsonDocument>
+#include <QJsonObject>
+#include <QJsonArray>
+#include <QFile>
+#include <QStringListModel>
+#include <QListview>
 
 #include "thread/script/ssjjmainthread.h"
 #include "thread/weapons/weaponbonusthread.h"
@@ -65,6 +71,8 @@ private slots:
     void on_startPushButton_clicked();
     void on_endPushButton_clicked();
     void on_singleBonusPushButton_clicked();
+    void on_contineBonusPushButton_clicked();
+    void on_stopBounsPushButton_clicked();
     void getSingleTask();
     void receiveRemindInfo(QString remindInfo);
     void sendNextTask(SSJJRunState res);
@@ -74,6 +82,10 @@ private slots:
     void createNodeEditor();
     void updateCurrentWeaponList();
     void getBounsWeaponList();
+    void saveBounsSettings(QString filePath);
+    void loadBounsSettings(QString filePath);
+    void on_saveBonusConfigPushButton_clicked();
+    void readBonusJsonFiles();
 };
 
 #endif // SUBSSJJWIDGET_H

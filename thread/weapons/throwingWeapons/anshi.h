@@ -2,18 +2,16 @@
 
 #include <QThread>
 #include "universal/script/simulate/mouseKeyboradControl.h"
+#include "thread/weapons/singleweaponthread.h"
 
-class AnShi  : public QThread
+
+class AnShi  : public SingleWeaponThread
 {
 	Q_OBJECT
 
 public:
 	AnShi(QObject *parent);
 	~AnShi();
-
-public:
-	QString name;
-	int times;
 
 protected:
 	void run() override;

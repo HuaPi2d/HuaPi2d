@@ -1,7 +1,7 @@
 #include "hundunbaofa.h"
 
 HunDunBaoFa::HunDunBaoFa(QObject *parent)
-	: QThread(parent)
+	: SingleWeaponThread(parent)
 {
 	name = "HunDunBaoFa";
 	times = 60;

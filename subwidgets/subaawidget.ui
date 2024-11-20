@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>796</width>
-    <height>603</height>
+    <width>1205</width>
+    <height>800</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -17,7 +17,7 @@
    <item>
     <layout class="QVBoxLayout" name="toolPart">
      <item>
-      <widget class="QPushButton" name="findMuiscPushButton">
+      <widget class="QPushButton" name="singleFunctionTestPushButton">
        <property name="minimumSize">
         <size>
          <width>36</width>
@@ -25,7 +25,7 @@
         </size>
        </property>
        <property name="toolTip">
-        <string>单个模块</string>
+        <string>单模块测试</string>
        </property>
        <property name="styleSheet">
         <string notr="true">QPushButton {
@@ -55,7 +55,10 @@ QPushButton:pressed {
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="localMusicPushButton">
+      <widget class="QPushButton" name="rocketSimulationPushButton">
+       <property name="toolTip">
+        <string>弹道模拟</string>
+       </property>
        <property name="styleSheet">
         <string notr="true">QPushButton {
     border: none; 
@@ -73,7 +76,7 @@ QPushButton:pressed {
        </property>
        <property name="icon">
         <iconset resource="../resource.qrc">
-         <normaloff>:/icon/resources/icons/MaterialSymbolsSimCardDownloadOutline.svg</normaloff>:/icon/resources/icons/MaterialSymbolsSimCardDownloadOutline.svg</iconset>
+         <normaloff>:/icon/resources/icons/rocket.svg</normaloff>:/icon/resources/icons/rocket.svg</iconset>
        </property>
        <property name="iconSize">
         <size>
@@ -274,6 +277,65 @@ QPushButton:pressed {
      </layout>
     </widget>
    </item>
+   <item>
+    <widget class="QWidget" name="rocketSimulationWidget" native="true">
+     <layout class="QHBoxLayout" name="horizontalLayout_2">
+      <item>
+       <widget class="QToolBox" name="chooseModelToolBox">
+        <property name="maximumSize">
+         <size>
+          <width>150</width>
+          <height>16777215</height>
+         </size>
+        </property>
+        <property name="currentIndex">
+         <number>0</number>
+        </property>
+        <widget class="QWidget" name="airModelPage">
+         <property name="geometry">
+          <rect>
+           <x>0</x>
+           <y>0</y>
+           <width>113</width>
+           <height>704</height>
+          </rect>
+         </property>
+         <attribute name="label">
+          <string>大气模型</string>
+         </attribute>
+        </widget>
+        <widget class="QWidget" name="page_2">
+         <property name="geometry">
+          <rect>
+           <x>0</x>
+           <y>0</y>
+           <width>113</width>
+           <height>704</height>
+          </rect>
+         </property>
+         <attribute name="label">
+          <string>积分方法</string>
+         </attribute>
+        </widget>
+       </widget>
+      </item>
+      <item>
+       <layout class="QVBoxLayout" name="mainSimPart">
+        <item>
+         <widget class="RocketSimOpenGLWidget" name="openGLWidget">
+          <property name="minimumSize">
+           <size>
+            <width>400</width>
+            <height>200</height>
+           </size>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+     </layout>
+    </widget>
+   </item>
   </layout>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
@@ -282,6 +344,11 @@ QPushButton:pressed {
    <class>TextEditPro</class>
    <extends>QTextEdit</extends>
    <header>customize/texteditpro.h</header>
+  </customwidget>
+  <customwidget>
+   <class>RocketSimOpenGLWidget</class>
+   <extends>QOpenGLWidget</extends>
+   <header>AACustomizeClass/rocketsimopenglwidget.h</header>
   </customwidget>
  </customwidgets>
  <resources>

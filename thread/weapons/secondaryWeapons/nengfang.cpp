@@ -1,7 +1,7 @@
 #include "nengfang.h"
 
 NengFang::NengFang(QObject *parent)
-	: QThread(parent)
+	: SingleWeaponThread(parent)
 {
 	name = "NengFang";
 	times = 35;

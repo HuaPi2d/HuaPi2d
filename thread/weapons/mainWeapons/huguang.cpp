@@ -1,7 +1,7 @@
 #include "huguang.h"
 
 HuGuang::HuGuang(QObject *parent)
-	: QThread(parent)
+	: SingleWeaponThread(parent)
 {
 	name = "HuGuang";
 	times = 5;

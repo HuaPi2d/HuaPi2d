@@ -1,7 +1,7 @@
 #include "limingzhiguang.h"
 
 LiMingZhiGuang::LiMingZhiGuang(QObject *parent)
-	: QThread(parent)
+	: SingleWeaponThread(parent)
 {
 	name = "LiMingZhiGuang";
 	times = -1;

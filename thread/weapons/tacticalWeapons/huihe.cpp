@@ -1,7 +1,7 @@
 #include "huihe.h"
 
 HuiHe::HuiHe(QObject *parent)
-	: QThread(parent)
+	: SingleWeaponThread(parent)
 {
 	name = "HuiHe";
 	times = 25;

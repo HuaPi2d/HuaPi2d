@@ -1,7 +1,7 @@
 #include "shenyu.h"
 
 ShenYu::ShenYu(QObject *parent)
-	: QThread(parent)
+	: SingleWeaponThread(parent)
 {
 	name = "ShenYu";
 	times = 3;

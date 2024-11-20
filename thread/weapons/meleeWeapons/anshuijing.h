@@ -3,18 +3,15 @@
 #include <QObject>
 #include <QThread>
 #include "universal/script/simulate/mouseKeyboradControl.h"
+#include "thread/weapons/singleweaponthread.h"
 
-class AnShuiJing  : public QThread
+class AnShuiJing  : public SingleWeaponThread
 {
 	Q_OBJECT
 
 public:
 	AnShuiJing(QObject *parent);
 	~AnShuiJing();
-
-public:
-	QString name;
-	int times;
 
 protected:
 	void run() override;

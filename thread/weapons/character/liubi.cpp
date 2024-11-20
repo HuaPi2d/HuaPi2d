@@ -1,7 +1,7 @@
 #include "liubi.h"
 
 LiuBi::LiuBi(QObject *parent)
-	: QThread(parent)
+	: SingleWeaponThread(parent)
 {
 	name = "LiuBi";
 	times = 30;

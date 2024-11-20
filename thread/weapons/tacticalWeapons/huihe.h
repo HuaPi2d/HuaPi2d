@@ -3,19 +3,16 @@
 #include <QObject>
 #include <QThread>
 #include "universal/script/simulate/mouseKeyboradControl.h"
+#include "thread/weapons/singleweaponthread.h"
 
 
-class HuiHe  : public QThread
+class HuiHe  : public SingleWeaponThread
 {
 	Q_OBJECT
 
 public:
 	HuiHe(QObject *parent);
 	~HuiHe();
-
-public:
-	QString name;
-	int times;
 
 protected:
 	void run() override;

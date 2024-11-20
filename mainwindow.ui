@@ -403,13 +403,6 @@ QPushButton:pressed {
       </layout>
      </widget>
     </item>
-    <item>
-     <widget class="QQuickWidget" name="quickWidget">
-      <property name="resizeMode">
-       <enum>QQuickWidget::ResizeMode::SizeRootObjectToView</enum>
-      </property>
-     </widget>
-    </item>
    </layout>
   </widget>
   <widget class="QMenuBar" name="menubar">
@@ -728,13 +721,6 @@ QPushButton:pressed {
    </property>
   </action>
  </widget>
- <customwidgets>
-  <customwidget>
-   <class>QQuickWidget</class>
-   <extends>QWidget</extends>
-   <header location="global">QtQuickWidgets/QQuickWidget</header>
-  </customwidget>
- </customwidgets>
  <resources>
   <include location="resource.qrc"/>
  </resources>

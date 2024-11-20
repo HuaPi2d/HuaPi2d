@@ -62,7 +62,7 @@ MainWindow::MainWindow(QWidget *parent)
     ui->menubar->setCornerWidget(downloadContentButton, Qt::TopRightCorner);
 
     /* 加载QQuickWidget控件 */
-    ui->quickWidget->hide();
+    // ui->quickWidget->hide();
 
     connect(downloadContentButton, &QPushButton::clicked, [=](){
         // 获取按钮的全局位置
@@ -220,7 +220,15 @@ void MainWindow::loadThemes()
 
     /* 样式表有关信息 */
     advancedStyleSheet = new acss::QtAdvancedStylesheet(this);
-    advancedStyleSheet->setStylesDirPath(appDir + "/../../styles");  // 设定主题文件路径
+    QDir stylesDir;
+    if (stylesDir.exists(appDir + "/../../styles") == true)
+    {
+        advancedStyleSheet->setStylesDirPath(appDir + "/../../styles");  // 设定主题文件路径
+    }
+    else
+    {
+        advancedStyleSheet->setStylesDirPath(appDir + "/styles");  // 设定主题文件路径
+    }
     advancedStyleSheet->setOutputDirPath(appDir + "/output");
     advancedStyleSheet->setCurrentStyle("qt_material");
     advancedStyleSheet->setDefaultTheme();

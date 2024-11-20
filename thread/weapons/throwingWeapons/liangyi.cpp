@@ -1,7 +1,7 @@
 #include "liangyi.h"
 
 LiangYi::LiangYi(QObject *parent)
-	: QThread(parent)
+	: SingleWeaponThread(parent)
 {
 	name = "LiangYi";
 	times = 45;

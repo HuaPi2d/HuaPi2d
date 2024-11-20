@@ -3,19 +3,15 @@
 #include <QObject>
 #include <QThread>
 #include "universal/script/simulate/mouseKeyboradControl.h"
+#include "thread/weapons/singleweaponthread.h"
 
-
-class LiangYi  : public QThread
+class LiangYi  : public SingleWeaponThread
 {
 	Q_OBJECT
 
 public:
 	LiangYi(QObject *parent);
 	~LiangYi();
-
-public:
-	QString name;
-	int times;
 
 protected:
 	void run() override;

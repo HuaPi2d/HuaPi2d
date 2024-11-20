@@ -1,7 +1,7 @@
 #include "anshi.h"
 
 AnShi::AnShi(QObject *parent)
-	: QThread(parent)
+	: SingleWeaponThread(parent)
 {
 	name = "AnShi";
 	times = -1;

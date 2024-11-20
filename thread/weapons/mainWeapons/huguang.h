@@ -2,19 +2,15 @@
 
 #include <QThread>
 #include "universal/script/simulate/mouseKeyboradControl.h"
+#include "thread/weapons/singleweaponthread.h"
 
-
-class HuGuang  : public QThread
+class HuGuang  : public SingleWeaponThread
 {
 	Q_OBJECT
 
 public:
 	HuGuang(QObject *parent);
 	~HuGuang();
-
-public:
-	QString name;
-	int times;
 
 protected:
 	void run() override;

@@ -30,9 +30,16 @@ public: signals:
 
 private:
 	Ui::SubAAWidgetClass *ui;
+	QVector<QWidget*> widgetList;
+	QWidget* currentWidget;
 
 	void saveSettigs();
 	void loadSettings();
 	void createRemindText();
 	void calculateEulerRotationMatrix();
+	void updateScreen();
+
+private slots:
+	void on_singleFunctionTestPushButton_clicked();
+	void on_rocketSimulationPushButton_clicked();
 };

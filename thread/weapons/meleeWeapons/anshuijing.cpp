@@ -1,7 +1,7 @@
 #include "anshuijing.h"
 
 AnShuiJing::AnShuiJing(QObject *parent)
-	: QThread(parent)
+	: SingleWeaponThread(parent)
 {
 	name = "AnShuiJing";
 	times = 25;

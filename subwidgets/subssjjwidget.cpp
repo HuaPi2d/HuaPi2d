@@ -8,12 +8,17 @@
 #include "thread/weapons/mainWeapons/huguang.h"
 #include "thread/weapons/mainWeapons/shenyu.h"
 #include "thread/weapons/mainWeapons/limingzhiguang.h"
+#include "thread/weapons/mainWeapons/meiying.h"
+#include "thread/weapons/mainWeapons/caijue.h"
 #include "thread/weapons/secondaryWeapons/feisuo.h"
 #include "thread/weapons/secondaryWeapons/nengfang.h"
+#include "thread/weapons/secondaryWeapons/fengshen.h"
 #include "thread/weapons/meleeWeapons/anshuijing.h"
+#include "thread/weapons/meleeWeapons/hantian.h"
 #include "thread/weapons/tacticalWeapons/huihe.h"
 #include "thread/weapons/throwingWeapons/liangyi.h"
 #include "thread/weapons/throwingWeapons/anshi.h"
+#include "thread/weapons/throwingWeapons/tianshu.h"
 #include "thread/weapons/character/liubi.h"
 #include "thread/weapons/character/taikesix.h"
 #include "thread/weapons/longQi/hundunbaofa.h"
@@ -45,8 +50,6 @@ SubSSJJWidget::SubSSJJWidget(QWidget *parent)
     widgetList.append(ui->writeScriptWidget);
     widgetList.append(ui->nodeEditorWidget);
     widgetList.append(ui->bonusWidget);
-    currentWidget = ui->scriptWidget;
-    updateScreen();
     /* 搭建脚本编辑界面 */
     createScriptEditor();
 
@@ -75,6 +78,10 @@ SubSSJJWidget::SubSSJJWidget(QWidget *parent)
     QObject::connect(F11, &QHotkey::activated, ui->endPushButton, &QPushButton::click);
     QHotkey* Ctrl_F = new QHotkey(QKeySequence("Ctrl+F"),true);
     QObject::connect(Ctrl_F, &QHotkey::activated, ui->singleBonusPushButton, &QPushButton::click);
+    QHotkey* Ctrl_M = new QHotkey(QKeySequence("Ctrl+M"),true);
+    QObject::connect(Ctrl_M, &QHotkey::activated, ui->contineBonusPushButton, &QPushButton::click);
+    QHotkey* Ctrl_T = new QHotkey(QKeySequence("Ctrl+T"),true);
+    QObject::connect(Ctrl_T, &QHotkey::activated, ui->stopBounsPushButton, &QPushButton::click);
     runningState = 0;
 
     /* 连接combox更新信号 */
@@ -86,11 +93,26 @@ SubSSJJWidget::SubSSJJWidget(QWidget *parent)
     connect(ui->characterComboBox, &QComboBox::currentIndexChanged, this, &SubSSJJWidget::updateCurrentWeaponList);
     connect(ui->longQiComboBox, &QComboBox::currentIndexChanged, this, &SubSSJJWidget::updateCurrentWeaponList);
 
+    /* 连接配置文件点击信号 */
+    connect(ui->bonusConfigListListView, &QListView::clicked, this, [=](const QModelIndex& index) {
+        // 获取点击的文件名
+        QString fileName = index.data().toString();
+
+        // 获取运行目录下的 bonusConfig 文件夹路径
+        QString configDirPath = QDir(QCoreApplication::applicationDirPath()).filePath("bonusConfig");
+
+        // 拼接文件路径
+        QString filePath = QDir(configDirPath).filePath(fileName);
+
+        // 读取文件内容
+        loadBounsSettings(filePath);
+        });
+
     /* 设置控件属性 */
     // 列表内元素可拖动
     ui->currentWeaponListWidget->setDragDropMode(QAbstractItemView::InternalMove);
 
-    /* 清楚表格 */
+    /* 清除表格 */
     connect(ui->taskTableWidget, &QTableWidget::itemClicked, this, &SubSSJJWidget::clearRow);
 
     loadSettings();
@@ -131,6 +153,7 @@ void SubSSJJWidget::saveSettings()
     setting.setValue("tacticalWeaponList", ui->tacticalWeaponComboBox->currentText());
     setting.setValue("characterList", ui->characterComboBox->currentText());
     setting.setValue("longQiList", ui->longQiComboBox->currentText());
+    setting.setValue("currentPage", widgetList.indexOf(currentWidget));
     QStringList weaponList;
     for (int i = 0; i < ui->currentWeaponListWidget->count(); i++)
     {
@@ -284,8 +307,19 @@ void SubSSJJWidget::loadSettings()
         ui->currentWeaponListWidget->addItem("战术武器");
         ui->currentWeaponListWidget->addItem("角色");
     }
+    if (setting.value("currentPage").toInt() != -1)
+    {
+        currentWidget = widgetList[setting.value("currentPage").toInt()];
+    }
+    else
+    {
+        currentWidget = ui->scriptWidget;
+    }
+    updateScreen();
     setting.endGroup();
     setting.endGroup();
+
+    readBonusJsonFiles();
 }
 
 void SubSSJJWidget::on_testPushButton_clicked()
@@ -529,11 +563,8 @@ void SubSSJJWidget::on_endPushButton_clicked()
 /* 执行单次加成任务 */
 void SubSSJJWidget::on_singleBonusPushButton_clicked()
 {
-    if (ui->singleBonusPushButton->isEnabled() == false) {
-        return;
-    }
-
     ui->singleBonusPushButton->setEnabled(false);
+    ui->contineBonusPushButton->setEnabled(false);
     
     /* 创建加成主线程 */
     weaponBonusThread = new WeaponBonusThread(this);
@@ -548,14 +579,70 @@ void SubSSJJWidget::on_singleBonusPushButton_clicked()
     // 成功结束
     connect(weaponBonusThread, &QThread::finished, this, [=]() {
         ui->singleBonusPushButton->setEnabled(true);
+        ui->contineBonusPushButton->setEnabled(true);
         });
     // 线程意外终止
     connect(weaponBonusThread, &QThread::destroyed, this, [=]() {
+        ui->singleBonusPushButton->setEnabled(true);
+        ui->contineBonusPushButton->setEnabled(true);
+        });
+
+    /* 开启主线程 */
+    weaponBonusThread->start();
+}
+
+/* 连续加成任务 */
+void SubSSJJWidget::on_contineBonusPushButton_clicked()
+{
+    ui->contineBonusPushButton->setEnabled(false);
+    ui->singleBonusPushButton->setEnabled(false);
+
+    /* 创建加成主线程 */
+    weaponBonusThread = new WeaponBonusThread(this);
+
+    /* 获取加成武器线程列表,并传入主线程 */
+    getBounsWeaponList();
+
+    /* 设置加成类型为连续加成 */
+    weaponBonusThread->setBonusType(1);
+
+    /* 是否需要随机移动 */
+    if (ui->randomMoveCheckBox->isChecked() == true)
+    {
+        weaponBonusThread->setIsRandomMove(true);
+    }
+
+    /* 是否发送消息 */
+    if (ui->sendMessageCheckBox->isChecked() == true)
+    {
+        weaponBonusThread->setIsSendMessage(true);
+    }
+
+    /* 接收线程执行情况信息 */
+    // 成功结束
+    connect(weaponBonusThread, &QThread::finished, this, [=]() {
+        ui->contineBonusPushButton->setEnabled(true);
+        ui->singleBonusPushButton->setEnabled(true);
+        });
+    // 线程意外终止
+    connect(weaponBonusThread, &QThread::destroyed, this, [=]() {
+        ui->contineBonusPushButton->setEnabled(true);
         ui->singleBonusPushButton->setEnabled(true);
         });
 
     /* 开启主线程 */
     weaponBonusThread->start();
+}
+
+void SubSSJJWidget::on_stopBounsPushButton_clicked()
+{
+    if (weaponBonusThread != NULL)
+    {
+        if(weaponBonusThread->isFinished() == false)
+        {
+            weaponBonusThread->terminate();
+        }
+    }
 }
 
 void SubSSJJWidget::getSingleTask()
@@ -692,6 +779,16 @@ void SubSSJJWidget::getBounsWeaponList()
                 // 黎明之光
                 weaponBonusThread->addBonusWeapon(new LiMingZhiGuang(weaponBonusThread));
             }
+            if(ui->mainWeaponComboBox->currentText() == "魅影")
+            {
+                // 魅影
+                weaponBonusThread->addBonusWeapon(new MeiYing(weaponBonusThread));
+            }
+            if(ui->mainWeaponComboBox->currentText() == "裁决")
+            {
+                // 裁决
+                weaponBonusThread->addBonusWeapon(new CaiJue(weaponBonusThread));
+            }
         }
         if (ui->currentWeaponListWidget->item(i)->text().contains("副武器"))
         {
@@ -706,6 +803,11 @@ void SubSSJJWidget::getBounsWeaponList()
                 // 能防
                 weaponBonusThread->addBonusWeapon(new NengFang(weaponBonusThread));
             }
+            if (ui->secondaryWeaponComboBox->currentText() == "风神")
+            {
+                // 风神
+                weaponBonusThread->addBonusWeapon(new FengShen(weaponBonusThread));
+            }
         }
         if (ui->currentWeaponListWidget->item(i)->text().contains("近战武器"))
         {
@@ -714,6 +816,11 @@ void SubSSJJWidget::getBounsWeaponList()
             {
                 // 黯水晶
                 weaponBonusThread->addBonusWeapon(new AnShuiJing(weaponBonusThread));
+            }
+            if (ui->meleeWeaponComboBox->currentText() == "撼天")
+            {
+                // 撼天
+                weaponBonusThread->addBonusWeapon(new HanTian(weaponBonusThread));
             }
         }
         if (ui->currentWeaponListWidget->item(i)->text().contains("投掷武器"))
@@ -728,6 +835,11 @@ void SubSSJJWidget::getBounsWeaponList()
             {
                 // 暗蚀
                 weaponBonusThread->addBonusWeapon(new AnShi(weaponBonusThread));
+            }
+            if(ui->throwingWeaponComboBox->currentText() == "天枢")
+            {
+                // 天枢
+                weaponBonusThread->addBonusWeapon(new TianShu(weaponBonusThread));
             }
         }
         if (ui->currentWeaponListWidget->item(i)->text().contains("战术武器"))
@@ -763,4 +875,206 @@ void SubSSJJWidget::getBounsWeaponList()
             }
         }
     }
+}
+
+/* 保存加成设置 */
+void SubSSJJWidget::saveBounsSettings(QString filePath)
+{
+    QJsonObject jsonObject;
+
+    for (int i = 0; i < ui->currentWeaponListWidget->count(); i++) {
+        QString itemText = ui->currentWeaponListWidget->item(i)->text();
+
+        if (itemText.contains("主武器")) {
+            // 主武器
+            QJsonObject mainWeapon;
+            mainWeapon["name"] = ui->mainWeaponComboBox->currentText();
+            mainWeapon["order"] = i;
+            jsonObject["mainWeapon"] = mainWeapon;
+        }
+        else if (itemText.contains("副武器")) {
+            // 副武器
+            QJsonObject secondaryWeapon;
+            secondaryWeapon["name"] = ui->secondaryWeaponComboBox->currentText();
+            secondaryWeapon["order"] = i;
+            jsonObject["secondaryWeapon"] = secondaryWeapon;
+        }
+        else if (itemText.contains("近战武器")) {
+            // 近战武器
+            QJsonObject meleeWeapon;
+            meleeWeapon["name"] = ui->meleeWeaponComboBox->currentText();
+            meleeWeapon["order"] = i;
+            jsonObject["meleeWeapon"] = meleeWeapon;
+        }
+        else if (itemText.contains("投掷武器")) {
+            // 投掷武器
+            QJsonObject throwingWeapon;
+            throwingWeapon["name"] = ui->throwingWeaponComboBox->currentText();
+            throwingWeapon["order"] = i;
+            jsonObject["throwingWeapon"] = throwingWeapon;
+        }
+        else if (itemText.contains("战术武器")) {
+            // 战术武器
+            QJsonObject tacticalWeapon;
+            tacticalWeapon["name"] = ui->tacticalWeaponComboBox->currentText();
+            tacticalWeapon["order"] = i;
+            jsonObject["tacticalWeapon"] = tacticalWeapon;
+        }
+        else if (itemText.contains("角色")) {
+            // 角色
+            QJsonObject character;
+            character["name"] = ui->characterComboBox->currentText();
+            character["order"] = i;
+            jsonObject["character"] = character;
+        }
+        else if (itemText.contains("龙骑兵")) {
+            // 龙骑兵
+            QJsonObject longQi;
+            longQi["name"] = ui->longQiComboBox->currentText();
+            longQi["order"] = i;
+            jsonObject["longQi"] = longQi;
+        }
+    }
+
+    QJsonDocument jsonDoc(jsonObject);
+    QFile file(filePath);
+    if (file.open(QIODevice::WriteOnly)) {
+        file.write(jsonDoc.toJson());
+        file.close();
+    }
+}
+
+void SubSSJJWidget::loadBounsSettings(QString filePath)
+{
+    QFile file(filePath);
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        qWarning() << "Unable to open file for reading:" << filePath;
+        return;
+    }
+
+    QByteArray fileData = file.readAll();
+    file.close();
+
+    QJsonDocument jsonDoc(QJsonDocument::fromJson(fileData));
+    if (jsonDoc.isNull() || !jsonDoc.isObject()) {
+        qWarning() << "Invalid JSON file format:" << filePath;
+        return;
+    }
+
+    QJsonObject jsonObject = jsonDoc.object();
+    struct WeaponInfo {
+        QString type;
+        QString name;
+        int order;
+    };
+
+    QList<WeaponInfo> weaponList;
+
+    // Retrieve each weapon type and store its data in the list with order
+    if (jsonObject.contains("mainWeapon")) {
+        QJsonObject mainWeapon = jsonObject["mainWeapon"].toObject();
+        ui->mainWeaponComboBox->setCurrentText(mainWeapon["name"].toString());
+        weaponList.append({ "主武器", mainWeapon["name"].toString(), mainWeapon["order"].toInt() });
+    }
+    if (jsonObject.contains("secondaryWeapon")) {
+        QJsonObject secondaryWeapon = jsonObject["secondaryWeapon"].toObject();
+        ui->secondaryWeaponComboBox->setCurrentText(secondaryWeapon["name"].toString());
+        weaponList.append({ "副武器", secondaryWeapon["name"].toString(), secondaryWeapon["order"].toInt() });
+    }
+    if (jsonObject.contains("meleeWeapon")) {
+        QJsonObject meleeWeapon = jsonObject["meleeWeapon"].toObject();
+        ui->meleeWeaponComboBox->setCurrentText(meleeWeapon["name"].toString());
+        weaponList.append({ "近战武器", meleeWeapon["name"].toString(), meleeWeapon["order"].toInt() });
+    }
+    if (jsonObject.contains("throwingWeapon")) {
+        QJsonObject throwingWeapon = jsonObject["throwingWeapon"].toObject();
+        ui->throwingWeaponComboBox->setCurrentText(throwingWeapon["name"].toString());
+        weaponList.append({ "投掷武器", throwingWeapon["name"].toString(), throwingWeapon["order"].toInt() });
+    }
+    if (jsonObject.contains("tacticalWeapon")) {
+        QJsonObject tacticalWeapon = jsonObject["tacticalWeapon"].toObject();
+        ui->tacticalWeaponComboBox->setCurrentText(tacticalWeapon["name"].toString());
+        weaponList.append({ "战术武器", tacticalWeapon["name"].toString(), tacticalWeapon["order"].toInt() });
+    }
+    if (jsonObject.contains("character")) {
+        QJsonObject character = jsonObject["character"].toObject();
+        ui->characterComboBox->setCurrentText(character["name"].toString());
+        weaponList.append({ "角色", character["name"].toString(), character["order"].toInt() });
+    }
+    if (jsonObject.contains("longQi")) {
+        QJsonObject longQi = jsonObject["longQi"].toObject();
+        ui->longQiComboBox->setCurrentText(longQi["name"].toString());
+        weaponList.append({ "龙骑兵", longQi["name"].toString(), longQi["order"].toInt() });
+    }
+
+    // Sort weapons by order
+    std::sort(weaponList.begin(), weaponList.end(), [](const WeaponInfo& a, const WeaponInfo& b) {
+        return a.order < b.order;
+        });
+
+    // Clear current list widget and add items in sorted order
+    ui->currentWeaponListWidget->clear();
+    for (const WeaponInfo& weapon : weaponList) {
+        QString displayText = QString("%1-%2").arg(weapon.type, weapon.name);
+        ui->currentWeaponListWidget->addItem(displayText);
+    }
+}
+
+void SubSSJJWidget::on_saveBonusConfigPushButton_clicked()
+{
+    // 确定保存文件夹路径（程序当前运行目录下的 bonusConfig 文件夹）
+    QString saveDir = QDir(QCoreApplication::applicationDirPath()).filePath("bonusConfig");
+
+    // 如果文件夹不存在，创建文件夹
+    QDir dir;
+    if (!dir.exists(saveDir)) {
+        dir.mkpath(saveDir);
+    }
+
+    // 打开文件对话框，获取保存文件名（不含路径）
+    QString fileName = QFileDialog::getSaveFileName(
+        this,
+        tr("Save Bonus Configuration"),
+        saveDir + "/bonus_config.json",  // 默认保存路径和文件名
+        tr("JSON Files (*.json)")  // 文件类型
+    );
+
+    // 检查用户是否选择了文件名
+    if (fileName.isEmpty()) {
+        return;  // 用户取消选择，直接返回
+    }
+
+    // 如果文件名没有 .json 扩展名，则添加
+    if (!fileName.endsWith(".json", Qt::CaseInsensitive)) {
+        fileName += ".json";
+    }
+
+    // 调用保存函数，将数据保存为 JSON 格式
+    saveBounsSettings(fileName);
+
+    // 输出保存路径
+    qDebug() << "File saved to:" << fileName;
+
+    // 更新列表内容
+    readBonusJsonFiles();
+}
+
+void SubSSJJWidget::readBonusJsonFiles()
+{
+    // 获取当前运行目录下的 bonusConfig 文件夹路径
+    QString configDirPath = QDir(QCoreApplication::applicationDirPath()).filePath("bonusConfig");
+
+    // 确认文件夹存在
+    QDir configDir(configDirPath);
+    if (!configDir.exists(configDirPath)) {
+        configDir.mkpath(configDirPath);
+    }
+
+    // 获取 bonusConfig 文件夹下所有 .json 文件名
+    QStringList jsonFiles = configDir.entryList(QStringList() << "*.json", QDir::Files);
+
+    // 将文件名列表显示到 bonusConfigListListView 中
+    auto* model = new QStringListModel(this);
+    model->setStringList(jsonFiles);
+    ui->bonusConfigListListView->setModel(model);
 }

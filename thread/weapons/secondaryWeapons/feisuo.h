@@ -3,8 +3,9 @@
 #include <QObject>
 #include <QThread>
 #include "universal/script/simulate/mouseKeyboradControl.h"
+#include "thread/weapons/singleweaponthread.h"
 
-class FeiSuo  : public QThread
+class FeiSuo  : public SingleWeaponThread
 {
 	Q_OBJECT
 

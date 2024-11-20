@@ -1,7 +1,7 @@
 #include "taikesix.h"
 
 TaiKeSiX::TaiKeSiX(QObject *parent)
-	: QThread(parent)
+	: SingleWeaponThread(parent)
 {
 	name = "TaiKeSiX";
 	times = 45;

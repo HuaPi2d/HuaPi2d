@@ -6,6 +6,10 @@ SubAAWidget::SubAAWidget(QWidget *parent)
 {
 	ui->setupUi(this);
 
+	/* 添加widget至列表 */
+	widgetList.append(ui->singleFunctionWidget);
+	widgetList.append(ui->rocketSimulationWidget);
+
 	/* 限制表格内输入数字*/
 	QLineEdit *heigetLineEdit = new QLineEdit(ui->airTableWidget);
 	QDoubleValidator* validator = new QDoubleValidator(heigetLineEdit);
@@ -58,6 +62,7 @@ void SubAAWidget::saveSettigs()
 	else {
 		setting.setValue("eulerConvertParams", ui->eulerRotationParamsTextEdit->toHtml());
 	}
+	setting.setValue("currentPage", widgetList.indexOf(currentWidget));
 	setting.endGroup();
 }
 
@@ -72,6 +77,15 @@ void SubAAWidget::loadSettings()
 		ui->eulerRotationParamsTextEdit->setHtml(setting.value("eulerConvertParams").toString());
 		ui->eulerRotationParamsTextEdit->currentText = setting.value("eulerConvertParams").toString();
 	}
+	if (setting.value("currentPage").toInt() != -1)
+	{
+		currentWidget = widgetList[setting.value("currentPage").toInt()];
+	}
+	else
+	{
+		currentWidget = ui->singleFunctionWidget;
+	}
+	updateScreen();
 	setting.endGroup();
 }
 
@@ -102,3 +116,30 @@ void SubAAWidget::calculateEulerRotationMatrix()
 	QVector<double> eulerRotationMatrix = euler_rotation_matrix_C(params);
 }
 
+
+/* 界面转换的更新 */
+void SubAAWidget::updateScreen()
+{
+	for (QWidget* m_Widget : widgetList) {
+		if (m_Widget == currentWidget) {
+			m_Widget->show();
+		}
+		else {
+			m_Widget->hide();
+		}
+	}
+}
+
+void SubAAWidget::on_singleFunctionTestPushButton_clicked()
+{
+	qDebug() << "singleFunctionTestPushButton clicked";
+	currentWidget = ui->singleFunctionWidget;
+	updateScreen();
+}
+
+void SubAAWidget::on_rocketSimulationPushButton_clicked()
+{
+	qDebug() << "rocketSimulationPushButton clicked";
+	currentWidget = ui->rocketSimulationWidget;
+	updateScreen();
+}

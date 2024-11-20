@@ -1,7 +1,7 @@
 #include "feisuo.h"
 
 FeiSuo::FeiSuo(QObject *parent)
-	: QThread(parent)
+	: SingleWeaponThread(parent)
 {
 	name = "FeiSuo";
 	times = 18;
