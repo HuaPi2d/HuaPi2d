@@ -7,14 +7,17 @@
 #include <thread/script/entergamethread.h>
 #include <thread/script/runscriptthread.h>
 #include <thread/script/settlementthread.h>
+#include "global/ssjjglobalvar.h"
+#include "thread/script/basic/basicscriptthread.h"
 
-class SSJJMainThread : public QThread
+
+class SSJJMainThread : public BasicScriptThread
 {
     Q_OBJECT
 public:
     explicit SSJJMainThread(QObject *parent = nullptr);
     ~SSJJMainThread();
-    QThread* currentThread;
+    BasicScriptThread* currentThread;
 
 private:
     SingleTask task;
@@ -30,6 +33,8 @@ private:
     void enterGame();
     void runScript();
     void settlement();
+    void changeCurrentThread(BasicScriptThread* thread);
+    void runCurrentThread();
 
 protected:
     void run() override;
@@ -52,6 +57,7 @@ public slots:
     void receiveEnterGameStates(SSJJRunState ssjjRunState);
     void receiveRunScriptStates(SSJJRunState ssjjRunState);
     void receiveSettlementStates(SSJJRunState ssjjRunState);
+    void receiveResolutionPath(QString m_resolution_path);
 };
 
 #endif // SSJJMAINTHREAD_H

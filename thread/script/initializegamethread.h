@@ -4,8 +4,9 @@
 #include <QThread>
 
 #include "ssjjCore/ssjjCoreFun.h"
+#include "thread/script/basic/basicscriptthread.h"
 
-class InitializeGameThread : public QThread
+class InitializeGameThread : public BasicScriptThread
 {
     Q_OBJECT
 public:
@@ -22,6 +23,7 @@ protected:
 
 public: signals:
     void sendStates(SSJJRunState ssjjRunState);
+    void threadFinished();
 };
 
 #endif // INITIALIZEGAMETHREAD_H
