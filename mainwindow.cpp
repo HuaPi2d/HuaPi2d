@@ -109,6 +109,19 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->filesConvert_action, &QAction::triggered, ui->filesConvertPushButton, &QPushButton::click);
     connect(ui->filesConvertPushButton, &QPushButton::clicked, this, &MainWindow::createFilesConvertSubWindow);
 
+    // 开发者模式
+    QHotkey* HUA = new QHotkey(QKeySequence("Ctrl+Shift+H"), true);
+    connect(HUA, &QHotkey::activated, this, [=]() {
+        if (developerMode == false) {
+            this->setWindowTitle(this->windowTitle() + " - 开发者模式");
+            developerMode = true;
+        }
+        else {
+            this->setWindowTitle(this->windowTitle().replace(" - 开发者模式", ""));
+            developerMode = false;
+        }
+        });
+
     /* 获取随机句子 */
     connect(ui->getRandomSentencePushButton, &QPushButton::clicked, this, &MainWindow::getRandomSentence); // 获取随机好文好句
     connect(ui->copySentencePushButton, &QPushButton::clicked, this, &MainWindow::copySentence);  // 复制到剪切板
@@ -170,6 +183,7 @@ void MainWindow::saveSettings()
     setting.setValue("width", this->width());
     setting.setValue("height", this->height());
     setting.setValue("isMaximized", this->isMaximized()); // 窗口大小
+    setting.setValue("developeMode", developerMode); // 开发者模式
     setting.endGroup();
 
     setting.beginGroup("text");
@@ -205,11 +219,37 @@ void MainWindow::loadSettings()
     {
         this->showMaximized();
     }  // 改变窗口大小
+    // 开发者模式
+    if (setting.value("developeMode").toBool() == true)
+    {
+        developerMode = true;
+        this->setWindowTitle(this->windowTitle() + " - 开发者模式");
+    }
+    else
+    {
+        developerMode = false;
+    }
     setting.endGroup();
 
     setting.beginGroup("text");
     ui->randomSentenceLabel->setText(setting.value("randomSentence").toString());
     setting.endGroup();
+
+    hideSomeItems();
+}
+
+void MainWindow::hideSomeItems()
+{
+    if (developerMode == false) {
+        ui->video_pushButton->setVisible(false);
+        ui->files_groupBox->setVisible(false);
+        ui->learning_groupBox->setVisible(false);
+        ui->aa_action->setVisible(false);
+        ui->hardwareDevelopment_action->setVisible(false);
+        ui->filesConvert_action->setVisible(false);
+        ui->video_action->setVisible(false);
+        ui->ranLearning_action->setVisible(false);
+    }
 }
 
 void MainWindow::loadThemes()

@@ -1,8 +1,4 @@
-# HuaPi2D
-
----
-
-[TOC]
+# 画皮`2D`
 
 ---
 
@@ -22,7 +18,29 @@
 
 <img src="README_img/image-20241120164729481-1732094259784-2.png" alt="image-20241120164729481" style="zoom:67%;" />
 
-#### 1.1.2 辅助加成
+**单次运行结果展示：**
+
+<img src="README_img/result.png" alt="result" style="zoom:67%;" />
+
+#### 1.1.2 虚拟机测试脚本
+
+开启过程：
+
+- 连接虚拟机
+
+	<img src="README_img/image-20241125224750305.png" alt="image-20241125224750305" style="zoom: 80%;" /> 
+
+- 修改分辨率为100
+
+- 立即注销
+
+	<img src="README_img/image-20241125224905192.png" alt="image-20241125224905192" style="zoom:67%;" /> 
+
+- 进入桌面
+
+- 增强会话
+
+#### 1.1.3 辅助加成
 
 **界面展示：**
 

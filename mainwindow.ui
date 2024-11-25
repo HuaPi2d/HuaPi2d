@@ -720,6 +720,11 @@ QPushButton:pressed {
     <string>格式转换</string>
    </property>
   </action>
+  <action name="developerModeAction">
+   <property name="text">
+    <string>开发者模式</string>
+   </property>
+  </action>
  </widget>
  <resources>
   <include location="resource.qrc"/>

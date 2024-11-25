@@ -86,10 +86,18 @@
         <file>resources/pic/script/LD_Icon.png</file>
         <file>resources/pic/script/leisure_mode.png</file>
         <file>resources/pic/script/loaded_cover.png</file>
-        <file>resources/pic/script/loading_pic.png</file>
         <file>resources/pic/script/money.png</file>
         <file>resources/pic/script/morningRemind.png</file>
         <file>resources/pic/script/resolutionRatio.png</file>
         <file>resources/pic/script/use_energy.png</file>
+        <file>resources/pic/script/deadRemind.png</file>
+        <file>resources/pic/script/2560-1600/loading_pic.png</file>
+        <file>resources/pic/script/2560-1600/waitPeriod.png</file>
+        <file>resources/pic/script/loading_pic.png</file>
+        <file>resources/pic/script/waitPeriod.png</file>
+        <file>resources/pic/script/VM/loading_pic.png</file>
+        <file>resources/pic/script/VM/waitPeriod.png</file>
+        <file>resources/pic/script/VM/inGamePlayingPage.png</file>
+        <file>resources/pic/script/inGamePlayingPage.png</file>
     </qresource>
 </RCC>

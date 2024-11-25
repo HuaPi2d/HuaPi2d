@@ -11,6 +11,8 @@
 
 #include "otherwidgets/downloadlistwidget.h"
 #include "otherwidgets/singledownloadframe.h"
+#include "global/mainglobalvar.h"
+#include "QHotkey/qhotkey.h"
 
 
 namespace Ui {
@@ -26,6 +28,7 @@ public:
     ~MainWindow();
     void saveSettings();
     void loadSettings();
+    void hideSomeItems();
     void loadThemes();
     void readCustomizedThemeFile();
     void onCustomizedThemesTriggered();
