@@ -63,7 +63,7 @@ void TerminateProcessByID(DWORD processID) {
         if (TerminateProcess(processHandle, 0)) {
             std::cout << "Process terminated successfully." << std::endl;
         } else {
-            std::cerr << "Failed to terminate process." << std::endl;
+            std::cerr << "TerminateProcess failed. Error code: " << GetLastError() << std::endl;
         }
         CloseHandle(processHandle);
     } else {
@@ -74,9 +74,82 @@ void TerminateProcessByID(DWORD processID) {
 void TerminateProcessByName(const std::string& processName){
     DWORD processID = findProcessByName(processName);
     if(processID != DWORD()){
-        TerminateProcessByID(processID);
+        // 递归终止进程树
+        TerminateProcessTree(processID);
     }
     else{
         std::cout << "can't find process." << std::endl;
+    }
+}
+
+bool TerminateProcessByNameAndCheck(const std::string& processName, int nums)
+{
+    for (int i = 0; i < nums; i++) {
+        DWORD processID = findProcessByName(processName);
+        if (processID != DWORD()) {
+            TerminateProcessByID(processID);
+        }
+        else {
+            return true;
+        }
+        QThread::msleep(3000);
+    }
+    return false;
+}
+
+// 获取指定进程的所有子进程ID
+std::vector<DWORD> GetChildProcesses(DWORD parentPID) {
+    std::vector<DWORD> childPIDs;
+    HANDLE hSnapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
+    if (hSnapshot == INVALID_HANDLE_VALUE) {
+        std::cerr << "Failed to create snapshot. Error: " << GetLastError() << std::endl;
+        return childPIDs;
+    }
+
+    PROCESSENTRY32 pe32;
+    pe32.dwSize = sizeof(PROCESSENTRY32);
+
+    if (Process32First(hSnapshot, &pe32)) {
+        do {
+            if (pe32.th32ParentProcessID == parentPID) {
+                childPIDs.push_back(pe32.th32ProcessID);
+            }
+        } while (Process32Next(hSnapshot, &pe32));
+    }
+    else {
+        std::cerr << "Failed to retrieve process information. Error: " << GetLastError() << std::endl;
+    }
+
+    CloseHandle(hSnapshot);
+    return childPIDs;
+}
+
+// 递归终止进程树
+bool TerminateProcessTree(DWORD processID) {
+    // 获取子进程
+    std::vector<DWORD> childPIDs = GetChildProcesses(processID);
+
+    // 递归终止子进程
+    for (DWORD childPID : childPIDs) {
+        TerminateProcessTree(childPID);
+    }
+
+    // 终止当前进程
+    HANDLE processHandle = OpenProcess(PROCESS_TERMINATE, FALSE, processID);
+    if (processHandle) {
+        if (TerminateProcess(processHandle, 0)) {
+            std::cout << "Terminated process: " << processID << std::endl;
+            CloseHandle(processHandle);
+            return true;
+        }
+        else {
+            std::cerr << "Failed to terminate process: " << processID << ". Error: " << GetLastError() << std::endl;
+            CloseHandle(processHandle);
+            return false;
+        }
+    }
+    else {
+        std::cerr << "Unable to open process: " << processID << ". Error: " << GetLastError() << std::endl;
+        return false;
     }
 }

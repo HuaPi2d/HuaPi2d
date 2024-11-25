@@ -1,7 +1,7 @@
 #include "startssjjthread.h"
 
 StartSSJJThread::StartSSJJThread(QObject *parent)
-    : QThread{parent}
+    : BasicScriptThread{parent}
 {}
 
 void StartSSJJThread::receiveParams(QString m_ssjjInstallPath)
@@ -12,7 +12,11 @@ void StartSSJJThread::receiveParams(QString m_ssjjInstallPath)
 void StartSSJJThread::run()
 {
     SSJJRunState state = restartSSJJ(ssjjInstallPath);
-    sendStates(state);
+    emit sendStates(state);
+    if (state.errorType == "NoError") {
+        emit threadFinished();
+    }
     QThread::msleep(1000);
+    // ·¢ËÍÐÅºÅ
     this->deleteLater();
 }

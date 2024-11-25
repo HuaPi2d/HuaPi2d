@@ -15,6 +15,7 @@
 #include <codecvt>
 #include <locale>
 #include <QSettings>
+#include <QThread>
 
 // 获取注册表内容
 QString getRegDitValue(QString RegDitPath, QString key);
@@ -29,5 +30,9 @@ DWORD findProcessByName(const std::string& processName);
 void TerminateProcessByID(DWORD processID);
 
 void TerminateProcessByName(const std::string& processName);
+
+bool TerminateProcessByNameAndCheck(const std::string& processName, int nums = 3);
+
+bool TerminateProcessTree(DWORD processID);
 
 #endif // PROGRAMCONTROLLER_H

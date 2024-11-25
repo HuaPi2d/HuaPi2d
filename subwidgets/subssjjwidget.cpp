@@ -92,6 +92,12 @@ SubSSJJWidget::SubSSJJWidget(QWidget *parent)
     connect(ui->tacticalWeaponComboBox, &QComboBox::currentIndexChanged, this, &SubSSJJWidget::updateCurrentWeaponList);
     connect(ui->characterComboBox, &QComboBox::currentIndexChanged, this, &SubSSJJWidget::updateCurrentWeaponList);
     connect(ui->longQiComboBox, &QComboBox::currentIndexChanged, this, &SubSSJJWidget::updateCurrentWeaponList);
+    connect(textToShowInScreen, &GlobalVariableQString::valueChanged, this, &SubSSJJWidget::receiveDisplayText);
+
+    /* 分辨率选择信息 */
+    connect(ui->radioButton25601440, &QRadioButton::clicked, this, [=]() {resolutionPath = ""; });
+    connect(ui->radioButton25601600, &QRadioButton::clicked, this, [=]() {resolutionPath = "2560-1600/"; });
+    connect(ui->radioButtonVM, &QRadioButton::clicked, this, [=]() {resolutionPath = "VM/"; });
 
     /* 连接配置文件点击信号 */
     connect(ui->bonusConfigListListView, &QListView::clicked, this, [=](const QModelIndex& index) {
@@ -154,6 +160,7 @@ void SubSSJJWidget::saveSettings()
     setting.setValue("characterList", ui->characterComboBox->currentText());
     setting.setValue("longQiList", ui->longQiComboBox->currentText());
     setting.setValue("currentPage", widgetList.indexOf(currentWidget));
+    setting.setValue("resolutionPath", this->resolutionPath);
     QStringList weaponList;
     for (int i = 0; i < ui->currentWeaponListWidget->count(); i++)
     {
@@ -211,7 +218,7 @@ void SubSSJJWidget::loadSettings()
         ui->loadingTimeLineEdit->setText(setting.value("loadingTime").toString());
     }
     else{
-        ui->loadingTimeLineEdit->setText("18");
+        ui->loadingTimeLineEdit->setText("11");
     }
     setting.beginGroup("bonusWeapenList");
      // 加载 combox 内容
@@ -316,10 +323,45 @@ void SubSSJJWidget::loadSettings()
         currentWidget = ui->scriptWidget;
     }
     updateScreen();
+    // 选中分辨率
+    if (setting.value("resolutionPath").toString() != "") {
+        this->resolutionPath = setting.value("resolutionPath").toString();
+    }
+    else {
+        this->resolutionPath = "";
+    }
+    if (this->resolutionPath == "")
+    {
+        ui->radioButton25601440->setChecked(true);
+    }
+    else if (this->resolutionPath == "2560-1600/")
+    {
+        ui->radioButton25601600->setChecked(true);
+    }
+    else if (this->resolutionPath == "VM/")
+    {
+        ui->radioButtonVM->setChecked(true);
+    }
     setting.endGroup();
     setting.endGroup();
 
     readBonusJsonFiles();
+
+    hideSomeItems();
+}
+
+// 隐藏某些控件
+void SubSSJJWidget::hideSomeItems()
+{
+    if (developerMode == false)
+    {
+        ui->terminateUnityPushButton->hide();
+        ui->nodeEditorPushButton->hide();
+        ui->writePushButton->hide();
+        ui->localMusicPushButton->hide();
+        ui->terminateWDLaucherPushButton->hide();
+        ui->terminateMicroClientPushButton->hide();
+    }
 }
 
 void SubSSJJWidget::on_testPushButton_clicked()
@@ -391,6 +433,42 @@ void SubSSJJWidget::on_bonusPushButton_clicked()
 {
     currentWidget = ui->bonusWidget;
     updateScreen();
+}
+
+void SubSSJJWidget::on_terminateUnityPushButton_clicked()
+{
+    if (TerminateProcessByNameAndCheck("SSJJ_BattleClient_Unity.exe"))
+    {
+        writeRemindInfo("<p>已销毁SSJJ_BattleClient_Unity.exe进程</p><br>");
+    }
+    else
+    {
+        writeRemindInfo("<p>销毁SSJJ_BattleClient_Unity.exe进程失败</p><br>");
+    }
+}
+
+void SubSSJJWidget::on_terminateMicroClientPushButton_clicked()
+{
+    if (TerminateProcessByNameAndCheck("MicroClient.exe"))
+    {
+        writeRemindInfo("<p>已销毁MicroClient.exe进程</p><br>");
+    }
+    else
+    {
+        writeRemindInfo("<p>销毁MicroClient.exe进程失败</p><br>");
+    }
+}
+
+void SubSSJJWidget::on_terminateWDLaucherPushButton_clicked()
+{
+    if (TerminateProcessByNameAndCheck("WDlauncher.exe"))
+    {
+        writeRemindInfo("<p>已销毁WDlauncher.exe进程</p><br>");
+    }
+    else
+    {
+        writeRemindInfo("<p>销毁WDlauncher.exe进程失败</p><br>");
+    }
 }
 
 /* 界面转换的更新 */
@@ -479,6 +557,9 @@ void SubSSJJWidget::on_addTaskPushButton_clicked()
         if(ui->teamPropRadioButton->isChecked() == true){
             ui->taskTableWidget->setItem(currentRow - 1, 0, new QTableWidgetItem("团队道具赛"));
         }
+        else if (ui->luanJingRadioButton->isChecked() == true) {
+            ui->taskTableWidget->setItem(currentRow - 1, 0, new QTableWidgetItem("乱境鏖战"));
+        }
     }
     else if(ui->tabWidget->currentWidget() == ui->ZXTab){
 
@@ -515,16 +596,21 @@ void SubSSJJWidget::on_chooseLDScriptPathPushButton_clicked()
 /* 开始运行脚本按钮按下 */
 void SubSSJJWidget::on_startPushButton_clicked()
 {
+    // 检查是否有脚本任务
+    if(ui->taskTableWidget->rowCount() == 0){
+        writeRemindInfo("<p><span style=\"color:red;\"><b>请先添加脚本任务</b></span></p><br>");
+        return;
+    }
+
     // 重置任务次数
     for(int i = 0; i < ui->taskTableWidget->rowCount(); i++){
         ui->taskTableWidget->setItem(i, 3, new QTableWidgetItem(QString::number(0)));
     }
 
-    if(runningState == 1){
+    if(checkThreadRunningState(ssjjMainThread) == 1){
         writeRemindInfo("<p><span style=\"color:red;\"><b>脚本正在运行中，请勿重复点击</b></span></p><br>");
         return;
     }
-    runningState = 1;
     writeRemindInfo("<p><span style=\"color:lightgreen;\"><b>脚本开始运行</b></span></p><br>");
 
     // 脚本逻辑
@@ -537,27 +623,42 @@ void SubSSJJWidget::on_startPushButton_clicked()
     /* 接收任务执行结果 */
     connect(ssjjMainThread, &SSJJMainThread::singleTaskFinished, this, &SubSSJJWidget::sendNextTask);
     connect(ssjjMainThread, &SSJJMainThread::sendFatalError, this, &SubSSJJWidget::receiveFatalError);
-    /* 发送任务 */
-    sendNextTask(SSJJRunState());
+    connect(ssjjMainThread, &SSJJMainThread::sendDisplayText, this, &SubSSJJWidget::receiveDisplayText);
+    /* 定义全局变量 */
+    ssjjMainThread->receiveResolutionPath(this->resolutionPath);
     /* 开始执行 */
     ssjjMainThread->start();
+    /* 发送任务 */
+    sendNextTask(SSJJRunState());
 }
 
 void SubSSJJWidget::on_endPushButton_clicked()
 {
-    if(runningState == 0){
+    // 检查是否有脚本正在运行
+    if(checkThreadRunningState(ssjjMainThread) != 1) {
         writeRemindInfo("<p><span style=\"color:red;\"><b>当前没有脚本运行</b></span></p><br>");
         return;
     }
 
     // 强制停止逻辑
     if(ssjjMainThread->isFinished() == false){
-        ssjjMainThread->stopThread();
-        ssjjMainThread->terminate();
+        forceQuitSSJJThread();
     }
 
-    runningState = 0;
     writeRemindInfo("<p><span style=\"color:lightgreen;\"><b>脚本运行已结束</b></span></p><br>");
+}
+
+void SubSSJJWidget::forceQuitSSJJThread()
+{
+    ssjjMainThread->stopThread();
+    ssjjMainThread->terminate();
+    ssjjMainThread->deleteLater();
+    ssjjMainThread = nullptr;
+}
+
+void SubSSJJWidget::receiveDisplayText(QString text)
+{
+    ShowTextInScreenWidget::showText(this, text, QPoint(50, 50), 1000);
 }
 
 /* 执行单次加成任务 */
@@ -645,6 +746,7 @@ void SubSSJJWidget::on_stopBounsPushButton_clicked()
     }
 }
 
+/* 获取单个任务 */
 void SubSSJJWidget::getSingleTask()
 {
     for(int i = 0; i < ui->taskTableWidget->rowCount(); i++){
@@ -657,7 +759,10 @@ void SubSSJJWidget::getSingleTask()
     }
 
     // 运行结束
-    runningState = 0;
+    ssjjMainThread->stopThread();
+    ssjjMainThread->terminate();
+    ssjjMainThread->deleteLater();
+    ssjjMainThread = nullptr;
 }
 
 void SubSSJJWidget::receiveRemindInfo(QString remindInfo)
@@ -668,28 +773,36 @@ void SubSSJJWidget::receiveRemindInfo(QString remindInfo)
 /* 发送下一个任务 */
 void SubSSJJWidget::sendNextTask(SSJJRunState res)
 {
-    /* 执行成功更新表格 */
+    /* 执行成功 */
     if(res.errorType == "Success"){
         for(int i = 0; i < ui->taskTableWidget->rowCount(); i++){
             if(ui->taskTableWidget->item(i, 3)->text().toInt() < ui->taskTableWidget->item(i, 2)->text().toInt()){
+                /* 显示信息 */
+                writeRemindInfo("<p>" + currentTask.taskName + "-" + QString::number(ui->taskTableWidget->item(i, 3)->text().toInt() + 1) + " " + getYYYYMMDDHHMMSS() + "</p><br>");
+                /* 更新表格 */
                 ui->taskTableWidget->setItem(i, 3, new QTableWidgetItem(QString::number(ui->taskTableWidget->item(i, 3)->text().toInt() + 1)));
+                break;
             }
         }
     }
+    else if (res.errorType == "FatalError") {
+        emit on_endPushButton_clicked();
+        return;
+    }
 
+    // 获取下一个任务
     getSingleTask();
 
-    if(runningState == 1){
+    if(checkThreadRunningState(ssjjMainThread) == 1){
         emit sendSingleTask(currentTask, ssjjInstallPath, ui->moveSpeedLineEdit->text().toInt(), ui->singleScriptTimeLineEdit->text().toInt(), ui->loadingTimeLineEdit->text().toInt());
     }
     else{
         // 强制停止逻辑
-        if(ssjjMainThread->isFinished() == false){
+        /*if(ssjjMainThread->isFinished() == false){
             if(ssjjMainThread->currentThread != new QThread()){
-                ssjjMainThread->stopThread();
+                forceQuitSSJJThread();
             }
-            ssjjMainThread->terminate();
-        }
+        }*/
         writeRemindInfo("<p><span style=\"color:lightgreen;\"><b>全部任务已执行完毕</b></span></p><br>");
         writeRemindInfo("<p><span style=\"color:lightgreen;\"><b>脚本运行已结束</b></span></p><br>");
     }

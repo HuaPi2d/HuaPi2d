@@ -2,9 +2,11 @@
 #define RUNSCRIPTTHREAD_H
 
 #include <QThread>
+#include <QProcess>
 #include "ssjjCore/ssjjCoreFun.h"
+#include "thread/script/basic/basicscriptthread.h"
 
-class RunScriptThread : public QThread
+class RunScriptThread : public BasicScriptThread
 {
     Q_OBJECT
 public:
@@ -22,6 +24,7 @@ protected:
 
 public: signals:
     void sendStates(SSJJRunState ssjjRunState);
+    void threadFinished();
 };
 
 #endif // RUNSCRIPTTHREAD_H

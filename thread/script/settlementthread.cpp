@@ -1,7 +1,7 @@
 #include "settlementthread.h"
 
 SettlementThread::SettlementThread(QObject *parent)
-    : QThread{parent}
+    : BasicScriptThread{parent}
 {}
 
 void SettlementThread::receiveParams(QString m_taskName)
@@ -12,8 +12,12 @@ void SettlementThread::receiveParams(QString m_taskName)
 void SettlementThread::run()
 {
     SSJJRunState res = settlement(taskName);
-    /* 返回初始化结果 */
     emit sendStates(res);
+    if (res.errorType == "Success")
+    {
+        emit threadFinished();
+    }
     QThread::msleep(1000);
+    /* 返回初始化结果 */
     this->deleteLater();
 }

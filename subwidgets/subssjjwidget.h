@@ -14,6 +14,10 @@
 
 #include "thread/script/ssjjmainthread.h"
 #include "thread/weapons/weaponbonusthread.h"
+#include "universal/timeFun/pctime.h"
+#include "thread/checkthreadstate.h"
+#include "subwidgets/unversal/showtextinscreenwidget.h"
+
 
 class QsciScintilla;
 
@@ -44,6 +48,7 @@ private:
     SSJJMainThread* ssjjMainThread;
     QsciScintilla* scriptEditor;
     WeaponBonusThread* weaponBonusThread;
+    QString resolutionPath;
 
 private: signals:
     void widgetClosed();
@@ -56,6 +61,7 @@ private: signals:
 private slots:
     void saveSettings();
     void loadSettings();
+    void hideSomeItems();
     void on_testPushButton_clicked();
     void on_closePushButton_clicked();
     void writeRemindInfo(QString htmlString);
@@ -64,12 +70,17 @@ private slots:
     void on_writePushButton_clicked();
     void on_nodeEditorPushButton_clicked();
     void on_bonusPushButton_clicked();
+    void on_terminateUnityPushButton_clicked();
+    void on_terminateMicroClientPushButton_clicked();
+    void on_terminateWDLaucherPushButton_clicked();
     void updateScreen();
     void on_chooseLauncherPathPushButton_clicked();
     void on_addTaskPushButton_clicked();
     void on_chooseLDScriptPathPushButton_clicked();
     void on_startPushButton_clicked();
     void on_endPushButton_clicked();
+    void forceQuitSSJJThread();
+    void receiveDisplayText(QString text);
     void on_singleBonusPushButton_clicked();
     void on_contineBonusPushButton_clicked();
     void on_stopBounsPushButton_clicked();
