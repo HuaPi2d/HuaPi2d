@@ -88,7 +88,7 @@ cv::Point findAndClick(QString picPath, int timeLimit, int interval)
     }
 }
 
-cv::Point findAndClickAndCheck(QString picPath, int waitTime, int timeLimit, int interval){
+cv::Point findAndClickAndConfirm(QString picPath, int waitTime, int timeLimit, int interval){
     cv::Point res = findAndClick(picPath, timeLimit, interval);
     QThread::msleep(waitTime);
     if(findPicInFullScreen(picPath) != cv::Point(-1, -1)){
@@ -96,6 +96,21 @@ cv::Point findAndClickAndCheck(QString picPath, int waitTime, int timeLimit, int
     }
     return res;
 }
+
+bool findAndClickAndCheck(QString picPath, int waitTime, int timeLimit, int interval)
+{
+    cv::Point res = findAndClick(picPath, timeLimit, interval);
+    QThread::msleep(waitTime);
+    if (findPicInFullScreen(picPath) != cv::Point(-1, -1)) {
+        // 点击后，依然存在图标，说明点击失败
+        return false;
+    }
+    else {
+        // 点击后，图标消失，说明点击成功
+        return true;
+    }
+}
+
 
 SSJJRunState restartSSJJ(QString ssjjInstallPath){
     SSJJRunState ssjjRunState;
@@ -225,7 +240,7 @@ SSJJRunState initiallizeGameScreen(QString taskName){
     findAndClick(":/pic/script/resources/pic/script/confirm_exit_channel.png", 3000);
     if(taskName == "团队道具赛" || taskName == "乱境鏖战"){
         // 乱斗模式
-        findAndClickAndCheck(":/pic/script/resources/pic/script/leisure_mode.png", 3000);
+        findAndClickAndConfirm(":/pic/script/resources/pic/script/leisure_mode.png", 3000);
         findAndClick(":/pic/script/resources/pic/script/LD_Icon.png", 8000);
         QThread::msleep(3000);
         picList.clear();
@@ -306,7 +321,7 @@ SSJJRunState enterGame(SingleTask task, int loadingTimes){
     QString state;
 
     if(task.taskName == "团队道具赛"){
-        findAndClickAndCheck(":/pic/script/resources/pic/script/LD_begin.png", 3000);
+        findAndClickAndConfirm(":/pic/script/resources/pic/script/LD_begin.png", 3000);
         findAndClick(":/pic/script/resources/pic/script/morningRemind.png", 3000);
         QThread::msleep(loadingTimes * 1000);
         for(int i = 0; i < 20; i++){
@@ -347,12 +362,20 @@ SSJJRunState enterGame(SingleTask task, int loadingTimes){
     }
     else if (task.taskName == "乱境鏖战")
     {
-        findAndClickAndCheck(":/pic/script/resources/pic/script/LD_begin.png", 3000);
-        findAndClick(":/pic/script/resources/pic/script/morningRemind.png", 3000);
+        findAndClickAndConfirm(":/pic/script/resources/pic/script/LD_begin.png", 3000);
+        if (findAndClickAndCheck(":/pic/script/resources/pic/script/morningRemind.png", 3000) == false)
+        {
+            // 开启超背
+            findAndClick(":/pic/script/resources/pic/script/checkBox.png", 3000);
+            ssjjRunState.errorType = "Error";
+            ssjjRunState.remindText = "";
+            ssjjRunState.nextStep = "enterGame";
+            return ssjjRunState;
+        }
         state = checkCurrentState(3000);
         if (state == "startPage")
         {
-            findAndClickAndCheck(":/pic/script/resources/pic/script/LD_begin.png", 3000);
+            findAndClickAndConfirm(":/pic/script/resources/pic/script/LD_begin.png", 3000);
             findAndClick(":/pic/script/resources/pic/script/morningRemind.png", 3000);
         }
         QThread::msleep(loadingTimes * 1000 - 3000);

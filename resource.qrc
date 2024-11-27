@@ -99,5 +99,6 @@
         <file>resources/pic/script/VM/waitPeriod.png</file>
         <file>resources/pic/script/VM/inGamePlayingPage.png</file>
         <file>resources/pic/script/inGamePlayingPage.png</file>
+        <file>resources/pic/script/checkBox.png</file>
     </qresource>
 </RCC>
