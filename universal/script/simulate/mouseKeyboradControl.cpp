@@ -107,3 +107,10 @@ void keyDown(BYTE virtualKeyCode)
 {
     keybd_event(virtualKeyCode, 0, 0, 0);
 }
+
+void inputString(QString str)
+{
+    for (int i = 0; i < str.length(); i++) {
+        keyPress(str[i].toLatin1(), 10);
+    }
+}

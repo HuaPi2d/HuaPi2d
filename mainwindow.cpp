@@ -172,6 +172,15 @@ void MainWindow::onStyleManagerStylesheetChanged()
     qApp->setStyleSheet(advancedStyleSheet->styleSheet());
 }
 
+void MainWindow::receiveDsizeInfo(int dwidth, int dheight)
+{
+    // 获取当前窗口大小
+    QSize currentSize = this->size();
+
+    // 设置窗口大小
+    this->resize(QSize(currentSize.width() + dwidth, currentSize.height() + dheight));
+}
+
 void MainWindow::saveSettings()
 {
     /* 声明对象 */
@@ -675,6 +684,9 @@ void MainWindow::createRandomLearningSubWindow()
         /* 销毁任务栏按钮 */
         taskButton->deleteLater();
     });
+
+    // 连接窗口大小变化信号
+    connect(randomLearningWindow, &RandomLearningWindow::sendDsizeInfo, this, &MainWindow::receiveDsizeInfo);
 }
 
 void MainWindow::createSSJJSubWindow()

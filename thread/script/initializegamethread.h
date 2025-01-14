@@ -13,10 +13,10 @@ public:
     explicit InitializeGameThread(QObject *parent = nullptr);
 
 private:
-    QString taskName;
+    SingleTask m_task;
 
 public slots:
-    void receiveParams(QString m_taskName);
+    void receiveParams(SingleTask task);
 
 protected:
     void run() override;

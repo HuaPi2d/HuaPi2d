@@ -1,12 +1,16 @@
-#ifndef CHECKTHREADSTATE_H
+ï»¿#ifndef CHECKTHREADSTATE_H
 #define CHECKTHREADSTATE_H
 
 #include <QThread>
+#include <QDebug>
+#include <QPointer>
 
-// ¼ì²éÏß³ÌÊÇ·ñÕıÔÚÔËĞĞ
-// -1 Ïß³Ì²»´æÔÚ
-// 0 Ïß³ÌÎ´ÔÚÔËĞĞ
-// 1 Ïß³ÌÕıÔÚÔËĞĞ
+// æ£€æŸ¥çº¿ç¨‹æ˜¯å¦æ­£åœ¨è¿è¡Œ
+// -1 çº¿ç¨‹ä¸å­˜åœ¨
+// 0 çº¿ç¨‹æœªåœ¨è¿è¡Œ
+// 1 çº¿ç¨‹æ­£åœ¨è¿è¡Œ
 int checkThreadRunningState(QThread* thread);
+
+void forceQuitThread(QThread* thread);
 
 #endif

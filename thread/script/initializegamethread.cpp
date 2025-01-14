@@ -4,14 +4,14 @@ InitializeGameThread::InitializeGameThread(QObject *parent)
     : BasicScriptThread{parent}
 {}
 
-void InitializeGameThread::receiveParams(QString m_taskName)
+void InitializeGameThread::receiveParams(SingleTask task)
 {
-    taskName = m_taskName;
+    m_task = task;
 }
 
 void InitializeGameThread::run()
 {
-    SSJJRunState res = initiallizeGameScreen(taskName);
+    SSJJRunState res = initiallizeGameScreen(m_task);
     emit sendStates(res);
     if (res.errorType == "NoError")
     {

@@ -4,7 +4,7 @@ HuGuang::HuGuang(QObject *parent)
 	: SingleWeaponThread(parent)
 {
 	name = "HuGuang";
-	times = 5;
+	times = 3;
 }
 
 HuGuang::~HuGuang()

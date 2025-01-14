@@ -1,10 +1,10 @@
-#include "checkthreadstate.h"
+ï»¿#include "checkthreadstate.h"
 
 
-// ¼ì²éÏß³ÌÊÇ·ñÕýÔÚÔËÐÐ
-// -1 Ïß³Ì²»´æÔÚ
-// 0 Ïß³ÌÎ´ÔÚÔËÐÐ
-// 1 Ïß³ÌÕýÔÚÔËÐÐ
+// æ£€æŸ¥çº¿ç¨‹æ˜¯å¦æ­£åœ¨è¿è¡Œ
+// -1 çº¿ç¨‹ä¸å­˜åœ¨
+// 0 çº¿ç¨‹æœªåœ¨è¿è¡Œ
+// 1 çº¿ç¨‹æ­£åœ¨è¿è¡Œ
 int checkThreadRunningState(QThread* thread)
 {
 	if (thread == nullptr) {
@@ -18,4 +18,11 @@ int checkThreadRunningState(QThread* thread)
 			return 1;
 		}
 	}
+}
+
+void forceQuitThread(QThread* thread)
+{
+	thread->terminate();
+	thread->deleteLater();
+	thread = nullptr;
 }

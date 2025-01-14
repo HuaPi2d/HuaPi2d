@@ -1,5 +1,4 @@
 #include "subssjjwidget.h"
-#include "ui_subssjjwidget.h"
 #include "thread/script/startssjjthread.h"
 #include "thread/script/initializegamethread.h"
 #include "universal/programController.h"
@@ -10,28 +9,23 @@
 #include "thread/weapons/mainWeapons/limingzhiguang.h"
 #include "thread/weapons/mainWeapons/meiying.h"
 #include "thread/weapons/mainWeapons/caijue.h"
+#include "thread/weapons/mainWeapons/liexi.h"
+#include "thread/weapons/mainWeapons/suixing.h"
 #include "thread/weapons/secondaryWeapons/feisuo.h"
 #include "thread/weapons/secondaryWeapons/nengfang.h"
 #include "thread/weapons/secondaryWeapons/fengshen.h"
 #include "thread/weapons/meleeWeapons/anshuijing.h"
 #include "thread/weapons/meleeWeapons/hantian.h"
+#include "thread/weapons/meleeWeapons/moyunhe.h"
 #include "thread/weapons/tacticalWeapons/huihe.h"
 #include "thread/weapons/throwingWeapons/liangyi.h"
 #include "thread/weapons/throwingWeapons/anshi.h"
 #include "thread/weapons/throwingWeapons/tianshu.h"
 #include "thread/weapons/character/liubi.h"
+#include "thread/weapons/character/lunhua.h"
 #include "thread/weapons/character/taikesix.h"
 #include "thread/weapons/longQi/hundunbaofa.h"
 
-
-#include <QSettings>
-#include <QFileDialog>
-#include <QMessageBox>
-#include <QIntValidator>
-#include <QComboBox>
-#include <QScrollBar>
-#include <Qsci/qsciscintilla.h>
-#include <qlayout.h>
 
 // 获取生死狙击安装路径
 QString getSSJJInstallPath() {
@@ -50,8 +44,6 @@ SubSSJJWidget::SubSSJJWidget(QWidget *parent)
     widgetList.append(ui->writeScriptWidget);
     widgetList.append(ui->nodeEditorWidget);
     widgetList.append(ui->bonusWidget);
-    /* 搭建脚本编辑界面 */
-    createScriptEditor();
 
     /* 搭建图形编辑器 */
     createNodeEditor();
@@ -59,29 +51,19 @@ SubSSJJWidget::SubSSJJWidget(QWidget *parent)
     /* 脚本框设置 */
     ui->remindTextEdit->setReadOnly(true);
     ui->taskTableWidget->setEditTriggers(QAbstractItemView::NoEditTriggers);
-    ui->testPushButton->setVisible(false);
     writeRemindInfo("<p>欢迎使用<b>生死狙击脚本</b>工具</p><p><span style=\"font-size: 13px; color: red;\">使用时注意本栏信息</span></p><p>请开启<span style=\"font-size: 13px; color: red;\"><b>自动登录</b></span></p>");
     ui->launcherPathLineEdit->setReadOnly(true);
     ui->LDScriptPathLineEdit->setReadOnly(true);
     QIntValidator *validator = new QIntValidator(0, 999, this);
     ui->moveSpeedLineEdit->setValidator(validator);
     ui->LDRunTimesLineEdit->setValidator(validator);
+    ui->zxRunTimesLineEdit->setValidator(validator);
     QIntValidator *loadingTimeValidator = new QIntValidator(0, 99, this);
     ui->loadingTimeLineEdit->setValidator(loadingTimeValidator);
     QIntValidator *validatorScriptTime = new QIntValidator(0, 20, this);
     ui->singleScriptTimeLineEdit->setValidator(validatorScriptTime);
 
     /* 热键设置 */
-    QHotkey* F10 = new QHotkey(QKeySequence("F10"),true);
-    QObject::connect(F10, &QHotkey::activated, ui->startPushButton, &QPushButton::click);
-    QHotkey* F11 = new QHotkey(QKeySequence("F11"),true);
-    QObject::connect(F11, &QHotkey::activated, ui->endPushButton, &QPushButton::click);
-    QHotkey* Ctrl_F = new QHotkey(QKeySequence("Ctrl+F"),true);
-    QObject::connect(Ctrl_F, &QHotkey::activated, ui->singleBonusPushButton, &QPushButton::click);
-    QHotkey* Ctrl_M = new QHotkey(QKeySequence("Ctrl+M"),true);
-    QObject::connect(Ctrl_M, &QHotkey::activated, ui->contineBonusPushButton, &QPushButton::click);
-    QHotkey* Ctrl_T = new QHotkey(QKeySequence("Ctrl+T"),true);
-    QObject::connect(Ctrl_T, &QHotkey::activated, ui->stopBounsPushButton, &QPushButton::click);
     runningState = 0;
 
     /* 连接combox更新信号 */
@@ -121,10 +103,38 @@ SubSSJJWidget::SubSSJJWidget(QWidget *parent)
     /* 清除表格 */
     connect(ui->taskTableWidget, &QTableWidget::itemClicked, this, &SubSSJJWidget::clearRow);
 
-    loadSettings();
+    /* 设置脚本编辑界面 */
+    // 设置标签页为可关闭
+    ui->scriptalTabWidget->setTabsClosable(true);
+    ui->fileAttributesTableWidget->verticalHeader()->setVisible(false);
+    ui->fileAttributesTableWidget->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+    ui->fileAttributesTableWidget->setEditTriggers(QAbstractItemView::NoEditTriggers);
+    
+    // 连接脚本编辑界面信号和槽
+    connect(ui->scriptalTabWidget, &QTabWidget::tabCloseRequested, this, &SubSSJJWidget::closeTab);
+    connect(ui->scriptalTabWidget, &QTabWidget::currentChanged, this, &SubSSJJWidget::currentTabChanged);
+
+    /* 主线关卡标签页的Combox的联动更新 */
+    connect(ui->zxChapterChooseComboBox, &QComboBox::currentTextChanged, this, [=]() {
+        currentChoosedZXChapter = ZXGameData::getChapterByName(ui->zxChapterChooseComboBox->currentText());
+        updateZXLevelChooseComboBox();
+        });
+    connect(ui->zxLevelComboBox, &QComboBox::currentTextChanged, this, [=]() {
+        for(ZXLevel level: currentChoosedZXChapter.levels){
+            if(level.name == ui->zxLevelComboBox->currentText()){
+                currentChoosedZXLevel = level;
+                break;
+            }
+        }
+        updateZXDiffcultyChooseComboBox();
+        updateZXScriptPathComboBox();
+        });
 
     writeRemindInfo("<p><span style=\"color: red;\">请确保在每次启动游戏时不会弹出以下图片</p><br>");
     writeRemindInfo("<img src=\"tips/ensure_ratio.png\" width=\"250\" alt=\"提示图片\"><br>");
+
+    // 创建数据库
+    ssjjScriptalFilesDatabase = new SSJJScriptalFilesDatabase("ssjjScriptalFiles.db", this);
 }
 
 SubSSJJWidget::~SubSSJJWidget()
@@ -138,6 +148,7 @@ void SubSSJJWidget::closeEvent(QCloseEvent *event)
     emit widgetClosed();
 }
 
+// 保存配置
 void SubSSJJWidget::saveSettings()
 {
     /* 声明对象 */
@@ -151,6 +162,10 @@ void SubSSJJWidget::saveSettings()
     setting.setValue("LDScriptPath", ui->LDScriptPathLineEdit->text());
     setting.setValue("singleScriptTime", ui->singleScriptTimeLineEdit->text());
     setting.setValue("loadingTime", ui->loadingTimeLineEdit->text());
+    setting.setValue("ifResetTimes", ui->ifResetTimesCheckBox->isChecked());
+    setting.setValue("passWordMode", passWordMode);
+    setting.setValue("enterGamePassWord", enterGamePassWord);
+
     setting.beginGroup("bonusWeapenList");
     setting.setValue("mainWeaponList", ui->mainWeaponComboBox->currentText());
     setting.setValue("secondaryWeaponList", ui->secondaryWeaponComboBox->currentText());
@@ -168,9 +183,33 @@ void SubSSJJWidget::saveSettings()
     }
     setting.setValue("currentWeaponList", weaponList);
     setting.endGroup();
+
+    setting.beginGroup("scriptEditor");
+    QString fileName;
+    QString savePath;
+    QStringList openFiles;
+    for (ScpLanguageEditor* editor : scpLanguageEditors)
+    {
+        fileName = editor->getFileName();
+        savePath = editor->getSavePath();
+        openFiles.append(savePath + "/" + fileName);
+    }
+    setting.setValue("openFiles", openFiles);
+    setting.endGroup();
+
+    // 保存主线关卡设置
+    setting.beginGroup("zxSetttings");
+    setting.setValue("chapter", ui->zxChapterChooseComboBox->currentText());
+    setting.setValue("level", ui->zxLevelComboBox->currentText());
+    setting.setValue("difficulty", ui->diffcultyChooseComboBox->currentText());
+    setting.setValue("runTimes", ui->zxRunTimesLineEdit->text());
+    setting.setValue("scriptPath", ui->zxChapterChooseComboBox->currentText());
+    setting.endGroup();
+
     setting.endGroup();
 }
 
+// 读取配置
 void SubSSJJWidget::loadSettings()
 {
     /* 声明对象 */
@@ -220,6 +259,25 @@ void SubSSJJWidget::loadSettings()
     else{
         ui->loadingTimeLineEdit->setText("11");
     }
+    if(setting.value("ifResetTimes").toString() != ""){
+        ui->ifResetTimesCheckBox->setChecked(setting.value("ifResetTimes").toBool());
+    }
+    else{
+        ui->ifResetTimesCheckBox->setChecked(false);
+    }
+    if(setting.value("passWordMode").toString() != ""){
+        passWordMode = setting.value("passWordMode").toInt();
+    }
+    else{
+        passWordMode = 1;
+    }
+    if(setting.value("enterGamePassWord").toString() != ""){
+        enterGamePassWord = setting.value("enterGamePassWord").toString();
+    }
+    else{
+        enterGamePassWord = "HuaPi2D";
+    }
+
     setting.beginGroup("bonusWeapenList");
      // 加载 combox 内容
     if (setting.value("mainWeaponList").toString() != "") {
@@ -343,6 +401,94 @@ void SubSSJJWidget::loadSettings()
         ui->radioButtonVM->setChecked(true);
     }
     setting.endGroup();
+
+    setting.beginGroup("scriptEditor");
+    if (setting.value("openFiles").toStringList() != QStringList()) {
+        for (QString filePath : setting.value("openFiles").toStringList()) {
+            QFileInfo fileInfo(filePath);
+            // 判断文件是否被删除或改名
+            QFile file(fileInfo.absoluteFilePath());
+            if (!file.exists()) {
+                QMessageBox::StandardButton button = QMessageBox::warning(this, "错误",
+                    file.fileName() + "文件不在" + filePath + "路径下，是否重新选择文件所在位置？", QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes);
+                if (button == QMessageBox::Yes)
+                {
+                    // 选择新文件，文件类型与当前文件相同
+                    QString newFilePath = QFileDialog::getOpenFileName(this, "选择文件", QDir::currentPath(), "脚本文件(*.scp);;乱斗脚本(*.lscp);;主线脚本(*.zscp)");
+                    if (newFilePath.isEmpty()) {
+                        return;
+                    }
+                    else {
+                        QFileInfo newfileInfo(newFilePath);
+                        this->creatNewScriptEditorTab(newfileInfo.fileName(), newfileInfo.path(), readFileAttributes(newfileInfo.absoluteFilePath()));
+                    }
+                }
+                else {
+                    return;
+                }
+            }
+            this->creatNewScriptEditorTab(fileInfo.fileName(), fileInfo.path(), readFileAttributes(fileInfo.absoluteFilePath()));
+        }
+    }
+    setting.endGroup();
+
+    // 读取主线关卡设置
+    setting.beginGroup("zxSetttings");
+    // 读取章节置 zxChapterChooseComboBox 内
+    for (ZXChapter chapter : ZXGameData::getChapters())
+    {
+        ui->zxChapterChooseComboBox->addItem(chapter.name);
+    }
+    if (setting.value("chapter").toString() != "") {
+        ui->zxChapterChooseComboBox->setCurrentText(setting.value("chapter").toString());
+    }
+    else {
+        ui->zxChapterChooseComboBox->setCurrentIndex(0);
+    }
+    currentChoosedZXChapter = ZXGameData::getChapterByName(ui->zxChapterChooseComboBox->currentText());
+    updateZXLevelChooseComboBox();
+    // 读取关卡置 zxLevelComboBox 内
+    if (setting.value("level").toString() != "") {
+        ui->zxLevelComboBox->setCurrentText(setting.value("level").toString());
+    }
+    else {
+        ui->zxLevelComboBox->setCurrentIndex(0);
+    }
+    for (ZXLevel level : currentChoosedZXChapter.levels)
+    {
+        if (level.name == ui->zxLevelComboBox->currentText())
+        {
+            currentChoosedZXLevel = level;
+            break;
+        }
+    }
+    updateZXDiffcultyChooseComboBox();
+    // 读取关卡难度至 diffcultyChooseComboBox 内
+    if (setting.value("difficulty").toString() != "") {
+        ui->diffcultyChooseComboBox->setCurrentText(setting.value("difficulty").toString());
+    }
+    else {
+        ui->diffcultyChooseComboBox->setCurrentIndex(0);
+    }
+    if (setting.value("runTimes").toString() != "") {
+        ui->zxRunTimesLineEdit->setText(setting.value("runTimes").toString());
+    }
+    else {
+        ui->zxRunTimesLineEdit->setText("3");
+    }
+
+    // 读取当前数据库脚本文件至 zxScriptPathComboBox 内
+    updateZXScriptPathComboBox();
+    if (setting.value("scriptPath").toString() != "") {
+        ui->zxScriptPathComboBox->setCurrentText(setting.value("scriptPath").toString());
+    }
+    else
+    {
+        ui->zxScriptPathComboBox->setCurrentIndex(0);
+    }
+    
+    setting.endGroup();
+
     setting.endGroup();
 
     readBonusJsonFiles();
@@ -355,9 +501,9 @@ void SubSSJJWidget::hideSomeItems()
 {
     if (developerMode == false)
     {
+        ui->testPushButton->hide();
         ui->terminateUnityPushButton->hide();
         ui->nodeEditorPushButton->hide();
-        ui->writePushButton->hide();
         ui->localMusicPushButton->hide();
         ui->terminateWDLaucherPushButton->hide();
         ui->terminateMicroClientPushButton->hide();
@@ -366,20 +512,11 @@ void SubSSJJWidget::hideSomeItems()
 
 void SubSSJJWidget::on_testPushButton_clicked()
 {
-    StartSSJJThread* startSSJJThread = new StartSSJJThread();
-    connect(this, &SubSSJJWidget::sendRestartParams, startSSJJThread, &StartSSJJThread::receiveParams);
-    connect(startSSJJThread, &StartSSJJThread::sendStates, this, [=](SSJJRunState res){
-        ui->remindTextEdit->insertHtml(res.remindText);
-        if(res.errorType == "FatalError"){
-            return;
-        }
-        else if(res.errorType == "Error"){
-            ui->remindTextEdit->insertHtml("<p>正在尝试重新启动</p>");
-            return;
-        }
-    });
-    emit sendRestartParams(ssjjInstallPath);
-    startSSJJThread->start();
+    QStringList fileList = ssjjScriptalFilesDatabase->getFilesFromDatabase("工业一");
+    for (QString file : fileList)
+    {
+        qDebug() << file;
+    }
 }
 
 void SubSSJJWidget::on_closePushButton_clicked()
@@ -482,6 +619,8 @@ void SubSSJJWidget::updateScreen()
             m_Widget->hide();
         }
     }
+
+    emit updateMenuBar(currentWidget);
 }
 
 /* 选择启动器路径 */
@@ -528,17 +667,18 @@ bool isAnyRadioButtonChecked(QWidget *widget) {
 /* 添加脚本任务 */
 void SubSSJJWidget::on_addTaskPushButton_clicked()
 {
-    if(isAnyRadioButtonChecked(ui->tabWidget->currentWidget())){
-        ui->taskTableWidget->setRowCount(ui->taskTableWidget->rowCount() + 1);
-        currentRow = ui->taskTableWidget->rowCount();
-    }
-    else{
-        writeRemindInfo("<p>请<span style=\"color:red;\"><b>先选择关卡</b></span>后再添加任务</p><br>");
-        return;
-    }
+    // 乱斗模式
+    if (ui->tabWidget->currentWidget() == ui->LDTab) {
+        if (isAnyRadioButtonChecked(ui->tabWidget->currentWidget())) {
+            ui->taskTableWidget->setRowCount(ui->taskTableWidget->rowCount() + 1);
+            currentRow = ui->taskTableWidget->rowCount();
+        }
+        else {
+            writeRemindInfo("<p>请<span style=\"color:red;\"><b>先选择关卡</b></span>后再添加任务</p><br>");
+            return;
+        }
 
-    if(ui->tabWidget->currentWidget() == ui->LDTab){
-        if(ui->LDRunTimesLineEdit->text() == ""){
+        if (ui->LDRunTimesLineEdit->text() == "") {
             writeRemindInfo("<p><span style=\"color:red;\"><b>关卡运行次数</b></span>未指定</p><br>");
             ui->taskTableWidget->removeRow(currentRow - 1);
             return;
@@ -547,49 +687,86 @@ void SubSSJJWidget::on_addTaskPushButton_clicked()
         ui->taskTableWidget->setItem(currentRow - 1, 1, new QTableWidgetItem("无"));
         ui->taskTableWidget->setItem(currentRow - 1, 2, new QTableWidgetItem(ui->LDRunTimesLineEdit->text()));
         ui->taskTableWidget->setItem(currentRow - 1, 3, new QTableWidgetItem("0"));
-        if(ui->LDScriptPathLineEdit->text() != ""){
+        if (ui->LDScriptPathLineEdit->text() != "") {
             ui->taskTableWidget->setItem(currentRow - 1, 4, new QTableWidgetItem(ui->LDScriptPathLineEdit->text()));
         }
-        else{
+        else {
             ui->taskTableWidget->setItem(currentRow - 1, 4, new QTableWidgetItem("未选择"));
         }
 
-        if(ui->teamPropRadioButton->isChecked() == true){
+        if (ui->teamPropRadioButton->isChecked() == true) {
             ui->taskTableWidget->setItem(currentRow - 1, 0, new QTableWidgetItem("团队道具赛"));
         }
         else if (ui->luanJingRadioButton->isChecked() == true) {
             ui->taskTableWidget->setItem(currentRow - 1, 0, new QTableWidgetItem("乱境鏖战"));
         }
+        else if (ui->challenHeroRadioButton->isChecked() == true) {
+            ui->taskTableWidget->setItem(currentRow - 1, 0, new QTableWidgetItem("挑战王者"));
+        }
+        ui->taskTableWidget->setItem(currentRow - 1, 5, new QTableWidgetItem("王者乱斗"));
     }
-    else if(ui->tabWidget->currentWidget() == ui->ZXTab){
+    // 主线关卡
+    else if (ui->tabWidget->currentWidget() == ui->ZXTab) {
+        if (ui->zxRunTimesLineEdit->text() == "")
+        {
+            writeRemindInfo("<p><span style=\"color:red;\"><b>关卡运行次数</b></span>未指定</p><br>");
+            return;
+        }
+        if (ui->zxScriptPathComboBox->currentText() == "")
+        {
+            writeRemindInfo("<p><span style=\"color:red;\"><b>脚本路径</b></span>未指定</p><br>");
+            return;
+        }
 
+        // 添加新的一行
+        ui->taskTableWidget->setRowCount(ui->taskTableWidget->rowCount() + 1);
+        currentRow = ui->taskTableWidget->rowCount();
+
+        // 添加信息
+        ui->taskTableWidget->setItem(currentRow - 1, 0, new QTableWidgetItem(currentChoosedZXLevel.name));
+        ui->taskTableWidget->setItem(currentRow - 1, 1, new QTableWidgetItem(ui->diffcultyChooseComboBox->currentText()));
+        ui->taskTableWidget->setItem(currentRow - 1, 2, new QTableWidgetItem(ui->zxRunTimesLineEdit->text()));
+        ui->taskTableWidget->setItem(currentRow - 1, 3, new QTableWidgetItem("0"));
+        ui->taskTableWidget->setItem(currentRow - 1, 4, new QTableWidgetItem(ui->zxScriptPathComboBox->currentText()));
+        ui->taskTableWidget->setItem(currentRow - 1, 5, new QTableWidgetItem("主线关卡"));
     }
 }
 
 /* 选择脚本 */
 void SubSSJJWidget::on_chooseLDScriptPathPushButton_clicked()
 {
-    // 设置文件过滤器，只允许选择 .exe 文件
-    QString filter = "Script File (*.scp)";
+    // 设置文件过滤器，只允许选择 .scp或.lscp 文件
+    QString filter = "乱斗脚本 (*.lscp);; 脚本文件 (*.scp)";
 
     // 打开文件选择对话框
-    QString fileName = QFileDialog::getOpenFileName(this, "请选择乱斗脚本文件(LD结尾)",  "", filter);
+    QString fileName = QFileDialog::getOpenFileName(this, "请选择乱斗脚本文件",  "", filter);
 
     // 检查用户是否选择了文件
     if (!fileName.isEmpty()) {
-        // 检查选择的文件是否是 乱斗脚本
-        QFileInfo fileInfo(fileName);
-        if (fileInfo.fileName().contains("LD")) {
-            // 如果是 乱斗脚本，执行进一步操作
-            ui->LDScriptPathLineEdit->setText(fileName);
-        } else {
-            // 如果不是 乱斗脚本，弹出警告提示
-            QMessageBox::information(this, "提示", "选择的可能不是乱斗脚本");
-            ui->LDScriptPathLineEdit->setText(fileName);
-        }
+        ui->LDScriptPathLineEdit->setText(fileName);
     }
     else{
         ui->LDScriptPathLineEdit->setText("");
+    }
+}
+
+void SubSSJJWidget::on_chooseZXScriptPathPushButton_clicked()
+{
+    // 打开文件选择对话框
+    QString fileName = QFileDialog::getOpenFileName(this, "请选择主线关卡脚本文件", "", "主线脚本 (*.zscp);; 脚本文件 (*.scp)");
+    if (!fileName.isEmpty()) {
+        // 查看文件是否在 zxScriptPathComboBox 中
+        if (ui->zxScriptPathComboBox->findText(fileName) != -1) 
+        {
+            ui->zxScriptPathComboBox->setCurrentText(fileName);
+        }
+        else 
+        {
+            ui->zxScriptPathComboBox->addItem(fileName);
+            ui->zxScriptPathComboBox->setCurrentText(fileName);
+            // 保存文件至数据库
+            ssjjScriptalFilesDatabase->readFileIntoDatabase(QFileInfo(fileName));
+        }
     }
 }
 
@@ -603,10 +780,14 @@ void SubSSJJWidget::on_startPushButton_clicked()
     }
 
     // 重置任务次数
-    for(int i = 0; i < ui->taskTableWidget->rowCount(); i++){
-        ui->taskTableWidget->setItem(i, 3, new QTableWidgetItem(QString::number(0)));
+    if (ui->ifResetTimesCheckBox->isChecked() == true)
+    {
+        for (int i = 0; i < ui->taskTableWidget->rowCount(); i++) {
+            ui->taskTableWidget->setItem(i, 3, new QTableWidgetItem(QString::number(0)));
+        }
     }
 
+    qDebug() << "开始运行脚本";
     if(checkThreadRunningState(ssjjMainThread) == 1){
         writeRemindInfo("<p><span style=\"color:red;\"><b>脚本正在运行中，请勿重复点击</b></span></p><br>");
         return;
@@ -712,11 +893,19 @@ void SubSSJJWidget::on_contineBonusPushButton_clicked()
     {
         weaponBonusThread->setIsRandomMove(true);
     }
+    else
+    {
+        weaponBonusThread->setIsRandomMove(false);
+    }
 
     /* 是否发送消息 */
     if (ui->sendMessageCheckBox->isChecked() == true)
     {
         weaponBonusThread->setIsSendMessage(true);
+    }
+    else
+    {
+        weaponBonusThread->setIsSendMessage(false);
     }
 
     /* 接收线程执行情况信息 */
@@ -754,7 +943,29 @@ void SubSSJJWidget::getSingleTask()
             currentTask.taskName = ui->taskTableWidget->item(i, 0)->text();
             currentTask.difficulty = ui->taskTableWidget->item(i, 1)->text();
             currentTask.script = ui->taskTableWidget->item(i, 4)->text();
-            return;
+            
+            if (ui->taskTableWidget->item(i, 5)->text() == "王者乱斗")
+            {
+                currentTask.taskType = Task::LuanDou;
+            }
+            else if (ui->taskTableWidget->item(i, 5)->text() == "主线关卡")
+            {
+                currentTask.taskType = Task::ZhuXian;
+            }
+
+            // 检查脚本文件是否存在
+            if (currentTask.script != "未选择" && !QFile::exists(currentTask.script))
+            {
+                writeRemindInfo("<p><span style=\"color:red;\"><b>" + currentTask.script + "脚本文件不存在</b></span></p><br>");
+                // 清除该行
+                ui->taskTableWidget->removeRow(i);
+                i--;
+                continue;
+            }
+            else
+            {
+                return;
+            }
         }
     }
 
@@ -817,14 +1028,6 @@ void SubSSJJWidget::clearRow(QTableWidgetItem *item)
 {
     int row = item->row();  // 获取当前点击的行
     ui->taskTableWidget->removeRow(row);  // 删除该行
-}
-
-void SubSSJJWidget::createScriptEditor()
-{
-    QLayout* qsciLayout = new QVBoxLayout;
-    scriptEditor = new QsciScintilla(this);
-    ui->qsciWidget->setLayout(qsciLayout);
-    qsciLayout->addWidget(scriptEditor);
 }
 
 void SubSSJJWidget::createNodeEditor()
@@ -902,6 +1105,16 @@ void SubSSJJWidget::getBounsWeaponList()
                 // 裁决
                 weaponBonusThread->addBonusWeapon(new CaiJue(weaponBonusThread));
             }
+            if (ui->mainWeaponComboBox->currentText() == "裂隙行者")
+            {
+                // 裂隙行者
+                weaponBonusThread->addBonusWeapon(new LieXi(weaponBonusThread));
+            }
+            if (ui->mainWeaponComboBox->currentText() == "碎星")
+            {
+                // 碎星
+                weaponBonusThread->addBonusWeapon(new SuiXing(weaponBonusThread));
+            }
         }
         if (ui->currentWeaponListWidget->item(i)->text().contains("副武器"))
         {
@@ -934,6 +1147,11 @@ void SubSSJJWidget::getBounsWeaponList()
             {
                 // 撼天
                 weaponBonusThread->addBonusWeapon(new HanTian(weaponBonusThread));
+            }
+            if (ui->meleeWeaponComboBox->currentText() == "墨韵·合")
+            {
+                // 墨韵·合
+                weaponBonusThread->addBonusWeapon(new MoYunHe(weaponBonusThread));
             }
         }
         if (ui->currentWeaponListWidget->item(i)->text().contains("投掷武器"))
@@ -971,6 +1189,11 @@ void SubSSJJWidget::getBounsWeaponList()
             {
                 // 六臂魔童（无中键）
                 weaponBonusThread->addBonusWeapon(new LiuBi(weaponBonusThread));
+            }
+            if (ui->characterComboBox->currentText() == "轮滑")
+            {
+                // 轮滑
+                weaponBonusThread->addBonusWeapon(new LunHua(weaponBonusThread));
             }
             if (ui->characterComboBox->currentText() == "泰克斯（有X）")
             {
@@ -1190,4 +1413,218 @@ void SubSSJJWidget::readBonusJsonFiles()
     auto* model = new QStringListModel(this);
     model->setStringList(jsonFiles);
     ui->bonusConfigListListView->setModel(model);
+}
+
+void SubSSJJWidget::closeTab(int index)
+{
+    if (index != 0) {
+        // 获取当前标签页的编辑器
+        ScpLanguageEditor* editor = scpLanguageEditors.at(index - 1);
+        // 从编辑器列表中删除
+        scpLanguageEditors.removeOne(editor);
+        if (editor) {
+            // 在这里可以执行关闭前的其他操作，比如保存文件等
+            editor->deleteLater();  // 删除编辑器对象
+        }
+
+        // 移除标签页
+        ui->scriptalTabWidget->removeTab(index);
+
+        // 如果标签页数量为 1，则显示欢迎页
+        if (ui->scriptalTabWidget->count() == 1) {
+            ui->scriptalTabWidget->setTabVisible(0, true);
+        }
+    }
+    else {
+        // 关闭欢迎页，显示第一个标签页
+        ui->scriptalTabWidget->setTabVisible(0, false);
+    }
+}
+
+void SubSSJJWidget::updateZXLevelChooseComboBox()
+{
+    ui->zxLevelComboBox->clear();
+    for (ZXLevel level : currentChoosedZXChapter.levels) {
+        ui->zxLevelComboBox->addItem(level.name);
+    }
+    ui->zxLevelComboBox->setCurrentIndex(0);
+    currentChoosedZXLevel = currentChoosedZXChapter.levels.at(0);
+}
+
+void SubSSJJWidget::updateZXDiffcultyChooseComboBox()
+{
+    ui->diffcultyChooseComboBox->clear();
+    for (DifficultyMode mode : currentChoosedZXLevel.modes)
+    {
+        ui->diffcultyChooseComboBox->addItem(mode.name);
+    }
+}
+
+void SubSSJJWidget::updateZXScriptPathComboBox()
+{
+    ui->zxScriptPathComboBox->clear();
+    QStringList scriptPaths = ssjjScriptalFilesDatabase->getFilesFromDatabase(currentChoosedZXLevel.name);
+    for (QString scriptPath : scriptPaths)
+    {
+        ui->zxScriptPathComboBox->addItem(scriptPath);
+    }
+}
+
+void SubSSJJWidget::currentTabChanged(int index)
+{
+    if (index > 0) {
+        // 获取当前标签页的编辑器
+        ScpLanguageEditor* editor = scpLanguageEditors.at(index - 1);
+        // 获取文件编辑器打开文件的文件属性
+        QList<FileAttribute> fileAttributes = editor->getFileAttributes();
+        // 更新 fileAttributesTableWidget 内容
+        ui->fileAttributesTableWidget->clearContents();
+        ui->fileAttributesTableWidget->setRowCount(0);
+        for (FileAttribute attribute : fileAttributes) {
+            int row = ui->fileAttributesTableWidget->rowCount();
+            ui->fileAttributesTableWidget->insertRow(row);
+            if (attribute.name == "speed") {
+                ui->fileAttributesTableWidget->setItem(row, 0, new QTableWidgetItem(attribute.name));
+                QLineEdit* speedLineEdit = new QLineEdit();
+                speedLineEdit->setText(attribute.value);
+                QValidator* speedValidator = new QIntValidator(0, 999, this);
+                speedLineEdit->setValidator(speedValidator);
+                ui->fileAttributesTableWidget->setCellWidget(row, 1, speedLineEdit);
+                connect(speedLineEdit, &QLineEdit::textChanged, [=]() {
+                    QList<FileAttribute> fileAttributes = editor->getFileAttributes();
+                    for (FileAttribute& attribute : fileAttributes) {
+                        if (attribute.name == "speed") {
+                            attribute.value = speedLineEdit->text();
+                            break;
+                        }
+                    }
+                    editor->receiveFileAttributes(fileAttributes);
+                });
+            }
+            else {
+                ui->fileAttributesTableWidget->setItem(row, 0, new QTableWidgetItem(attribute.name));
+                ui->fileAttributesTableWidget->setItem(row, 1, new QTableWidgetItem(attribute.value));
+            }
+            
+        }
+    }
+    else if (index == 0) {
+        // 清空 fileAttributesTableWidget 内容
+        ui->fileAttributesTableWidget->clearContents();
+        ui->fileAttributesTableWidget->setRowCount(0);
+    }
+}
+
+void SubSSJJWidget::getCurrentScriptEditor()
+{
+    if (ui->scriptalTabWidget->currentIndex() > 0) {
+        // 找到当前标签页
+        currentScriptEditor = scpLanguageEditors.at(ui->scriptalTabWidget->currentIndex() - 1);
+    }
+    else {
+        currentScriptEditor = nullptr;
+    }
+}
+
+void SubSSJJWidget::receiveWarningMessage(QString title, QString message)
+{
+    QMessageBox::warning(this, title, message);
+}
+
+// 创建新的文件编辑标签页
+void SubSSJJWidget::creatNewScriptEditorTab(QString fileName, QString filePath, QList<FileAttribute> fileAttributes)
+{
+    // 新建编辑器对象
+    ScpLanguageEditor* newEditor = new ScpLanguageEditor(this);
+    // 判断文件是否已经打开
+    for (ScpLanguageEditor* editor : scpLanguageEditors)
+    {
+        if (editor->getFileName() == fileName && editor->getSavePath() == filePath)
+        {
+            // 文件已经打开，直接转到该标签页
+            ui->scriptalTabWidget->setCurrentWidget(editor);
+            // 删除newEditor 对象
+            newEditor->deleteLater();
+            return;
+        }
+        else if (editor->getFileName() == fileName && editor->getSavePath() != filePath)
+        {
+            // 文件名相同，但路径不同，在原标签页上添加路径信息
+            int index = ui->scriptalTabWidget->indexOf(editor);
+            ui->scriptalTabWidget->setTabText(index, fileName + " (" + filePath + ")");
+            // 新建标签页
+            ui->scriptalTabWidget->addTab(newEditor, fileName + " (" + filePath + ")");
+            // 创建新的标签页
+            newEditor->receiveFileInfo(fileName, filePath, fileAttributes);
+            scpLanguageEditors.append(newEditor);
+            // 转到新建标签页
+            ui->scriptalTabWidget->setCurrentWidget(newEditor);
+            return;
+        }
+    }
+    // 创建新的标签页
+    ui->scriptalTabWidget->addTab(newEditor, fileName);
+    newEditor->receiveFileInfo(fileName, filePath, fileAttributes);
+    scpLanguageEditors.append(newEditor);
+
+    // 转到新建标签页
+    ui->scriptalTabWidget->setCurrentWidget(newEditor);
+
+    // 隐藏欢迎页
+    ui->scriptalTabWidget->setTabVisible(0, false);
+}
+
+void SubSSJJWidget::readFilesIntoSSJJDatabase(QDir dir)
+{
+    ssjjScriptalFilesDatabase->readFilesIntoDatabase(dir);
+    updateZXScriptPathComboBox();
+}
+
+void SubSSJJWidget::saveFile()
+{
+    // 找到当前标签页
+    getCurrentScriptEditor();
+    if (currentScriptEditor == nullptr) {
+        return;  // 当前标签页无效，直接返回
+    }
+    // 保存文件
+    currentScriptEditor->saveFile();
+    // 将文件相关信息写入数据库
+    ssjjScriptalFilesDatabase->readFileIntoDatabase(currentScriptEditor->getFileInfo());
+    // 更新 zxScriptPathComboBox 内容
+    updateZXScriptPathComboBox();
+}
+
+void SubSSJJWidget::testCurrentScript()
+{
+    if (checkThreadRunningState(testScriptThread) == 1)
+    {
+        textToShowInScreen->setValue("当前有脚本正在测试");
+        return;
+    }
+
+    getCurrentScriptEditor();
+    if (currentScriptEditor == nullptr) {
+        return;  // 当前标签页无效，直接返回
+    }
+     
+    currentScriptEditor->saveFile();
+    testScriptThread = new TestScriptThread(currentScriptEditor->getFileInfo(), this);
+    connect(testScriptThread, &TestScriptThread::sendWarningMessage, this, &SubSSJJWidget::receiveWarningMessage);
+
+    testScriptThread->start();
+    connect(testScriptThread, &TestScriptThread::finished, [=]() {testScriptThread->deleteLater(); });
+}
+
+void SubSSJJWidget::stopTestScript()
+{
+    int state = checkThreadRunningState(testScriptThread);
+    if (state == -1)
+    {
+        return;
+    }
+    else if (state == 1)
+    {
+        forceQuitThread(testScriptThread);
+    }
 }

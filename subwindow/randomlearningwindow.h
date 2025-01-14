@@ -16,6 +16,7 @@ signals:
     void sendStateInfo(QString state);
     void windowDestroyed(QMdiSubWindow *window);
     void downloadFinished();
+    void sendDsizeInfo(int dwidth, int dheight);
 };
 
 #endif // RANDOMLEARNINGWINDOW_H

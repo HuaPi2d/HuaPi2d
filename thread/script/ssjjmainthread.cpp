@@ -28,7 +28,7 @@ void SSJJMainThread::initializeGameScreen()
         initializeGameThread->sendDisplayText("Initialize Success");
         });
 
-    emit sendInitializeGameParams(task.taskName);
+    emit sendInitializeGameParams(task);
 }
 
 // 重启SSJJ
@@ -118,7 +118,7 @@ void SSJJMainThread::settlement()
         settlementThread->sendDisplayText("Task finished");
         });
 
-    emit sendSettlementParams(task.taskName);
+    emit sendSettlementParams(task);
 }
 
 // 切换线程

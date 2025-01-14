@@ -43,7 +43,7 @@ void WeaponBonusThread::run()
 			{
 				randomMove();
 			}
-			else 
+			else
 			{
 				QThread::msleep(1000);
 			}

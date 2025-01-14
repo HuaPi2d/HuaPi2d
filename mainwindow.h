@@ -63,6 +63,8 @@ private:
 private slots:
     void onThemeActionTriggered();
     void onStyleManagerStylesheetChanged();
+    // 改变窗口大小
+    void receiveDsizeInfo(int dwidth, int dheight);
 
 public: signals:
     void isAnyChildWindow();

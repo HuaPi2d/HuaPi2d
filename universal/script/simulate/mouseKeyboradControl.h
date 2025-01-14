@@ -32,5 +32,6 @@ void mouseClick(int x, int y);
 void keyPress(BYTE virtualKeyCode, int interval = 50);
 void keyRelease(BYTE virtualKeyCode);
 void keyDown(BYTE virtualKeyCode);
+void inputString(QString str);
 
 #endif // MOUSEKEYBORADCONTROL_H

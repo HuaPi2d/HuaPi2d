@@ -478,15 +478,6 @@ QPushButton:pressed {
    <property name="windowTitle">
     <string>toolBar</string>
    </property>
-   <property name="styleSheet">
-    <string notr="true">QToolBar{background-color:rgb(231, 234, 248);}</string>
-   </property>
-   <property name="movable">
-    <bool>false</bool>
-   </property>
-   <property name="allowedAreas">
-    <set>Qt::ToolBarArea::RightToolBarArea</set>
-   </property>
    <attribute name="toolBarArea">
     <enum>RightToolBarArea</enum>
    </attribute>
@@ -596,15 +587,6 @@ QPushButton:pressed {
    </property>
    <property name="text">
     <string>恢复默认配置</string>
-   </property>
-  </action>
-  <action name="video_action">
-   <property name="icon">
-    <iconset resource="resource.qrc">
-     <normaloff>:/icon/resources/icons/MaterialSymbolsMediaLinkOutline.svg</normaloff>:/icon/resources/icons/MaterialSymbolsMediaLinkOutline.svg</iconset>
-   </property>
-   <property name="text">
-    <string>视频解析</string>
    </property>
   </action>
   <action name="music_action">
@@ -723,6 +705,15 @@ QPushButton:pressed {
   <action name="developerModeAction">
    <property name="text">
     <string>开发者模式</string>
+   </property>
+  </action>
+  <action name="video_action">
+   <property name="icon">
+    <iconset resource="resource.qrc">
+     <normaloff>:/icon/resources/icons/MaterialSymbolsMediaLinkOutline.svg</normaloff>:/icon/resources/icons/MaterialSymbolsMediaLinkOutline.svg</iconset>
+   </property>
+   <property name="text">
+    <string>视频解析</string>
    </property>
   </action>
  </widget>

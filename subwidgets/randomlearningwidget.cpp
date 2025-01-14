@@ -13,16 +13,143 @@ RandomLearningWidget::RandomLearningWidget(QWidget *parent)
     // 设置最小值和最大值
     ui->doubleSpinBox->setMinimum(10);  // 设置下限为 1
     ui->doubleSpinBox->setMaximum(30); // 设置上限为 100
+
+    // 加载配置
+    loadSettings();
+
+    // 更新界面
+    updateWidget();
+
+    // 加载数据库至列表
+    loadDatabaseToList();
 }
 
 RandomLearningWidget::~RandomLearningWidget()
 {
+    // 保存配置
+    saveSetttings();
     delete ui;
 }
 
 void RandomLearningWidget::closeEvent(QCloseEvent *event)
 {
     emit widgetClosed();
+}
+
+void RandomLearningWidget::saveSetttings()
+{
+    /* 声明对象 */
+    QSettings setting(qApp->applicationDirPath() + "/userSettings.ini", QSettings::IniFormat);
+
+    /* 写入配置 */
+    setting.beginGroup("randomLearning");
+    setting.setValue("autoSave", ui->autoSaveCheckBox->isChecked());
+    setting.setValue("viewDataList", ui->viewDataListCheckBox->isChecked());
+    setting.setValue("readOnly", ui->readonlyCheckBox->isChecked());
+    setting.setValue("viewKeyWords", ui->viewKeyWordsCheckBox->isChecked());
+    setting.setValue("highlight", ui->highlightCheckBox->isChecked());
+    setting.endGroup();
+}
+
+void RandomLearningWidget::loadSettings()
+{
+    /* 声明对象 */
+    QSettings setting(qApp->applicationDirPath() + "/userSettings.ini", QSettings::IniFormat);
+
+    /* 读取配置 */
+    setting.beginGroup("randomLearning");
+    if (setting.value("autoSave").toString() != "")
+    {
+        ui->autoSaveCheckBox->setChecked(setting.value("autoSave").toBool());
+    }
+    else
+    {
+        ui->autoSaveCheckBox->setChecked(true);
+    }
+    if (setting.value("viewDataList").toString() != "")
+    {
+        ui->viewDataListCheckBox->setChecked(setting.value("viewDataList").toBool());
+    }
+    else
+    {
+        ui->viewDataListCheckBox->setChecked(false);
+    }
+    if (setting.value("readOnly").toString() != "")
+    {
+        ui->readonlyCheckBox->setChecked(setting.value("readOnly").toBool());
+    }
+    else
+    {
+        ui->readonlyCheckBox->setChecked(false);
+    }
+    if (setting.value("viewKeyWords").toString() != "")
+    {
+        ui->viewKeyWordsCheckBox->setChecked(setting.value("viewKeyWords").toBool());
+    }
+    else
+    {
+        ui->viewKeyWordsCheckBox->setChecked(false);
+    }
+    if (setting.value("highlight").toString() != "")
+    {
+        ui->highlightCheckBox->setChecked(setting.value("highlight").toBool());
+    }
+    else
+    {
+        ui->highlightCheckBox->setChecked(false);
+    }
+    setting.endGroup();
+}
+
+void RandomLearningWidget::updateWidget()
+{
+    if (ui->viewDataListCheckBox->isChecked() == true)
+    {
+        if (ui->questionListHorizontalWidget->isHidden() == true)
+        {
+            // 设置窗口大小
+            emit this->sendDsizeInfo(ui->questionListHorizontalWidget->maximumWidth(), 0);
+            // 显示数据列表
+            ui->questionListHorizontalWidget->show();
+        }
+    }
+    else
+    {
+        if (ui->questionListHorizontalWidget->isHidden() == false)
+        {
+            // 设置窗口大小
+            emit this->sendDsizeInfo(-ui->questionListHorizontalWidget->maximumWidth(), 0);
+            // 隐藏数据列表
+            ui->questionListHorizontalWidget->hide();
+        }
+    }
+}
+
+void RandomLearningWidget::loadDatabaseToList()
+{
+    // 连接数据库
+    connectDatabase();
+
+    // 获取数据
+    currentKnowledgeItemList = m_knowledgeItemsDataBase->getKnowledgeItems();
+
+    // 创建 KnowledgeItemWidget 对象，并添加至列表
+    int index = 0;
+    ui->questionListWidget->clear();
+    for (KnowledgeItem item : currentKnowledgeItemList)
+    {
+        // 创建 QListWidgetItem 对象
+        QListWidgetItem* listWidgetItem = new QListWidgetItem(ui->questionListWidget);
+
+        // 创建 LisItemWidget 对象
+        KnowledgeItemWidget* itemWidget = new KnowledgeItemWidget(ui->questionListWidget, index++, item.question, item.answer);
+        listWidgetItem->setSizeHint(QSize(ui->questionListWidget->width(), itemWidget->height()));
+
+        // 添加条目至列表
+        ui->questionListWidget->addItem(listWidgetItem);
+        listWidgetItem->setData(Qt::UserRole, index);
+        ui->questionListWidget->setItemWidget(listWidgetItem, itemWidget);
+    }
 }
 
 void RandomLearningWidget::on_closePushButton_clicked()
@@ -39,16 +166,111 @@ void RandomLearningWidget::on_openSourceFirstPushButton_clicked()
 
 void RandomLearningWidget::on_fontComboBox_currentFontChanged(const QFont &f)
 {
-    QFont font = f;
+    /*QFont font = f;
     font.setPointSize(ui->doubleSpinBox->value());
-    ui->textEdit->setFont(font);
+    ui->textEdit->setFont(font);*/
 }
 
 
 void RandomLearningWidget::on_doubleSpinBox_valueChanged(double arg1)
 {
-    QFont font = ui->textEdit->font();
+    /*QFont font = ui->textEdit->font();
     font.setPointSize(arg1);
-    ui->textEdit->setFont(font);
+    ui->textEdit->setFont(font);*/
+}
+
+void RandomLearningWidget::on_viewDataListCheckBox_clicked(bool checked)
+{
+    // 获取questionListHorizontalWidget窗口宽度
+    int width = ui->questionListHorizontalWidget->maximumWidth();
+    if (ui->viewDataListCheckBox->isChecked()) {
+        // 设置窗口大小
+        emit this->sendDsizeInfo(width, 0);
+        // 显示数据列表
+        ui->questionListHorizontalWidget->show();
+    }
+    else {
+        // 设置窗口大小
+        emit this->sendDsizeInfo(-width, 0);
+        // 隐藏数据列表
+        ui->questionListHorizontalWidget->hide();
+    }
+}
+
+// 保存当前的知识点
+void RandomLearningWidget::saveCurrentKnowledgeItem()
+{
+    KnowledgeItem item;
+    item.type = "English Words";
+    item.question = ui->questionTextEdit->toPlainText();
+    item.answer = ui->answerTextEdit->toPlainText();
+    item.latestReviewTime = QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss");
+    item.reviewCount = QString::number(1);
+
+    if (isOnlyWhitespaceOrNewline(item.question) == false) {
+        // 保存到数据库
+        m_knowledgeItemsDataBase->insertKnowledgeItem(item);
+    }
+    else 
+    {
+        sendStateInfo("问题处为空白，未保存");
+    }
+
+    // 更新数据库
+    loadDatabaseToList();
+}
+
+void RandomLearningWidget::on_firstNextPushButton_clicked()
+{
+    // 保存当前的知识点
+    saveCurrentKnowledgeItem();
+}
+
+void RandomLearningWidget::on_firstLastPushButton_clicked()
+{
+}
+
+void RandomLearningWidget::on_addNewKnowledgeItemPushButton_clicked()
+{
+    // 保存当前的知识点
+    saveCurrentKnowledgeItem();
+
+    // 清空输入框内容
+    ui->questionTextEdit->clear();
+    ui->answerTextEdit->clear();
+}
+
+void RandomLearningWidget::on_questionListWidget_itemClicked(QListWidgetItem* item)
+{
+    qDebug() << "item clicked";
+    // 获取数据 ID
+    currentListIndex = item->data(Qt::UserRole).toInt();
+
+    // 获取当前知识点
+    currentKnowledgeItem = currentKnowledgeItemList.at(currentListIndex);
+
+    // 显示当前知识点
+    ui->questionTextEdit->setText(currentKnowledgeItem.question);
+    ui->answerTextEdit->setText(currentKnowledgeItem.answer);
+}
+
+void RandomLearningWidget::connectDatabase()
+{
+    // 获取数据库对象
+    m_knowledgeItemsDataBase = KnowledgeItemsDataBase::getKnowledgeItemsDataBase("knowledgeItems.db");
+
+    // 打开数据库
+    if (!m_knowledgeItemsDataBase->open()) {
+        qDebug() << "数据库打开失败" << m_knowledgeItemsDataBase->lastError().text();
+        return;
+    }
+    else
+    {
+        qDebug() << "数据库打开成功";
+    }
+
+    // 创建表
+    m_knowledgeItemsDataBase->createKnowledgeItemsTable();
+
 }
 

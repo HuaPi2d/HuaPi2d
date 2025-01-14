@@ -40,11 +40,11 @@ protected:
     void run() override;
 
 public:signals:
-    void sendInitializeGameParams(QString taskNmae);
+    void sendInitializeGameParams(SingleTask task);
     void sendRestartParams(QString ssjjInstallPath);
     void sendEnterGameParams(SingleTask task, int loadingTimes);
     void sendRunScriptParams(SingleTask task, int speed);
-    void sendSettlementParams(QString taskNmae);
+    void sendSettlementParams(SingleTask task);
     void sendRemindInfo(QString remindInfo);
     void singleTaskFinished(SSJJRunState res);
     void sendFatalError();

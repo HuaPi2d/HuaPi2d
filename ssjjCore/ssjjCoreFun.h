@@ -4,6 +4,10 @@
 #include "universal/programController.h"
 #include "universal/script/image/findPicPro.h"
 #include "global/ssjjglobalvar.h"
+#include "universal/file/fileattributes.h"
+#include "universal/timeFun/pctime.h"
+#include "ssjjCore/script/scriptcompiler/scriptcompiler.h"
+
 
 // 下一步操作
 // restartSSJJ: 重启游戏
@@ -19,10 +23,18 @@ struct SSJJRunState
     QString nextStep;
 };
 
+namespace Task {
+    enum TaskType {
+        LuanDou = 0,
+        ZhuXian
+    };
+};
+
 struct SingleTask{
     QString taskName;
     QString difficulty;
     QString script;
+    Task::TaskType taskType;
 };
 
 QString checkCurrentState(int waitTime = 0);
@@ -35,12 +47,23 @@ bool findAndClickAndCheck(QString picPath, int waitTime = 1000, int timeLimit = 
 
 SSJJRunState restartSSJJ(QString ssjjInstallPath);
 
-SSJJRunState initiallizeGameScreen(QString taskName);
+SSJJRunState initiallizeGameScreen(SingleTask task);
 
 SSJJRunState enterGame(SingleTask task, int loadingTimes);
 
 SSJJRunState runScript(SingleTask task, int speed);
 
-SSJJRunState settlement(QString taskName);
+SSJJRunState settlement(SingleTask task);
+
+void turnToPage(FileAttribute chapter, FileAttribute level);
+
+// 点击对应关卡
+bool clickLevel(FileAttribute level);
+
+// 选择对应难度
+void chooseDifficulty(QString difficulty);
+
+// 进入主线关卡
+void enterZXGame();
 
 #endif // SSJJCOREFUN_H

@@ -1,0 +1,9 @@
+# 读取配置，包含人物移动速度
+read_settings()
+settings.speed
+# 移动逻辑
+move_back(times)
+move_front(times)
+move_left(times)
+move_right(times)
+move(direction, times)

@@ -12,4 +12,6 @@ RandomLearningWindow::RandomLearningWindow(QWidget *parent)
         this->deleteLater();
     });
     connect(randomLearningWidget, &RandomLearningWidget::sendStateInfo, this, &RandomLearningWindow::sendStateInfo);
+    // а╛╫спе╨е
+    connect(randomLearningWidget, &RandomLearningWidget::sendDsizeInfo, this, &RandomLearningWindow::sendDsizeInfo);
 }

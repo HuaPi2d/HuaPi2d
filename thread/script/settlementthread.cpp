@@ -4,14 +4,14 @@ SettlementThread::SettlementThread(QObject *parent)
     : BasicScriptThread{parent}
 {}
 
-void SettlementThread::receiveParams(QString m_taskName)
+void SettlementThread::receiveParams(SingleTask task)
 {
-    taskName = m_taskName;
+    m_task = task;
 }
 
 void SettlementThread::run()
 {
-    SSJJRunState res = settlement(taskName);
+    SSJJRunState res = settlement(m_task);
     emit sendStates(res);
     if (res.errorType == "Success")
     {
