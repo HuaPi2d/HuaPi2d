@@ -44,6 +44,7 @@ SubSSJJWidget::SubSSJJWidget(QWidget *parent)
     widgetList.append(ui->writeScriptWidget);
     widgetList.append(ui->nodeEditorWidget);
     widgetList.append(ui->bonusWidget);
+    appDir = qApp->applicationDirPath();
 
     /* 搭建图形编辑器 */
     createNodeEditor();
@@ -139,6 +140,11 @@ SubSSJJWidget::SubSSJJWidget(QWidget *parent)
 
 SubSSJJWidget::~SubSSJJWidget()
 {
+    // 终止线程
+    if(checkThreadRunningState(ssjjMainThread) == 1)
+        forceQuitThread(ssjjMainThread);
+    if(checkThreadRunningState(testScriptThread) == 1)
+        forceQuitThread(testScriptThread);
     saveSettings();
     delete ui;
 }
@@ -152,39 +158,39 @@ void SubSSJJWidget::closeEvent(QCloseEvent *event)
 void SubSSJJWidget::saveSettings()
 {
     /* 声明对象 */
-    QSettings setting(qApp->applicationDirPath() + "/userSettings.ini", QSettings::IniFormat);
+    UsersSettings settings(qApp->applicationDirPath() + "/Settings/ssjjSettings.ini");
 
     /* 写入配置 */
-    setting.beginGroup("SSJJ_Script");
-    setting.setValue("ssjjInstallPath", ssjjInstallPath);
-    setting.setValue("moveSpeed", ui->moveSpeedLineEdit->text());
-    setting.setValue("LDRunTimes", ui->LDRunTimesLineEdit->text());
-    setting.setValue("LDScriptPath", ui->LDScriptPathLineEdit->text());
-    setting.setValue("singleScriptTime", ui->singleScriptTimeLineEdit->text());
-    setting.setValue("loadingTime", ui->loadingTimeLineEdit->text());
-    setting.setValue("ifResetTimes", ui->ifResetTimesCheckBox->isChecked());
-    setting.setValue("passWordMode", passWordMode);
-    setting.setValue("enterGamePassWord", enterGamePassWord);
+    settings.beginGroup("SSJJ_Script");
+    settings.setValue("ssjjInstallPath", ssjjInstallPath);
+    settings.setValue("moveSpeed", ui->moveSpeedLineEdit->text());
+    settings.setValue("LDRunTimes", ui->LDRunTimesLineEdit->text());
+    settings.setValue("LDScriptPath", ui->LDScriptPathLineEdit->text());
+    settings.setValue("singleScriptTime", ui->singleScriptTimeLineEdit->text());
+    settings.setValue("loadingTime", ui->loadingTimeLineEdit->text());
+    settings.setValue("ifResetTimes", ui->ifResetTimesCheckBox->isChecked());
+    settings.setValue("passWordMode", passWordMode);
+    settings.setValue("enterGamePassWord", enterGamePassWord);
 
-    setting.beginGroup("bonusWeapenList");
-    setting.setValue("mainWeaponList", ui->mainWeaponComboBox->currentText());
-    setting.setValue("secondaryWeaponList", ui->secondaryWeaponComboBox->currentText());
-    setting.setValue("meleeWeaponList", ui->meleeWeaponComboBox->currentText());
-    setting.setValue("throwingWeaponList", ui->throwingWeaponComboBox->currentText());
-    setting.setValue("tacticalWeaponList", ui->tacticalWeaponComboBox->currentText());
-    setting.setValue("characterList", ui->characterComboBox->currentText());
-    setting.setValue("longQiList", ui->longQiComboBox->currentText());
-    setting.setValue("currentPage", widgetList.indexOf(currentWidget));
-    setting.setValue("resolutionPath", this->resolutionPath);
+    settings.beginGroup("bonusWeapenList");
+    settings.setValue("mainWeaponList", ui->mainWeaponComboBox->currentText());
+    settings.setValue("secondaryWeaponList", ui->secondaryWeaponComboBox->currentText());
+    settings.setValue("meleeWeaponList", ui->meleeWeaponComboBox->currentText());
+    settings.setValue("throwingWeaponList", ui->throwingWeaponComboBox->currentText());
+    settings.setValue("tacticalWeaponList", ui->tacticalWeaponComboBox->currentText());
+    settings.setValue("characterList", ui->characterComboBox->currentText());
+    settings.setValue("longQiList", ui->longQiComboBox->currentText());
+    settings.setValue("currentPage", widgetList.indexOf(currentWidget));
+    settings.setValue("resolutionPath", this->resolutionPath);
     QStringList weaponList;
     for (int i = 0; i < ui->currentWeaponListWidget->count(); i++)
     {
         weaponList.append(ui->currentWeaponListWidget->item(i)->text());
     }
-    setting.setValue("currentWeaponList", weaponList);
-    setting.endGroup();
+    settings.setValue("currentWeaponList", weaponList);
+    settings.endGroup();
 
-    setting.beginGroup("scriptEditor");
+    settings.beginGroup("scriptEditor");
     QString fileName;
     QString savePath;
     QStringList openFiles;
@@ -194,116 +200,121 @@ void SubSSJJWidget::saveSettings()
         savePath = editor->getSavePath();
         openFiles.append(savePath + "/" + fileName);
     }
-    setting.setValue("openFiles", openFiles);
-    setting.endGroup();
+    settings.setValue("openFiles", openFiles);
+    settings.endGroup();
 
     // 保存主线关卡设置
-    setting.beginGroup("zxSetttings");
-    setting.setValue("chapter", ui->zxChapterChooseComboBox->currentText());
-    setting.setValue("level", ui->zxLevelComboBox->currentText());
-    setting.setValue("difficulty", ui->diffcultyChooseComboBox->currentText());
-    setting.setValue("runTimes", ui->zxRunTimesLineEdit->text());
-    setting.setValue("scriptPath", ui->zxChapterChooseComboBox->currentText());
-    setting.endGroup();
+    settings.beginGroup("zxSetttings");
+    settings.setValue("chapter", ui->zxChapterChooseComboBox->currentText());
+    settings.setValue("level", ui->zxLevelComboBox->currentText());
+    settings.setValue("difficulty", ui->diffcultyChooseComboBox->currentText());
+    settings.setValue("runTimes", ui->zxRunTimesLineEdit->text());
+    settings.setValue("scriptPath", ui->zxChapterChooseComboBox->currentText());
+    settings.endGroup();
 
-    setting.endGroup();
+    settings.endGroup();
+
+
+    /* 声明对象 */
+    UsersSettings editorConfigSettings(appDir + "/Settings/editorConfig.ini");
+
+    /* 写入编辑器配置 */
+    editorConfigSettings.beginGroup("scpEditorConfig");
+    editorConfigSettings.setValue("font", scpEditorConfig.font.font.toString());
+    editorConfigSettings.setValue("fontSize", scpEditorConfig.font.size);
+    editorConfigSettings.beginGroup("color");
+    editorConfigSettings.setValue("background", scpEditorConfig.color.background.name());
+    editorConfigSettings.setValue("text", scpEditorConfig.color.text.name());
+    editorConfigSettings.setValue("keyword", scpEditorConfig.color.keyword.name());
+    editorConfigSettings.setValue("number", scpEditorConfig.color.number.name());
+    editorConfigSettings.setValue("string", scpEditorConfig.color.string.name());
+    editorConfigSettings.setValue("operateur", scpEditorConfig.color.operateur.name());
+    editorConfigSettings.setValue("function", scpEditorConfig.color.function.name());
+    editorConfigSettings.setValue("variable", scpEditorConfig.color.variable.name());
+    editorConfigSettings.setValue("comment", scpEditorConfig.color.comment.name());
+    editorConfigSettings.endGroup();
+    editorConfigSettings.endGroup();
 }
 
 // 读取配置
 void SubSSJJWidget::loadSettings()
 {
+    // 全局编辑器配置
     /* 声明对象 */
-    QSettings setting(qApp->applicationDirPath() + "/userSettings.ini", QSettings::IniFormat);
+    UsersSettings editorConfigSettings(appDir + "/Settings/editorConfig.ini");
+
+    /* 读取编辑器配置 */
+    //// 编辑器配置
+    editorConfigSettings.beginGroup("scpEditorConfig");
+    scpEditorConfig.font.font = editorConfigSettings.value("font", QFont("Consolas")).value<QFont>();
+    scpEditorConfig.font.size = editorConfigSettings.value("fontSize", 12).toInt();
+    editorConfigSettings.beginGroup("color");
+    scpEditorConfig.color.background = QColor(editorConfigSettings.value("background", "#2E2E2E").toString());
+    scpEditorConfig.color.foreground = QColor(editorConfigSettings.value("foreground", "#FAFAFA").toString());
+    scpEditorConfig.color.text = QColor(editorConfigSettings.value("text", "#000000").toString());
+    scpEditorConfig.color.keyword = QColor(editorConfigSettings.value("keyword", "#6A7FCC").toString());
+    scpEditorConfig.color.number = QColor(editorConfigSettings.value("number", "#1793D0").toString());
+    scpEditorConfig.color.string = QColor(editorConfigSettings.value("string", "#8CD000").toString());
+    scpEditorConfig.color.operateur = QColor(editorConfigSettings.value("operateur", "#FF8F00").toString());
+    scpEditorConfig.color.function = QColor(editorConfigSettings.value("function", "#FF3DB5").toString());
+    scpEditorConfig.color.variable = QColor(editorConfigSettings.value("variable", "#000099").toString());
+    scpEditorConfig.color.comment = QColor(editorConfigSettings.value("comment", "#999999").toString());
+    editorConfigSettings.endGroup();
+    editorConfigSettings.endGroup();
+
+
+
+    /* 声明对象 */
+    UsersSettings settings(qApp->applicationDirPath() + "/Settings/ssjjSettings.ini");
 
     /* 写入配置 */
-    setting.beginGroup("SSJJ_Script");
-    if(setting.value("ssjjInstallPath").toString() != "")
+    settings.beginGroup("SSJJ_Script");
+    // 生死狙击程序安装路径
+    if(settings.value("ssjjInstallPath").toString() != "")
     {
-        ssjjInstallPath = setting.value("ssjjInstallPath").toString();
+        ssjjInstallPath = settings.value("ssjjInstallPath").toString();
         writeRemindInfo("<p>生死狙击程序安装路径:</p><b>" + ssjjInstallPath + "</b><br><br>");
     }
     else
     {
         ssjjInstallPath = getRegDitValue("\\HKEY_CURRENT_USER\\Software\\Wooduan\\SSJJ-4399", "InstallPath") + "\\WDlauncher.exe";
         if( ssjjInstallPath == ""){
-            writeRemindInfo("<p><span style=\"font-size: 13px; color: red;\">生死狙击程序安装路径读取失败，请手动添加<b>WDlauncher.exe</b>的路径</span></p><br>");
+            writeRemindInfo(tr("<p><span style=\"font-size: 13px; color: red;\">生死狙击程序安装路径读取失败，请手动添加<b>WDlauncher.exe</b>的路径</span></p><br>"));
             writeRemindInfo("<br><img src=\"tips/choose_launcher_tip.png\" width=\"250\" alt=\"提示图片\"><br>");
         }
         else{
             writeRemindInfo("<p>生死狙击程序安装路径:<b>" + ssjjInstallPath + "</b></p><br>");
         }
     }
-    if(setting.value("moveSpeed").toString() != ""){
-        ui->moveSpeedLineEdit->setText(setting.value("moveSpeed").toString());
-    }
-    else{
-        ui->moveSpeedLineEdit->setText("100");
-    }
     ui->launcherPathLineEdit->setText(ssjjInstallPath);
-    if(setting.value("LDRunTimes").toString() != ""){
-        ui->LDRunTimesLineEdit->setText(setting.value("LDRunTimes").toString());
-    }
-    else{
-        ui->LDRunTimesLineEdit->setText("100");
-    }
-    ui->LDScriptPathLineEdit->setText(setting.value("LDScriptPath").toString());
-    if(setting.value("singleScriptTime").toString() != ""){
-        ui->singleScriptTimeLineEdit->setText(setting.value("singleScriptTime").toString());
-    }
-    else{
-        ui->singleScriptTimeLineEdit->setText("5");
-    }
-    if(setting.value("loadingTime").toString() != ""){
-        ui->loadingTimeLineEdit->setText(setting.value("loadingTime").toString());
-    }
-    else{
-        ui->loadingTimeLineEdit->setText("11");
-    }
-    if(setting.value("ifResetTimes").toString() != ""){
-        ui->ifResetTimesCheckBox->setChecked(setting.value("ifResetTimes").toBool());
-    }
-    else{
-        ui->ifResetTimesCheckBox->setChecked(false);
-    }
-    if(setting.value("passWordMode").toString() != ""){
-        passWordMode = setting.value("passWordMode").toInt();
-    }
-    else{
-        passWordMode = 1;
-    }
-    if(setting.value("enterGamePassWord").toString() != ""){
-        enterGamePassWord = setting.value("enterGamePassWord").toString();
-    }
-    else{
-        enterGamePassWord = "HuaPi2D";
-    }
+    // 移动速度
+    ui->moveSpeedLineEdit->setText(settings.value("moveSpeed", "100").toString());
+    // 乱斗次数
+    ui->LDRunTimesLineEdit->setText(settings.value("LDRunTimes", "100").toString());
+    // 乱斗脚本路径
+    ui->LDScriptPathLineEdit->setText(settings.value("LDScriptPath").toString());
+    // 单次脚本超时时长
+    ui->singleScriptTimeLineEdit->setText(settings.value("singleScriptTime", "5").toString());
+    // 加载时间
+    ui->loadingTimeLineEdit->setText(settings.value("loadingTime", "11").toString());
+    // 是否重置次数
+    ui->ifResetTimesCheckBox->setChecked(settings.value("ifResetTimes", false).toBool());
+    // 房间密码模式
+    passWordMode = settings.value("passWordMode", 1).toInt();
+    // 房间密码
+    enterGamePassWord = settings.value("enterGamePassWord", "HuaPi2D").toString();
 
-    setting.beginGroup("bonusWeapenList");
-     // 加载 combox 内容
-    if (setting.value("mainWeaponList").toString() != "") {
-        ui->mainWeaponComboBox->setCurrentText(setting.value("mainWeaponList").toString());
-    }
-    if (setting.value("secondaryWeaponList").toString() != "") {
-        ui->secondaryWeaponComboBox->setCurrentText(setting.value("secondaryWeaponList").toString());
-    }
-    if (setting.value("meleeWeaponList").toString() != "") {
-        ui->meleeWeaponComboBox->setCurrentText(setting.value("meleeWeaponList").toString());
-    }
-    if (setting.value("throwingWeaponList").toString() != "") {
-        ui->throwingWeaponComboBox->setCurrentText(setting.value("throwingWeaponList").toString());
-    }
-    if (setting.value("tacticalWeaponList").toString() != "") {
-        ui->tacticalWeaponComboBox->setCurrentText(setting.value("tacticalWeaponList").toString());
-    }
-    if (setting.value("characterList").toString() != "") {
-        ui->characterComboBox->setCurrentText(setting.value("characterList").toString());
-    }
-    if (setting.value("longQiList").toString() != "")
-    {
-        ui->longQiComboBox->setCurrentText(setting.value("longQiList").toString());
-    }
-    if (setting.value("currentWeaponList").toStringList() != QStringList()) {
-        for (QString str : setting.value("currentWeaponList").toStringList()) {
+    settings.beginGroup("bonusWeapenList");
+    // 加载武器 combox 内容
+    ui->mainWeaponComboBox->setCurrentText(settings.value("mainWeaponList").toString());
+    ui->secondaryWeaponComboBox->setCurrentText(settings.value("secondaryWeaponList").toString());
+    ui->meleeWeaponComboBox->setCurrentText(settings.value("meleeWeaponList").toString());
+    ui->throwingWeaponComboBox->setCurrentText(settings.value("throwingWeaponList").toString());
+    ui->tacticalWeaponComboBox->setCurrentText(settings.value("tacticalWeaponList").toString());
+    ui->characterComboBox->setCurrentText(settings.value("characterList").toString());
+    ui->longQiComboBox->setCurrentText(settings.value("longQiList").toString());
+    if (settings.value("currentWeaponList").toStringList() != QStringList()) {
+        for (QString str : settings.value("currentWeaponList").toStringList()) {
             ui->currentWeaponListWidget->addItem(str);
         }
         for (int i = 0; i < 7; i++)
@@ -372,39 +383,22 @@ void SubSSJJWidget::loadSettings()
         ui->currentWeaponListWidget->addItem("战术武器");
         ui->currentWeaponListWidget->addItem("角色");
     }
-    if (setting.value("currentPage").toInt() != -1)
-    {
-        currentWidget = widgetList[setting.value("currentPage").toInt()];
-    }
-    else
-    {
-        currentWidget = ui->scriptWidget;
-    }
+    // 转到上次关闭时界面
+    currentWidget = widgetList[settings.value("currentPage", "0").toInt()];
     updateScreen();
     // 选中分辨率
-    if (setting.value("resolutionPath").toString() != "") {
-        this->resolutionPath = setting.value("resolutionPath").toString();
-    }
-    else {
-        this->resolutionPath = "";
-    }
+    this->resolutionPath = settings.value("resolutionPath").toString();
     if (this->resolutionPath == "")
-    {
         ui->radioButton25601440->setChecked(true);
-    }
     else if (this->resolutionPath == "2560-1600/")
-    {
         ui->radioButton25601600->setChecked(true);
-    }
     else if (this->resolutionPath == "VM/")
-    {
         ui->radioButtonVM->setChecked(true);
-    }
-    setting.endGroup();
+    settings.endGroup();
 
-    setting.beginGroup("scriptEditor");
-    if (setting.value("openFiles").toStringList() != QStringList()) {
-        for (QString filePath : setting.value("openFiles").toStringList()) {
+    settings.beginGroup("scriptEditor");
+    if (settings.value("openFiles").toStringList() != QStringList()) {
+        for (QString filePath : settings.value("openFiles").toStringList()) {
             QFileInfo fileInfo(filePath);
             // 判断文件是否被删除或改名
             QFile file(fileInfo.absoluteFilePath());
@@ -430,30 +424,25 @@ void SubSSJJWidget::loadSettings()
             this->creatNewScriptEditorTab(fileInfo.fileName(), fileInfo.path(), readFileAttributes(fileInfo.absoluteFilePath()));
         }
     }
-    setting.endGroup();
+    settings.endGroup();
 
     // 读取主线关卡设置
-    setting.beginGroup("zxSetttings");
+    settings.beginGroup("zxSetttings");
     // 读取章节置 zxChapterChooseComboBox 内
     for (ZXChapter chapter : ZXGameData::getChapters())
-    {
         ui->zxChapterChooseComboBox->addItem(chapter.name);
-    }
-    if (setting.value("chapter").toString() != "") {
-        ui->zxChapterChooseComboBox->setCurrentText(setting.value("chapter").toString());
-    }
-    else {
+    // 章节设置
+    if (settings.value("chapter").toString() != "") 
+        ui->zxChapterChooseComboBox->setCurrentText(settings.value("chapter").toString());
+    else 
         ui->zxChapterChooseComboBox->setCurrentIndex(0);
-    }
     currentChoosedZXChapter = ZXGameData::getChapterByName(ui->zxChapterChooseComboBox->currentText());
     updateZXLevelChooseComboBox();
     // 读取关卡置 zxLevelComboBox 内
-    if (setting.value("level").toString() != "") {
-        ui->zxLevelComboBox->setCurrentText(setting.value("level").toString());
-    }
-    else {
+    if (settings.value("level").toString() != "") 
+        ui->zxLevelComboBox->setCurrentText(settings.value("level").toString());
+    else 
         ui->zxLevelComboBox->setCurrentIndex(0);
-    }
     for (ZXLevel level : currentChoosedZXChapter.levels)
     {
         if (level.name == ui->zxLevelComboBox->currentText())
@@ -464,35 +453,26 @@ void SubSSJJWidget::loadSettings()
     }
     updateZXDiffcultyChooseComboBox();
     // 读取关卡难度至 diffcultyChooseComboBox 内
-    if (setting.value("difficulty").toString() != "") {
-        ui->diffcultyChooseComboBox->setCurrentText(setting.value("difficulty").toString());
-    }
-    else {
+    if (settings.value("difficulty").toString() != "") 
+        ui->diffcultyChooseComboBox->setCurrentText(settings.value("difficulty").toString());
+    else 
         ui->diffcultyChooseComboBox->setCurrentIndex(0);
-    }
-    if (setting.value("runTimes").toString() != "") {
-        ui->zxRunTimesLineEdit->setText(setting.value("runTimes").toString());
-    }
-    else {
+    if (settings.value("runTimes").toString() != "") 
+        ui->zxRunTimesLineEdit->setText(settings.value("runTimes").toString());
+    else 
         ui->zxRunTimesLineEdit->setText("3");
-    }
 
     // 读取当前数据库脚本文件至 zxScriptPathComboBox 内
     updateZXScriptPathComboBox();
-    if (setting.value("scriptPath").toString() != "") {
-        ui->zxScriptPathComboBox->setCurrentText(setting.value("scriptPath").toString());
-    }
+    if (settings.value("scriptPath").toString() != "") 
+        ui->zxScriptPathComboBox->setCurrentText(settings.value("scriptPath").toString());
     else
-    {
         ui->zxScriptPathComboBox->setCurrentIndex(0);
-    }
     
-    setting.endGroup();
-
-    setting.endGroup();
+    settings.endGroup();
+    settings.endGroup();
 
     readBonusJsonFiles();
-
     hideSomeItems();
 }
 
@@ -512,11 +492,8 @@ void SubSSJJWidget::hideSomeItems()
 
 void SubSSJJWidget::on_testPushButton_clicked()
 {
-    QStringList fileList = ssjjScriptalFilesDatabase->getFilesFromDatabase("工业一");
-    for (QString file : fileList)
-    {
-        qDebug() << file;
-    }
+    EditorSettingsDialog dialog(scpEditorConfig, this);
+    dialog.exec();
 }
 
 void SubSSJJWidget::on_closePushButton_clicked()
@@ -1531,11 +1508,40 @@ void SubSSJJWidget::receiveWarningMessage(QString title, QString message)
     QMessageBox::warning(this, title, message);
 }
 
+// 更改编辑器配色
+void SubSSJJWidget::resetEditorsAppearances()
+{
+    EditorSettingsDialog dialog(scpEditorConfig, this);
+    connect(&dialog, &EditorSettingsDialog::applySettings, this, [=](EditorConfig config) {
+        for (ScpLanguageEditor* editor : scpLanguageEditors)
+        {
+            editor->setEditorConfig(config);
+        }
+        });
+
+    dialog.exec();
+    if (dialog.result() == QDialog::Accepted) {
+        scpEditorConfig = dialog.getEditorConfig();
+        for (ScpLanguageEditor* editor : scpLanguageEditors)
+        {
+            editor->setEditorConfig(scpEditorConfig);
+        }
+    }
+    else if (dialog.result() == QDialog::Rejected) {
+        return;
+    }
+}
+
+void SubSSJJWidget::getGlobalEditorConfig(EditorConfig editorConfig)
+{
+    globalEditorConfig = editorConfig;
+}
+
 // 创建新的文件编辑标签页
 void SubSSJJWidget::creatNewScriptEditorTab(QString fileName, QString filePath, QList<FileAttribute> fileAttributes)
 {
     // 新建编辑器对象
-    ScpLanguageEditor* newEditor = new ScpLanguageEditor(this);
+    ScpLanguageEditor* newEditor = new ScpLanguageEditor(scpEditorConfig, this);
     // 判断文件是否已经打开
     for (ScpLanguageEditor* editor : scpLanguageEditors)
     {

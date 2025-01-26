@@ -1,4 +1,4 @@
-#ifndef STARTSSJJTHREAD_H
+﻿#ifndef STARTSSJJTHREAD_H
 #define STARTSSJJTHREAD_H
 
 #include <QThread>

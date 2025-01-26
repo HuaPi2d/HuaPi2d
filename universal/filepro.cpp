@@ -1,12 +1,12 @@
-#include "filepro.h"
+ï»¿#include "filepro.h"
 
 void createDirectoryIfNotExists(const QString& folderPath)
 {
     QDir dir;
 
-    // ÅĞ¶ÏÎÄ¼ş¼ĞÊÇ·ñ´æÔÚ
+    // åˆ¤æ–­æ–‡ä»¶å¤¹æ˜¯å¦å­˜åœ¨
     if (!dir.exists(folderPath)) {
-        // ³¢ÊÔ´´½¨ÎÄ¼ş¼Ğ£¬Ö§³Ö¶à²ãÎÄ¼ş¼ĞµÄ´´½¨
+        // å°è¯•åˆ›å»ºæ–‡ä»¶å¤¹ï¼Œæ”¯æŒå¤šå±‚æ–‡ä»¶å¤¹çš„åˆ›å»º
         dir.mkpath(folderPath);
     }
 }

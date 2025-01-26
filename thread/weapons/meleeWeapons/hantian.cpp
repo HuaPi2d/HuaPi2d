@@ -1,4 +1,4 @@
-#include "hantian.h"
+ï»¿#include "hantian.h"
 
 HanTian::HanTian(QObject *parent)
 	: SingleWeaponThread(parent)
@@ -13,10 +13,10 @@ HanTian::~HanTian()
 void HanTian::run()
 {
 	qDebug() << name;
-	// °´ÏÂ 3 ¼ü
+	// æŒ‰ä¸‹ 3 é”®
 	keyPress(0x33);
-	// µÈ´ý 200ms
+	// ç­‰å¾… 200ms
 	QThread::msleep(100);
-	// °´ÏÂ E ¼ü
+	// æŒ‰ä¸‹ E é”®
 	keyPress(0x45);
 }

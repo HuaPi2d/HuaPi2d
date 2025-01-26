@@ -1,4 +1,4 @@
-#include "feisuo.h"
+ï»¿#include "feisuo.h"
 
 FeiSuo::FeiSuo(QObject *parent)
 	: SingleWeaponThread(parent)
@@ -13,12 +13,12 @@ FeiSuo::~FeiSuo()
 void FeiSuo::run()
 {
 	qDebug() << name;
-	// °´ÏÂ 2 ¼ü
+	// æŒ‰ä¸‹ 2 é”®
 	keyPress(0x32);
-	// µÈ´ý 200ms
+	// ç­‰å¾… 200ms
 	QThread::msleep(200);
-	// °´ÏÂ E ¼ü
+	// æŒ‰ä¸‹ E é”®
 	keyPress(0x45);
-	// µÈ´ý 200ms
+	// ç­‰å¾… 200ms
 	QThread::msleep(1000);
 }

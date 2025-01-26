@@ -1,4 +1,4 @@
-#ifndef RUNSCRIPTTHREAD_H
+﻿#ifndef RUNSCRIPTTHREAD_H
 #define RUNSCRIPTTHREAD_H
 
 #include <QThread>

@@ -1,4 +1,4 @@
-#include "anshuijing.h"
+ï»¿#include "anshuijing.h"
 
 AnShuiJing::AnShuiJing(QObject *parent)
 	: SingleWeaponThread(parent)
@@ -13,15 +13,15 @@ AnShuiJing::~AnShuiJing()
 void AnShuiJing::run()
 {
 	qDebug() << name;
-	// °´ÏÂ 3 ¼ü
+	// æŒ‰ä¸‹ 3 é”®
 	keyPress(0x33);
-	// µÈ´ý 200ms
+	// ç­‰å¾… 200ms
 	QThread::msleep(200);
-	// °´ÏÂ E ¼ü
+	// æŒ‰ä¸‹ E é”®
 	keyPress(0x45);
-	// µÈ´ý¼¼ÄÜÊÍ·ÅÊ±¼ä 3s
+	// ç­‰å¾…æŠ€èƒ½é‡Šæ”¾æ—¶é—´ 3s
 	QThread::msleep(3500);
-	// ÇÐ»»ÎªÖ÷ÎäÆ÷
+	// åˆ‡æ¢ä¸ºä¸»æ­¦å™¨
 	keyPress(0x31);
 }
 

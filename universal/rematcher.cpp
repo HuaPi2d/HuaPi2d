@@ -1,4 +1,4 @@
-#include "rematcher.h"
+﻿#include "rematcher.h"
 
 QRegularExpressionMatchIterator findFitStruct(QString pattern, QString content)
 {

@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include <QWidget>
 #include <Qsci/qsciscintilla.h>
@@ -7,6 +7,7 @@
 #include <QDir>
 #include <QKeyEvent>
 #include <QList>
+#include <QSettings>
 #include "universal/file/fileattributes.h"
 
 

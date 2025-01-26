@@ -1,4 +1,4 @@
-#include "rocketsimopenglwidget.h"
+﻿#include "rocketsimopenglwidget.h"
 
 RocketSimOpenGLWidget::RocketSimOpenGLWidget(QWidget *parent)
 	: QOpenGLWidget(parent)

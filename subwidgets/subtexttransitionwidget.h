@@ -6,7 +6,9 @@
 #include <QAudioOutput>
 #include <QSettings>
 #include <QFileDialog>
+
 #include "otherwidgets/singledownloadframe.h"
+#include "universal/file/userssettings.h"
 
 // 声音信息结构体，包含中文和英文名称
 struct VoiceInfo {

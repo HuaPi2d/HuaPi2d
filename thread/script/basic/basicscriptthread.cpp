@@ -1,4 +1,4 @@
-#include "basicscriptthread.h"
+﻿#include "basicscriptthread.h"
 
 BasicScriptThread::BasicScriptThread(QObject *parent)
 	: QThread(parent)

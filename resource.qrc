@@ -63,6 +63,7 @@
         <file>resources/icons/addBoxOutline.svg</file>
         <file>resources/pic/script/zx_settlementConfirm.png</file>
         <file>resources/pic/script/zx_settlementExit.png</file>
+        <file>resources/icons/color_board.svg</file>
     </qresource>
     <qresource prefix="/pic/defaultPic">
         <file>resources/pic/defaultPic/defaultMusicPic.jpg</file>

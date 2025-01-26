@@ -1,4 +1,4 @@
-#ifndef GETNETWORK_H
+﻿#ifndef GETNETWORK_H
 #define GETNETWORK_H
 
 #include <QObject>

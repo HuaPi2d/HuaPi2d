@@ -1,22 +1,22 @@
-#include "ssjjscriptalfilesdatabase.h"
+ï»¿#include "ssjjscriptalfilesdatabase.h"
 
 SSJJScriptalFilesDatabase::SSJJScriptalFilesDatabase(const QString& dbName, QObject* parent)
 	: LocalDatabase(dbName, parent)
 {
-	// ¶¨Òå±íÃû³Æ
+	// å®šä¹‰è¡¨åç§°
 	zx_tableName = "zx_ssjj_scriptal_files";
 
-	// ¶¨Òå±í½á¹¹
+	// å®šä¹‰è¡¨ç»“æ„
 	zx_columns["id"] = "INTEGER PRIMARY KEY AUTOINCREMENT";
 	zx_columns["chapter"] = "TEXT";
 	zx_columns["level"] = "TEXT";
 	zx_columns["difficulty"] = "TEXT";
 	zx_columns["fullfilepath"] = "TEXT";
 
-	// ´´½¨±í
+	// åˆ›å»ºè¡¨
 	createTable(zx_tableName, zx_columns, "UNIQUE(fullfilepath)");
 
-	// ¶ÁÈ¡ÎÄ¼ş¼ĞÏÂµÄÊı¾İÖÁÊı¾İ¿â
+	// è¯»å–æ–‡ä»¶å¤¹ä¸‹çš„æ•°æ®è‡³æ•°æ®åº“
 	zx_defaultFileSavePath = QDir::currentPath() + "/scriptal/zx";
 	deleteEmptyFilesFromDatabase();
 	readFilesIntoDatabase(QDir(zx_defaultFileSavePath));
@@ -35,14 +35,14 @@ QString SSJJScriptalFilesDatabase::getTableName(QString type) const
 
 void SSJJScriptalFilesDatabase::readFilesIntoDatabase(QDir dir)
 {
-	// ¶ÁÈ¡ÎÄ¼ş¼ĞÏÂºó×ºÎª scp, lscp, zscp µÄÎÄ¼ş
+	// è¯»å–æ–‡ä»¶å¤¹ä¸‹åç¼€ä¸º scp, lscp, zscp çš„æ–‡ä»¶
 	QStringList filters;
 	filters << "*.scp" << "*.lscp" << "*.zscp";
 	dir.setNameFilters(filters);
 	dir.setFilter(QDir::Files | QDir::NoSymLinks);
 	dir.setSorting(QDir::Name);
 
-	// ±éÀúÎÄ¼ş
+	// éå†æ–‡ä»¶
 	QFileInfoList fileInfoList = dir.entryInfoList();
 	for (QFileInfo fileInfo : fileInfoList)
 	{

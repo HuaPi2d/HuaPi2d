@@ -1,4 +1,4 @@
-#ifndef SINGLEDOWNLOADFRAME_H
+﻿#ifndef SINGLEDOWNLOADFRAME_H
 #define SINGLEDOWNLOADFRAME_H
 
 #include "qnamespace.h"

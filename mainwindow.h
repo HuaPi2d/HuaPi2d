@@ -1,4 +1,4 @@
-#ifndef MAINWINDOW_H
+Ôªø#ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
 #include <QMainWindow>
@@ -13,6 +13,8 @@
 #include "otherwidgets/singledownloadframe.h"
 #include "global/mainglobalvar.h"
 #include "QHotkey/qhotkey.h"
+#include "universal/file/userssettings.h"
+#include "struct/editor/EditorConfig.h"
 
 
 namespace Ui {
@@ -26,6 +28,7 @@ class MainWindow : public QMainWindow
 public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
+
     void saveSettings();
     void loadSettings();
     void hideSomeItems();
@@ -52,22 +55,24 @@ public:
 private:
     Ui::MainWindow *ui;
     QString appDir;
-    QString currentTheme;                       // µ±«∞÷˜Ã‚
+    QString currentTheme;                       // ÂΩìÂâç‰∏ªÈ¢ò
     int currentThemeType;
     QSignalMapper *signalMapper;
     QButtonGroup *taskButtonList;
     QWidgetList *subWindowList;
     DownloadListWidget *downloadListWidget;
     acss::QtAdvancedStylesheet* advancedStyleSheet;
+    EditorConfig editorConfig;
 
 private slots:
     void onThemeActionTriggered();
     void onStyleManagerStylesheetChanged();
-    // ∏ƒ±‰¥∞ø⁄¥Û–°
+    // ÊîπÂèòÁ™óÂè£Â§ßÂ∞è
     void receiveDsizeInfo(int dwidth, int dheight);
 
 public: signals:
     void isAnyChildWindow();
     void updateQuickWidgetTheme(acss::QtAdvancedStylesheet* advancedStyleSheet);
+    void getGlobalEditorConfig(EditorConfig globalEditorConfig);
 };
 #endif // MAINWINDOW_H

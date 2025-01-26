@@ -1,4 +1,4 @@
-#ifndef DELETEMUSICDIALOG_H
+﻿#ifndef DELETEMUSICDIALOG_H
 #define DELETEMUSICDIALOG_H
 
 #include <QDialog>

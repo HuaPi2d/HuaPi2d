@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 
 #include <QString>
 #include <QDir>
@@ -16,10 +16,10 @@ public:
 	~SSJJScriptalFilesDatabase();
 
 	QString getTableName(QString type) const;
-	// ½«ÎÄ¼ş¶ÁÈ¡ÖÁÊı¾İ¿â
+	// å°†æ–‡ä»¶è¯»å–è‡³æ•°æ®åº“
 	void readFilesIntoDatabase(QDir dir);
 	void readFileIntoDatabase(QFileInfo fileInfo);
-	// ¸ù¾İ¹Ø¿¨ĞÅÏ¢»ñÈ¡½Å±¾ÎÄ¼ş
+	// æ ¹æ®å…³å¡ä¿¡æ¯è·å–è„šæœ¬æ–‡ä»¶
 	QStringList getFilesFromDatabase(QString level);
 	QStringList getAllFilesPath(QString type);
 

@@ -1,4 +1,4 @@
-#include "startssjjthread.h"
+ï»¿#include "startssjjthread.h"
 
 StartSSJJThread::StartSSJJThread(QObject *parent)
     : BasicScriptThread{parent}
@@ -17,6 +17,6 @@ void StartSSJJThread::run()
         emit threadFinished();
     }
     QThread::msleep(1000);
-    // ·¢ËÍÐÅºÅ
+    // å‘é€ä¿¡å·
     this->deleteLater();
 }

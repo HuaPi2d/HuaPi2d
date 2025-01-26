@@ -24,6 +24,7 @@
 #include <QtMultimedia>
 
 #include "otherwidgets/singledownloadframe.h"
+#include "universal/file/userssettings.h"
 
 
 class MusicInfo {

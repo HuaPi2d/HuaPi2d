@@ -1,4 +1,4 @@
-#include "entergamethread.h"
+ï»¿#include "entergamethread.h"
 
 EnterGameThread::EnterGameThread(QObject *parent)
     : BasicScriptThread{parent}
@@ -22,6 +22,6 @@ void EnterGameThread::run()
         emit threadFinished();
     }
     QThread::msleep(1000);
-    // ·¢ËÍÐÅºÅ
+    // å‘é€ä¿¡å·
     this->deleteLater();
 }

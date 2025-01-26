@@ -1,4 +1,4 @@
-#include "suixing.h"
+ï»¿#include "suixing.h"
 
 SuiXing::SuiXing(QObject *parent)
 	: SingleWeaponThread(parent)
@@ -13,13 +13,13 @@ SuiXing::~SuiXing()
 void SuiXing::run()
 {
 	qDebug() << name;
-	// °´ÏÂ1¼ü
+	// æŒ‰ä¸‹1é”®
 	keyPress(0x31);
 	QThread::msleep(100);
-	// °´ÏÂE¼ü
+	// æŒ‰ä¸‹Eé”®
 	keyPress(0x45);
 	QThread::msleep(100);
-	// °´ÏÂÊó±êÓÒ¼ü
+	// æŒ‰ä¸‹é¼ æ ‡å³é”®
 	RightClick();
 	QThread::msleep(1500);
 	keyPress(0x45);

@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 
 #include <QObject>
 #include <QSqlDatabase>
@@ -10,7 +10,7 @@
 #include <QSqlRecord>
 
 
-// ±¾µØÊı¾İ¿âÀà
+// æœ¬åœ°æ•°æ®åº“ç±»
 class LocalDatabase  : public QObject
 {
 	Q_OBJECT

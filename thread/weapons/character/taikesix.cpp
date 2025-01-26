@@ -1,4 +1,4 @@
-#include "taikesix.h"
+ï»¿#include "taikesix.h"
 
 TaiKeSiX::TaiKeSiX(QObject *parent)
 	: SingleWeaponThread(parent)
@@ -13,8 +13,8 @@ TaiKeSiX::~TaiKeSiX()
 void TaiKeSiX::run()
 {
 	qDebug() << name;
-	// °´ÏÂ X ¼ü
+	// æŒ‰ä¸‹ X é”®
 	keyPress(0x58);
-	// µÈ´ý¼¼ÄÜÊÍ·ÅÊ±¼ä 3s
+	// ç­‰å¾…æŠ€èƒ½é‡Šæ”¾æ—¶é—´ 3s
 	QThread::msleep(3000);
 }

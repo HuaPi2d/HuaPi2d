@@ -52,41 +52,35 @@ void SubAAWidget::saveSettigs()
 {
 	/* 保存设置 */
 	/* 声明对象 */
-	QSettings setting(qApp->applicationDirPath() + "/userSettings.ini", QSettings::IniFormat);
+	UsersSettings settings(qApp->applicationDirPath() + "/Settings/aaSettings.ini");
 
 	/* 写入配置 */
-	setting.beginGroup("aa");
+	settings.beginGroup("aa");
 	if (ui->eulerRotationParamsTextEdit->currentText == ui->eulerRotationParamsTextEdit->placeholderText) {
-		setting.setValue("eulerConvertParams", "");
+		settings.setValue("eulerConvertParams", "");
 	}
 	else {
-		setting.setValue("eulerConvertParams", ui->eulerRotationParamsTextEdit->toHtml());
+		settings.setValue("eulerConvertParams", ui->eulerRotationParamsTextEdit->toHtml());
 	}
-	setting.setValue("currentPage", widgetList.indexOf(currentWidget));
-	setting.endGroup();
+	settings.setValue("currentPage", widgetList.indexOf(currentWidget));
+	settings.endGroup();
 }
 
 void SubAAWidget::loadSettings()
 {
 	/* 声明对象 */
-	QSettings setting(qApp->applicationDirPath() + "/userSettings.ini", QSettings::IniFormat);
+	UsersSettings settings(qApp->applicationDirPath() + "/Settings/aaSettings.ini");
 
 	/* 读取配置 */
-	setting.beginGroup("aa");
-	if (setting.value("eulerConvertParams").toString() != "") {
-		ui->eulerRotationParamsTextEdit->setHtml(setting.value("eulerConvertParams").toString());
-		ui->eulerRotationParamsTextEdit->currentText = setting.value("eulerConvertParams").toString();
+	settings.beginGroup("aa");
+	// 欧拉旋转矩阵
+	if (settings.value("eulerConvertParams").toString() != "") {
+		ui->eulerRotationParamsTextEdit->setHtml(settings.value("eulerConvertParams").toString());
+		ui->eulerRotationParamsTextEdit->currentText = settings.value("eulerConvertParams").toString();
 	}
-	if (setting.value("currentPage").toInt() != -1)
-	{
-		currentWidget = widgetList[setting.value("currentPage").toInt()];
-	}
-	else
-	{
-		currentWidget = ui->singleFunctionWidget;
-	}
+	currentWidget = widgetList[settings.value("currentPage", "0").toInt()];
 	updateScreen();
-	setting.endGroup();
+	settings.endGroup();
 }
 
 void SubAAWidget::createRemindText()

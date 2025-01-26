@@ -1,4 +1,4 @@
-#include "liubi.h"
+ï»¿#include "liubi.h"
 
 LiuBi::LiuBi(QObject *parent)
 	: SingleWeaponThread(parent)
@@ -13,8 +13,8 @@ LiuBi::~LiuBi()
 void LiuBi::run()
 {
 	qDebug() << name;
-	// µÈ´ý 200ms
+	// ç­‰å¾… 200ms
 	QThread::msleep(200);
-	// °´ÏÂ X ¼ü
+	// æŒ‰ä¸‹ X é”®
 	keyPress(0x58);
 }

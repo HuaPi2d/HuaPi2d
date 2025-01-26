@@ -1,4 +1,4 @@
-#ifndef MAINGLOBALVAR_H
+﻿#ifndef MAINGLOBALVAR_H
 #define MAINGLOBALVAR_H
 
 extern bool developerMode;

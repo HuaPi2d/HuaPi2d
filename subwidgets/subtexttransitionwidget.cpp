@@ -64,42 +64,42 @@ void SubTextTransitionWidget::on_closePushButton_clicked()
 void SubTextTransitionWidget::saveSettings()
 {
     /* 声明对象 */
-    QSettings setting(qApp->applicationDirPath() + "/userSettings.ini", QSettings::IniFormat);
+    UsersSettings settings(qApp->applicationDirPath() + "/Settings/textTransitionSettings.ini");
 
     /* 写入配置 */
-    setting.beginGroup("testTransition");
-    setting.setValue("voiceClass", ui->voiceClassComboBox->currentText());
-    setting.setValue("text", ui->plainTextEdit->toPlainText());
-    setting.setValue("currentUrl", currentUrl);
-    setting.setValue("currentVoice", ui->voiceComboBox->currentText());
-    setting.endGroup();
+    settings.beginGroup("testTransition");
+    settings.setValue("voiceClass", ui->voiceClassComboBox->currentText());
+    settings.setValue("text", ui->plainTextEdit->toPlainText());
+    settings.setValue("currentUrl", currentUrl);
+    settings.setValue("currentVoice", ui->voiceComboBox->currentText());
+    settings.endGroup();
 }
 
 /* 加载相关配置 */
 void SubTextTransitionWidget::loadSettings()
 {
     /* 声明对象 */
-    QSettings setting(qApp->applicationDirPath() + "/userSettings.ini", QSettings::IniFormat);
+    UsersSettings settings(qApp->applicationDirPath() + "/Settings/textTransitionSettings.ini");
 
     /* 写入配置 */
-    setting.beginGroup("testTransition");
-    if(setting.value("voiceClass").toString() != "")
+    settings.beginGroup("testTransition");
+    if(settings.value("voiceClass").toString() != "")
     {
-        ui->voiceClassComboBox->setCurrentText(setting.value("voiceClass").toString());
-        emit on_voiceClassComboBox_currentTextChanged(setting.value("voiceClass").toString());
-        ui->voiceComboBox->setCurrentText(setting.value("currentVoice").toString());
+        ui->voiceClassComboBox->setCurrentText(settings.value("voiceClass").toString());
+        emit on_voiceClassComboBox_currentTextChanged(settings.value("voiceClass").toString());
+        ui->voiceComboBox->setCurrentText(settings.value("currentVoice").toString());
     }
     else
     {
         emit on_voiceClassComboBox_currentTextChanged("通用");
     }
-    ui->plainTextEdit->setPlainText(setting.value("text").toString());
-    if(setting.value("currentUrl").toString() != "")
+    ui->plainTextEdit->setPlainText(settings.value("text").toString());
+    if(settings.value("currentUrl").toString() != "")
     {
-        currentUrl = setting.value("currentUrl").toString();
+        currentUrl = settings.value("currentUrl").toString();
         mediaPlayer->setSource(currentUrl);
     }
-    setting.endGroup();
+    settings.endGroup();
 }
 
 void SubTextTransitionWidget::on_voiceClassComboBox_currentTextChanged(const QString &arg1)

@@ -1,4 +1,4 @@
-#include "knowledgeitemsdatabase.h"
+ï»¿#include "knowledgeitemsdatabase.h"
 
 KnowledgeItemsDataBase::KnowledgeItemsDataBase(QString dbType)
 	: QSqlDatabase(QSqlDatabase::addDatabase(dbType))
@@ -7,23 +7,23 @@ KnowledgeItemsDataBase::KnowledgeItemsDataBase(QString dbType)
 KnowledgeItemsDataBase::~KnowledgeItemsDataBase()
 {}
 
-// ¾²Ì¬·½·¨£¬ÓÃÓÚ´´½¨KnowledgeItemsDataBase¶ÔÏó
+// é™æ€æ–¹æ³•ï¼Œç”¨äºåˆ›å»ºKnowledgeItemsDataBaseå¯¹è±¡
 KnowledgeItemsDataBase* KnowledgeItemsDataBase::getKnowledgeItemsDataBase(QString dbname)
 {
-	// ÉùÃ÷Ò»¸öKnowledgeItemsDataBase¶ÔÏó
+	// å£°æ˜ä¸€ä¸ªKnowledgeItemsDataBaseå¯¹è±¡
 	KnowledgeItemsDataBase* knowledgeItemsDataBase = new KnowledgeItemsDataBase();
-	// ÉèÖÃÊı¾İ¿âÃû³Æ
+	// è®¾ç½®æ•°æ®åº“åç§°
 	knowledgeItemsDataBase->setDatabaseName(dbname);
-	// ·µ»ØKnowledgeItemsDataBase¶ÔÏó
+	// è¿”å›KnowledgeItemsDataBaseå¯¹è±¡
 	return knowledgeItemsDataBase;
 }
 
-// ´´½¨knowledgeItems±í
+// åˆ›å»ºknowledgeItemsè¡¨
 bool KnowledgeItemsDataBase::createKnowledgeItemsTable()
 {
-	// ¶¨ÒåSQLÓï¾ä
-	// ±íÃûÎªknowledgeItems
-	// ×Ö¶Î°üÀ¨ÀàĞÍ¡¢ÎÊÌâ¡¢´ğ°¸¡¢´´½¨Ê±¼ä¡¢¸üĞÂÊ±¼ä
+	// å®šä¹‰SQLè¯­å¥
+	// è¡¨åä¸ºknowledgeItems
+	// å­—æ®µåŒ…æ‹¬ç±»å‹ã€é—®é¢˜ã€ç­”æ¡ˆã€åˆ›å»ºæ—¶é—´ã€æ›´æ–°æ—¶é—´
 	QString sql = "CREATE TABLE IF NOT EXISTS knowledgeItems("
 		"id INTEGER PRIMARY KEY AUTOINCREMENT,"
 		"type varchar(20) NOT NULL,"
@@ -33,19 +33,19 @@ bool KnowledgeItemsDataBase::createKnowledgeItemsTable()
 		"reviewCount varchar(20) NOT NULL"
 		");";
 
-	// Ö´ĞĞSQLÓï¾ä
+	// æ‰§è¡ŒSQLè¯­å¥
 	return query.exec(sql);
 }
 
-// ²åÈëÒ»ÌõÖªÊ¶ÌõÄ¿
+// æ’å…¥ä¸€æ¡çŸ¥è¯†æ¡ç›®
 bool KnowledgeItemsDataBase::insertKnowledgeItem(KnowledgeItem item)
 {
-	// ¶¨ÒåSQLÓï¾ä
-	// ±íÃûÎªknowledgeItems
-	// ×Ö¶Î°üÀ¨ÀàĞÍ¡¢ÎÊÌâ¡¢´ğ°¸¡¢´´½¨Ê±¼ä¡¢¸üĞÂÊ±¼ä
+	// å®šä¹‰SQLè¯­å¥
+	// è¡¨åä¸ºknowledgeItems
+	// å­—æ®µåŒ…æ‹¬ç±»å‹ã€é—®é¢˜ã€ç­”æ¡ˆã€åˆ›å»ºæ—¶é—´ã€æ›´æ–°æ—¶é—´
 	QString sql = "INSERT INTO knowledgeItems(type,question,answer,letestReviewTime,reviewCount) VALUES(?,?,?,?,?)";
 
-	// °ó¶¨²ÎÊı
+	// ç»‘å®šå‚æ•°
 	query.prepare(sql);
 	query.bindValue(0, item.type);
 	query.bindValue(1, item.question);
@@ -53,33 +53,33 @@ bool KnowledgeItemsDataBase::insertKnowledgeItem(KnowledgeItem item)
 	query.bindValue(3, item.latestReviewTime);
 	query.bindValue(4, item.reviewCount);
 
-	// Ö´ĞĞSQLÓï¾ä
+	// æ‰§è¡ŒSQLè¯­å¥
 	return query.exec();
 }
 
 QList<KnowledgeItem> KnowledgeItemsDataBase::getKnowledgeItems(QString type)
 {
-	// ¶¨Òå·µ»Ø¶ÔÏó
+	// å®šä¹‰è¿”å›å¯¹è±¡
 	QList<KnowledgeItem> knowledgeItems;
 
-	// ¶¨ÒåSQLÓï¾ä
+	// å®šä¹‰SQLè¯­å¥
 	QString sql;
 	if (type == "")
 	{
 		sql = "SELECT * FROM knowledgeItems";
 	}
 
-	// Ö´ĞĞSQLÓï¾ä
+	// æ‰§è¡ŒSQLè¯­å¥
 	if (!query.exec(sql))
 	{
-		qDebug() << "SQL²éÑ¯Êı¾İÖ´ĞĞÊ§°Ü£º" << query.lastError().text();
+		qDebug() << "SQLæŸ¥è¯¢æ•°æ®æ‰§è¡Œå¤±è´¥ï¼š" << query.lastError().text();
 	}
 	else
 	{
-		// Ñ­»·¶ÁÈ¡½á¹û¼¯
+		// å¾ªç¯è¯»å–ç»“æœé›†
 		while (query.next())
 		{
-			// ¶ÁÈ¡Ò»ÌõÊı¾İ
+			// è¯»å–ä¸€æ¡æ•°æ®
 			KnowledgeItem item;
 			item.id = query.value("id").toInt();
 			item.type = query.value("type").toString();
@@ -87,7 +87,7 @@ QList<KnowledgeItem> KnowledgeItemsDataBase::getKnowledgeItems(QString type)
 			item.answer = query.value("answer").toString();
 			item.latestReviewTime = query.value("letestReviewTime").toString();
 			item.reviewCount = query.value("reviewCount").toString();
-			// ½«Êı¾İÌí¼Óµ½·µ»Ø¶ÔÏóÖĞ
+			// å°†æ•°æ®æ·»åŠ åˆ°è¿”å›å¯¹è±¡ä¸­
 			knowledgeItems.append(item);
 		}
 	}
@@ -97,23 +97,23 @@ QList<KnowledgeItem> KnowledgeItemsDataBase::getKnowledgeItems(QString type)
 
 bool KnowledgeItemsDataBase::deleteKnowledgeItemById(int id)
 {
-	// ¶¨ÒåSQLÓï¾ä
+	// å®šä¹‰SQLè¯­å¥
 	QString sql = "DELETE FROM knowledgeItems WHERE id = ?";
 
-	// °ó¶¨²ÎÊı
+	// ç»‘å®šå‚æ•°
 	query.prepare(sql);
 	query.bindValue(0, id);
 	
-	// Ö´ĞĞSQLÓï¾ä
+	// æ‰§è¡ŒSQLè¯­å¥
 	return query.exec(sql);
 }
 
 bool KnowledgeItemsDataBase::updateKnowledgeItemById(int id, KnowledgeItem item)
 {
-	// ¶¨ÒåSQLÓï¾ä
+	// å®šä¹‰SQLè¯­å¥
 	QString sql = "UPDATE knowledgeItems SET type = ?, question = ?, answer = ?, letestReviewTime = ?, reviewCount = ? WHERE id = ?";
 
-	// °ó¶¨²ÎÊı
+	// ç»‘å®šå‚æ•°
 	query.prepare(sql);
 	query.bindValue(0, item.type);
 	query.bindValue(1, item.question);
@@ -122,6 +122,6 @@ bool KnowledgeItemsDataBase::updateKnowledgeItemById(int id, KnowledgeItem item)
 	query.bindValue(4, item.reviewCount);
 	query.bindValue(5, id);
 
-	// Ö´ĞĞSQLÓï¾ä
+	// æ‰§è¡ŒSQLè¯­å¥
 	return query.exec(sql);
 }

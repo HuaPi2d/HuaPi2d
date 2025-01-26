@@ -1,12 +1,12 @@
-#include "coordinate.h"
+ï»¿#include "coordinate.h"
 
 QVector<double> euler_rotation_matrix_C(QVector<QVector2D> rotation_vector)
 {
-    // ³õÊ¼»¯ MATLAB »·¾³
+    // åˆå§‹åŒ– MATLAB ç¯å¢ƒ
     if (!euler_rotation_matrixInitialize())
         return QVector<double>();
 
-    // ¶¨Òå´«ÈëºÍ´«³ö²ÎÊı
+    // å®šä¹‰ä¼ å…¥å’Œä¼ å‡ºå‚æ•°
     mwArray rotation_matrix(3, 3, mxDOUBLE_CLASS);
     mwArray rotation_axis(rotation_vector.length(), 2, mxINT32_CLASS, mxREAL);
 
@@ -20,14 +20,14 @@ QVector<double> euler_rotation_matrix_C(QVector<QVector2D> rotation_vector)
 
     rotation_axis.SetData(rotation_vector_data, 2 * rotation_vector.length());
 
-    // µ÷ÓÃ MATLAB º¯Êı
+    // è°ƒç”¨ MATLAB å‡½æ•°
     euler_rotation_matrix(1, rotation_axis, rotation_matrix);
 
-    // ´Ó mwArray rotation_matrix ÖĞÌáÈ¡Êı¾İ
+    // ä» mwArray rotation_matrix ä¸­æå–æ•°æ®
     double matrix_data[9];
     rotation_matrix.GetData(matrix_data, 9);
 
-    // ´òÓ¡Êä³ö
+    // æ‰“å°è¾“å‡º
     for(int i = 0; i < 3; i++)
     {
         for(int j = 0; j < 3; j++)
@@ -37,10 +37,10 @@ QVector<double> euler_rotation_matrix_C(QVector<QVector2D> rotation_vector)
         std::cout << std::endl;
     }
 
-    // ÌáÈ¡¼ÆËãºóµÄĞı×ª¾ØÕóÖĞµÄ 2D ·ÖÁ¿
+    // æå–è®¡ç®—åçš„æ—‹è½¬çŸ©é˜µä¸­çš„ 2D åˆ†é‡
     
 
-    // ÇåÀí MATLAB »·¾³
+    // æ¸…ç† MATLAB ç¯å¢ƒ
     euler_rotation_matrixTerminate();
 
     return QVector<double>();

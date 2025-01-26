@@ -1,4 +1,4 @@
-#ifndef REMATCHER_H
+﻿#ifndef REMATCHER_H
 #define REMATCHER_H
 
 #include <QObject>

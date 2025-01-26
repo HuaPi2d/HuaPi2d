@@ -1,4 +1,4 @@
-#include "subtexttransitionwindow.h"
+﻿#include "subtexttransitionwindow.h"
 
 SubTextTransitionWindow::SubTextTransitionWindow(QWidget *parent)
     : QMdiSubWindow{parent}

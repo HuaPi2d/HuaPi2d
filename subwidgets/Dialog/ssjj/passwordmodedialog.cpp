@@ -1,4 +1,4 @@
-#include "passwordmodedialog.h"
+ï»¿#include "passwordmodedialog.h"
 
 PasswordModeDialog::PasswordModeDialog(QWidget *parent)
 	: QDialog(parent)
@@ -7,7 +7,7 @@ PasswordModeDialog::PasswordModeDialog(QWidget *parent)
 	ui->setupUi(this);
 
 	this->resize(400, 150);
-	// ¹Ì¶¨´°¿Ú´óÐ¡
+	// å›ºå®šçª—å£å¤§å°
 	this->setFixedSize(this->width(), this->height());
 
 	if (passWordMode == 1) {
@@ -19,7 +19,7 @@ PasswordModeDialog::PasswordModeDialog(QWidget *parent)
 	else if (passWordMode == 3) {
 		ui->mode3RadioButton->setChecked(true);
 	}
-	// Ê¹ÃÜÂëÊäÈë¿òÖ»ÄÜÊäÈëÊý×Ö»ò×ÖÄ¸
+	// ä½¿å¯†ç è¾“å…¥æ¡†åªèƒ½è¾“å…¥æ•°å­—æˆ–å­—æ¯
 	ui->mode1PassWordLineEdit->setValidator(new QRegularExpressionValidator(QRegularExpression("[a-zA-Z0-9]+"), ui->mode1PassWordLineEdit));
 	ui->mode1PassWordLineEdit->setText(enterGamePassWord);
 

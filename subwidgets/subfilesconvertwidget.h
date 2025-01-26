@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 
 #include <QWidget>
 #include <QScrollBar>
@@ -30,18 +30,18 @@ private slots:
 	void loadSettings();
 	void wirteRemindInfo(QString htmlString);
 	void openVideoFile();
-	// Ñ¡ÔñÊÓÆµÊä³öÎÄ¼şÂ·¾¶
+	// é€‰æ‹©è§†é¢‘è¾“å‡ºæ–‡ä»¶è·¯å¾„
 	void openVideoOutputDir();
-	// ¿ªÊ¼×ª»»
+	// å¼€å§‹è½¬æ¢
 	void beginToConvertVideo();
-	// ½ÓÊÕ×ÓÏß³ÌĞÅÏ¢
+	// æ¥æ”¶å­çº¿ç¨‹ä¿¡æ¯
 	void receiveVideoConvertInfo(QString state);
 	
 
 public: signals:
 	void widgetClosed();
 	void sendStateInfo(QString state);
-	// ´«µİÊÓÆµ×ª»»²ÎÊı
+	// ä¼ é€’è§†é¢‘è½¬æ¢å‚æ•°
 	void sendVideoConvertParams(const QString& input_file, const QString& output_path, const QString& original_type, const QString& target_type);
 
 private:

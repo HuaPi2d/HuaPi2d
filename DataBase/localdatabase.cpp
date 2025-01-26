@@ -1,4 +1,4 @@
-#include "localdatabase.h"
+﻿#include "localdatabase.h"
 
 LocalDatabase::LocalDatabase(const QString& dbName, QObject* parent)
 	: QObject(parent)

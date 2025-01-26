@@ -191,3 +191,30 @@ bool writeExtAttribute(const wchar_t* fullFilePath, const wchar_t* attributeName
     return true;
 }
 
+bool saveStringFile(QFileInfo fileInfo, QString content)
+{
+    QDir dir = fileInfo.absoluteDir();
+    if (!fileInfo.absoluteDir().exists())
+    {
+        // 创建目录
+        if (!dir.mkpath("."))
+        {
+            std::wcerr << L"Failed to create directory: " << dir.absolutePath().toStdWString() << L"\n";
+            return false;
+        }
+    }
+
+    QFile file(fileInfo.absoluteFilePath());
+    if (!file.open(QIODevice::WriteOnly))
+    {
+        std::wcerr << L"Failed to open file for writing: " << fileInfo.absoluteFilePath().toStdWString() << L"\n";
+        return false;
+    }
+
+    QTextStream out(&file);
+    out << content;
+    file.close();
+
+    return true;
+}
+

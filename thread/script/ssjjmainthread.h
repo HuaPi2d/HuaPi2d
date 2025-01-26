@@ -1,4 +1,4 @@
-#ifndef SSJJMAINTHREAD_H
+﻿#ifndef SSJJMAINTHREAD_H
 #define SSJJMAINTHREAD_H
 
 #include <QThread>

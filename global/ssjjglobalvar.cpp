@@ -1,4 +1,4 @@
-#include "ssjjglobalvar.h"
+﻿#include "ssjjglobalvar.h"
 
 QString resolutionPath = "";
 bool isRunScriptThreadRunning = false;

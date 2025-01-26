@@ -1,4 +1,4 @@
-#ifndef SNAPSHOOT_H
+﻿#ifndef SNAPSHOOT_H
 #define SNAPSHOOT_H
 
 #include <QApplication>

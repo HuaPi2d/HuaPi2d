@@ -1,4 +1,4 @@
-#ifndef RANDOMLEARNINGWIDGET_H
+ï»¿#ifndef RANDOMLEARNINGWIDGET_H
 #define RANDOMLEARNINGWIDGET_H
 
 #include <QWidget>
@@ -25,7 +25,7 @@ public:
 public: signals:
     void widgetClosed();
     void sendStateInfo(QString state);
-    // ¸Ä±äÖ÷´°¿Ú´óĞ¡ĞÅºÅ
+    // æ”¹å˜ä¸»çª—å£å¤§å°ä¿¡å·
     void sendDsizeInfo(int dwidth, int dheight);
 
 private slots:
@@ -47,10 +47,10 @@ private slots:
 
     void on_addNewKnowledgeItemPushButton_clicked();
 
-    // Êı¾İ¿âÁĞ±íµÄÄÚÈİ±»µã»÷
+    // æ•°æ®åº“åˆ—è¡¨çš„å†…å®¹è¢«ç‚¹å‡»
     void on_questionListWidget_itemClicked(QListWidgetItem *item);
 
-    // Á¬½ÓÊı¾İ¿â
+    // è¿æ¥æ•°æ®åº“
     void connectDatabase();
 
 private:
@@ -63,16 +63,16 @@ private:
     int currentListIndex;
     KnowledgeItem currentKnowledgeItem;
 
-    // ±£´æµ±Ç°ÅäÖÃ
+    // ä¿å­˜å½“å‰é…ç½®
     void saveSetttings();
 
-    // ¼ÓÔØÅäÖÃ
+    // åŠ è½½é…ç½®
     void loadSettings();
 
-    // ¸üĞÂ½çÃæ¼°ÄÚÈİ
+    // æ›´æ–°ç•Œé¢åŠå†…å®¹
     void updateWidget();
 
-    // ¼ÓÔØÊı¾İ¿âÄÚÈİÖÁÁĞ±í
+    // åŠ è½½æ•°æ®åº“å†…å®¹è‡³åˆ—è¡¨
     void loadDatabaseToList();
 };
 

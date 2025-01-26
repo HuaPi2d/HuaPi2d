@@ -1,4 +1,4 @@
-#ifndef PIXMAPPRO_H
+﻿#ifndef PIXMAPPRO_H
 #define PIXMAPPRO_H
 
 #include <QObject>

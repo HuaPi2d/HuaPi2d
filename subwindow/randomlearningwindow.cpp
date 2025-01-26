@@ -1,4 +1,4 @@
-#include "randomlearningwindow.h"
+О╩©#include "randomlearningwindow.h"
 
 RandomLearningWindow::RandomLearningWindow(QWidget *parent)
     : QMdiSubWindow{parent}
@@ -12,6 +12,6 @@ RandomLearningWindow::RandomLearningWindow(QWidget *parent)
         this->deleteLater();
     });
     connect(randomLearningWidget, &RandomLearningWidget::sendStateInfo, this, &RandomLearningWindow::sendStateInfo);
-    // а╛╫спе╨е
+    // Х©·Ф▌╔Д©║Е▐╥
     connect(randomLearningWidget, &RandomLearningWidget::sendDsizeInfo, this, &RandomLearningWindow::sendDsizeInfo);
 }

@@ -1,4 +1,4 @@
-#ifndef BASICSCRIPTTHREAD_H
+﻿#ifndef BASICSCRIPTTHREAD_H
 #define BASICSCRIPTTHREAD_H
 
 #include <QThread>

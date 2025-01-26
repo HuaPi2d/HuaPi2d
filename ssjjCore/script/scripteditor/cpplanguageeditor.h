@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include "languageeditor.h"
 #include <Qsci/qscilexercpp.h>

@@ -1,4 +1,4 @@
-#ifndef SUBSSJJWINDOW_H
+ï»¿#ifndef SUBSSJJWINDOW_H
 #define SUBSSJJWINDOW_H
 
 #include <QMdiSubWindow>
@@ -9,6 +9,7 @@
 #include <QMenu>
 #include <QIcon>
 #include <QPixmap>
+
 #include "QHotkey/qhotkey.h"
 #include "subwidgets/subssjjwidget.h"
 #include "subwidgets/Dialog/createnewfiledialog.h"
@@ -19,6 +20,9 @@ class SubSSJJWindow : public QMdiSubWindow
     Q_OBJECT
 public:
     explicit SubSSJJWindow(QWidget *parent = nullptr);
+
+public: signals:
+    void getGlobalEditorConfig(EditorConfig globalEditorConfig);
 
 signals:
     void sendStateInfo(QString state);
@@ -32,20 +36,20 @@ private:
     SubSSJJWidget* subSSJJWidget;
 
     void addMenuBarAction();
-    // ĞÂ½¨ÎÄ¼ş
+    // æ–°å»ºæ–‡ä»¶
     void createNewFile();
-    // ´ò¿ªÎÄ¼ş
+    // æ‰“å¼€æ–‡ä»¶
     void openFile();
-    // ±£´æÎÄ¼ş
+    // ä¿å­˜æ–‡ä»¶
     void saveFile();
-    // ²Ëµ¥À¸µÄ¸üĞÂ
+    // èœå•æ çš„æ›´æ–°
     void updateMenuBar(QWidget* currentWidget);
-    // ÉèÖÃÃÜÂë
+    // è®¾ç½®å¯†ç 
     void setPasswordMode();
-    // µ¼Èë½Å±¾ÎÄ¼ş
+    // å¯¼å…¥è„šæœ¬æ–‡ä»¶
     void importScriptalFiles();
 
-// ²Ëµ¥À¸
+// èœå•æ 
 private:
     QMenu* fileMenu;
     QMenu* editMenu;
@@ -66,6 +70,8 @@ private:
     QAction* stopAutoScriptAction;
 
     QMenu* settingMenu;
+    QMenu* editorSettingsMenu;
+    QAction* editorSettingsAction;
     QMenu* autoScriptMenu;
     QAction* passWordModeAction;
     QAction* importScriptalFilesAction;

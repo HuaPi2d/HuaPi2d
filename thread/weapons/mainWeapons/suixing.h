@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include <QThread>
 #include "universal/script/simulate/mouseKeyboradControl.h"

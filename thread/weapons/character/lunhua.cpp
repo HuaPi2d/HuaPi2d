@@ -1,4 +1,4 @@
-#include "lunhua.h"
+ï»¿#include "lunhua.h"
 
 LunHua::LunHua(QObject *parent)
 	: SingleWeaponThread(parent)
@@ -13,6 +13,6 @@ LunHua::~LunHua()
 void LunHua::run()
 {
 	qDebug() << name;
-	// ÉÏ»®¿ª¶Ü
+	// ä¸Šåˆ’å¼€ç›¾
 	ScrollMouse(2);
 }

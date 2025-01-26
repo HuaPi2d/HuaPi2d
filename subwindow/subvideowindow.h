@@ -1,4 +1,4 @@
-#ifndef SUBVIDEOWINDOW_H
+﻿#ifndef SUBVIDEOWINDOW_H
 #define SUBVIDEOWINDOW_H
 
 #include <QMainWindow>

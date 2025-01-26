@@ -3,6 +3,7 @@
 #include <QList>
 #include <QFileInfo>
 #include <QFile>
+#include <QDir>
 #include <iostream>
 #include <fstream>
 #include <string>
@@ -42,3 +43,5 @@ std::wstring readExtAttribute(const wchar_t* fullFilePath, const wchar_t* attrib
 
 // 写入扩展属性
 bool writeExtAttribute(const wchar_t* fullFilePath, const wchar_t* attributeName, const wchar_t* content);
+
+bool saveStringFile(QFileInfo fileInfo, QString content);

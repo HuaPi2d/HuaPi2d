@@ -1,4 +1,4 @@
-#ifndef SUBSSJJWIDGET_H
+﻿#ifndef SUBSSJJWIDGET_H
 #define SUBSSJJWIDGET_H
 
 #include <QWidget>
@@ -19,7 +19,6 @@
 #include <QIntValidator>
 #include <QComboBox>
 #include <QScrollBar>
-#include <Qsci/qsciscintilla.h>
 #include <qlayout.h>
 
 #include "thread/script/ssjjmainthread.h"
@@ -27,14 +26,15 @@
 #include "universal/timeFun/pctime.h"
 #include "thread/checkthreadstate.h"
 #include "subwidgets/universal/showtextinscreenwidget.h"
-#include "ssjjCore/script/scripteditor/scplanguageeditor.h"
 #include "ui_subssjjwidget.h"
 #include "ssjjCore/zx/zxlevels.h"
 #include "DataBase/ssjj/ssjjscriptalfilesdatabase.h"
 #include "thread/scriptTest/testscriptthread.h"
+#include "universal/file/userssettings.h"
+#include "ssjjCore/script/scripteditor/scplanguageeditor.h"
+#include "subwidgets/Dialog/editor/editorsettingsdialog.h"
+#include "struct/editor/EditorConfig.h"
 
-
-class QsciScintilla;
 
 namespace Ui {
 class SubSSJJWidget;
@@ -49,15 +49,19 @@ public:
     ~SubSSJJWidget();
 
     Ui::SubSSJJWidget* ui;
+    // 全局代码编辑器样式设置
     void loadSettings();
 
 public slots:
-    // �����µ��ļ��༭��ǩҳ
+    // 创建新的文件编辑标签页
     void creatNewScriptEditorTab(QString fileName, QString filePath, QList<FileAttribute> fileAttributes);
     void readFilesIntoSSJJDatabase(QDir dir);
     void saveFile();
     void testCurrentScript();
     void stopTestScript();
+    // 更改编辑器配色
+    void resetEditorsAppearances();
+    void getGlobalEditorConfig(EditorConfig editorConfig);
 
 protected:
     void closeEvent(QCloseEvent *event) override;
@@ -75,10 +79,13 @@ private:
     QPointer<TestScriptThread> testScriptThread;
     QString resolutionPath;
     QList<ScpLanguageEditor *> scpLanguageEditors;
-    ZXChapter currentChoosedZXChapter;                    // ��ǰҳ��ѡ�е��½�
-    ZXLevel currentChoosedZXLevel;                        // ��ǰҳ��ѡ�еĹؿ�
-    SSJJScriptalFilesDatabase* ssjjScriptalFilesDatabase; // �ű��ļ����ݿ�
+    ZXChapter currentChoosedZXChapter;                    // 当前页面选中的章节
+    ZXLevel currentChoosedZXLevel;                        // 当前页面选中的关卡
+    SSJJScriptalFilesDatabase* ssjjScriptalFilesDatabase; // 脚本文件数据库
     ScpLanguageEditor* currentScriptEditor;
+    EditorConfig scpEditorConfig;
+    EditorConfig globalEditorConfig;
+    QString appDir;
 
 private: signals:
     void widgetClosed();
@@ -106,9 +113,9 @@ private slots:
     void updateScreen();
     void on_chooseLauncherPathPushButton_clicked();
     void on_addTaskPushButton_clicked();
-    // ѡ���Ҷ��ű�
+    // 选择乱斗脚本
     void on_chooseLDScriptPathPushButton_clicked();
-    // ѡ�����߹ؿ��ű�
+    // 选择主线关卡脚本
     void on_chooseZXScriptPathPushButton_clicked();
     void on_startPushButton_clicked();
     void on_endPushButton_clicked();

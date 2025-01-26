@@ -1,39 +1,47 @@
-#pragma once
+ï»¿#ifndef SCPLANGUAGELEXER_H
+#define SCPLANGUAGELEXER_H
 
 #include <Qsci/qscilexercustom.h>
 #include <Qsci/qsciscintilla.h>
+#include <QSettings>
+
+#include "struct/editor/EditorConfig.h"
+
 
 class ScpLanguageLexer  : public QsciLexerCustom
 {
 public:
-	ScpLanguageLexer(QObject *parent);
+	ScpLanguageLexer(EditorConfig editorConfig, QObject *parent);
 	~ScpLanguageLexer();
 
 protected:
-	// ·µ»Ø´Ê·¨·ÖÎöÆ÷µÄÓïÑÔÃû³Æ
+	// è¿”å›è¯æ³•åˆ†æå™¨çš„è¯­è¨€åç§°
 	const char *language() const override;
-	// ¶¨ÒåÖ§³ÖµÄÑùÊ½ÊıÁ¿
+	// å®šä¹‰æ”¯æŒçš„æ ·å¼æ•°é‡
 	int styleBitsNeeded() const override;
-	// ·µ»ØÃ¿ÖÖÑùÊ½µÄÃèÊö
+	// è¿”å›æ¯ç§æ ·å¼çš„æè¿°
 	QString description(int style) const override;
-	// ¶¨ÒåÓï·¨¸ßÁÁµÄÂß¼­
+	// å®šä¹‰è¯­æ³•é«˜äº®çš„é€»è¾‘
 	void styleText(int start, int end) override;
 
 private:
-	// ¶Ô×Ö·ûÀàĞÍÉè¶¨ÑùÊ½
+	// å¯¹å­—ç¬¦ç±»å‹è®¾å®šæ ·å¼
 	void setupStyles();
 
-	// ÑùÊ½ÀàĞÍÃ¶¾Ù
+	// æ ·å¼ç±»å‹æšä¸¾
 	enum {
 		Default = 0,
-		Keyword,   // ¹Ø¼ü×Ö
-		Number,    // Êı×Ö
-		String,    // ×Ö·û´®
-		Operator,  // ÔËËã·û
-		Function,  // º¯Êı
-		Variable,  // ±äÁ¿
-		Comment,   // ×¢ÊÍ
+		Keyword,   // å…³é”®å­—
+		Number,    // æ•°å­—
+		String,    // å­—ç¬¦ä¸²
+		Operator,  // è¿ç®—ç¬¦
+		Function,  // å‡½æ•°
+		Variable,  // å˜é‡
+		Comment,   // æ³¨é‡Š
 	};
 
-	QStringList keywords;  // ¹Ø¼ü×ÖÁĞ±í
+	QStringList keywords;  // å…³é”®å­—åˆ—è¡¨
+	EditorConfig m_editorConfig;  // ç¼–è¾‘å™¨é…ç½®
 };
+
+#endif // SCPLANGUAGELEXER_H

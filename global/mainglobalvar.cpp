@@ -1,3 +1,3 @@
-#include "mainglobalvar.h"
+﻿#include "mainglobalvar.h"
 
 bool developerMode = false;

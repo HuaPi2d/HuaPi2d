@@ -1,4 +1,4 @@
-#include "fengshen.h"
+ï»¿#include "fengshen.h"
 
 FengShen::FengShen(QObject *parent)
 	: SingleWeaponThread(parent)
@@ -13,10 +13,10 @@ FengShen::~FengShen()
 void FengShen::run()
 {
 	qDebug() << name;
-	// °´ÏÂ 2 ¼ü
+	// æŒ‰ä¸‹ 2 é”®
 	keyPress(0x32);
-	// µÈ´ý 200ms
+	// ç­‰å¾… 200ms
 	QThread::msleep(100);
-	// °´ÏÂ E ¼ü
+	// æŒ‰ä¸‹ E é”®
 	keyPress(0x45);
 }

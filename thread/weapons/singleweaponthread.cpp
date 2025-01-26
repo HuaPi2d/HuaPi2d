@@ -1,4 +1,4 @@
-#include "singleweaponthread.h"
+﻿#include "singleweaponthread.h"
 
 SingleWeaponThread::SingleWeaponThread(QObject *parent)
 	: QThread(parent)

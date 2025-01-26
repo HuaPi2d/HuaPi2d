@@ -1,4 +1,4 @@
-#include "liangyi.h"
+ï»¿#include "liangyi.h"
 
 LiangYi::LiangYi(QObject *parent)
 	: SingleWeaponThread(parent)
@@ -13,14 +13,14 @@ LiangYi::~LiangYi()
 void LiangYi::run()
 {
 	qDebug() << name;
-	// °´ÏÂ 4 ¼ü
+	// æŒ‰ä¸‹ 4 é”®
 	keyPress(0x34);
-	// µÈ´ý 200ms
+	// ç­‰å¾… 200ms
 	QThread::msleep(200);
-	// °´ÏÂ E ¼ü
+	// æŒ‰ä¸‹ E é”®
 	keyPress(0x45);
-	// µÈ´ý 200ms
+	// ç­‰å¾… 200ms
 	QThread::msleep(100);
-	// ÇÐ»»ÎªÖ÷ÎäÆ÷
+	// åˆ‡æ¢ä¸ºä¸»æ­¦å™¨
 	keyPress(0x31);
 }

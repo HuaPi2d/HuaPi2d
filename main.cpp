@@ -1,22 +1,24 @@
-#include "mainwindow.h"
+ï»¿#include "mainwindow.h"
 #include "qqml.h"
 
 #include <QApplication>
 #include <QQuickWidget>
 #include <QCoreApplication>
 #include <iostream>
+#include <QLocale>
+
 #include "info/videoinfo.h"
 #include "info/videoinfolistmodel.h"
 
 int main(int argc, char *argv[])
 {
-    // ·ÀÖ¹QQuickWidgetÔÚWindowsÏÂÊ¹ÓÃOpenGLäÖÈ¾Ê±³öÏÖºÚÆÁ https://forum.qt.io/topic/148089/qopenglwidget-doesn-t-work-with-qquickwidget/3
+    // é˜²æ­¢QQuickWidgetåœ¨Windowsä¸‹ä½¿ç”¨OpenGLæ¸²æŸ“æ—¶å‡ºç°é»‘å± https://forum.qt.io/topic/148089/qopenglwidget-doesn-t-work-with-qquickwidget/3
     QQuickWindow::setGraphicsApi(QSGRendererInterface::OpenGL);
     QApplication a(argc, argv);
     qmlRegisterType<VideoInfo>("QMLVideoInfo", 1, 0, "VideoInfo");
     qmlRegisterType<VideoInfoListModel>("QMLVideoInfoListModel",1,0,"VideoInfoListModel");
 
-    // ÉèÖÃ±¾µØ»¯Îª UTF-8
+    // è®¾ç½®æœ¬åœ°åŒ–ä¸º UTF-8
     std::locale::global(std::locale(""));
 
     MainWindow w;

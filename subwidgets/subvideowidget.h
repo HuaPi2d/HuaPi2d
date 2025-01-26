@@ -1,4 +1,4 @@
-#ifndef SUBVIDEOWIDGET_H
+﻿#ifndef SUBVIDEOWIDGET_H
 #define SUBVIDEOWIDGET_H
 
 #include "ui_subvideowidget.h"
@@ -15,6 +15,8 @@
 #include <QtAdvancedStylesheet.h>
 #include <Qsci/QsciScintilla.h>
 #include <QmlStyleUrlInterceptor.h>
+
+#include "universal/file/userssettings.h"
 
 namespace Ui {
 class SubVideoWidget;

@@ -1,4 +1,4 @@
-#include "huihe.h"
+ï»¿#include "huihe.h"
 
 HuiHe::HuiHe(QObject *parent)
 	: SingleWeaponThread(parent)
@@ -13,12 +13,12 @@ HuiHe::~HuiHe()
 void HuiHe::run()
 {
 	qDebug() << name;
-	// °´ÏÂ 5 ¼ü
+	// æŒ‰ä¸‹ 5 é”®
 	keyPress(0x35);
-	// µÈ´ý 200ms
+	// ç­‰å¾… 200ms
 	QThread::msleep(200);
-	// °´ÏÂ E ¼ü
+	// æŒ‰ä¸‹ E é”®
 	keyPress(0x45);
-	// µÈ´ý 100ms
+	// ç­‰å¾… 100ms
 	QThread::msleep(100);
 }

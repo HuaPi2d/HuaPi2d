@@ -1,4 +1,4 @@
-#include "subvideowindow.h"
+﻿#include "subvideowindow.h"
 
 SubVideoWindow::SubVideoWindow(QWidget *parent)
     : QMdiSubWindow{parent}

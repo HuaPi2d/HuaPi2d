@@ -1,4 +1,4 @@
-#ifndef SUBMUSICWINDOW_H
+﻿#ifndef SUBMUSICWINDOW_H
 #define SUBMUSICWINDOW_H
 
 #include <QMdiSubWindow>

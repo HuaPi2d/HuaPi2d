@@ -1,10 +1,10 @@
-#include "stringcheck.h"
+ï»¿#include "stringcheck.h"
 
 bool isOnlyWhitespaceOrNewline(const QString& text) {
-    // Æ¥ÅäÆÕÍ¨ÎÄ±¾µÄ¿Õ¸ñºÍ»»ĞĞ
+    // åŒ¹é…æ™®é€šæ–‡æœ¬çš„ç©ºæ ¼å’Œæ¢è¡Œ
     QRegularExpression rePlain(R"(^[\s]*$)");
 
-    // Æ¥Åä HTML ¸ñÊ½µÄ <br> ±êÇ©ºÍ¿Õ¸ñ
+    // åŒ¹é… HTML æ ¼å¼çš„ <br> æ ‡ç­¾å’Œç©ºæ ¼
     QRegularExpression reHtml(R"(^([\s]|<br\s*/?>)*$)");
 
     return rePlain.match(text).hasMatch() || reHtml.match(text).hasMatch();

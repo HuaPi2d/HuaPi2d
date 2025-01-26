@@ -1,35 +1,35 @@
-#include "pythoneditor.h"
+ï»¿#include "pythoneditor.h"
 
 PythonEditor::PythonEditor(QWidget *parent)
 	: QsciScintilla(parent)
 {
-	// ÉèÖÃ´Ê·¨·ÖÎöÆ÷
+	// è®¾ç½®è¯æ³•åˆ†æå™¨
 	textLexer = new QsciLexerPython(this);
 	textLexer->setDefaultColor(QColor(0, 0, 0));
 	this->setLexer(textLexer);
-	// ÏÔÊ¾ĞĞºÅ
+	// æ˜¾ç¤ºè¡Œå·
 	this->setMarginType(0, QsciScintilla::NumberMargin);
 	this->setMarginLineNumbers(0, true);
 	this->setMarginWidth(0, 30);
-	// ´úÂëÌáÊ¾
+	// ä»£ç æç¤º
 	textAPIs = new QsciAPIs(textLexer);
 	textAPIs->load("api/Python-3.11.api");
 	textAPIs->prepare();
 
-	this->setAutoCompletionSource(QsciScintilla::AcsAll);   // ÉèÖÃÔ´£¬×Ô¶¯²¹È«ËùÓĞµØ·½³öÏÖµÄ
-	this->setAutoCompletionThreshold(1);  // ÉèÖÃ×Ô¶¯²¹È«µÄ´¥·¢×Ö·ûÊı
-	this->setAutoCompletionCaseSensitivity(true);  // ÉèÖÃ×Ô¶¯²¹È«µÄ´óĞ¡Ğ´Ãô¸Ğ
-	this->setAutoIndent(true);             // ÉèÖÃ×Ô¶¯Ëõ½ø
-	this->setBraceMatching(QsciScintilla::SloppyBraceMatch);  // ÉèÖÃÀ¨ºÅÆ¥Åä
+	this->setAutoCompletionSource(QsciScintilla::AcsAll);   // è®¾ç½®æºï¼Œè‡ªåŠ¨è¡¥å…¨æ‰€æœ‰åœ°æ–¹å‡ºç°çš„
+	this->setAutoCompletionThreshold(1);  // è®¾ç½®è‡ªåŠ¨è¡¥å…¨çš„è§¦å‘å­—ç¬¦æ•°
+	this->setAutoCompletionCaseSensitivity(true);  // è®¾ç½®è‡ªåŠ¨è¡¥å…¨çš„å¤§å°å†™æ•æ„Ÿ
+	this->setAutoIndent(true);             // è®¾ç½®è‡ªåŠ¨ç¼©è¿›
+	this->setBraceMatching(QsciScintilla::SloppyBraceMatch);  // è®¾ç½®æ‹¬å·åŒ¹é…
 	
 }
 
 PythonEditor::~PythonEditor()
 {}
 
-// ÖØĞ´²¿·ÖÊó±êÊÂ¼ş
-// ÊµÏÖÀ¨ºÅ£¬ÒıºÅÆ¥ÅäÊäÈë¹¦ÄÜ
-// ÊµÏÖÀ¨ºÅ£¬ÒıºÅµÄÁª¶¯É¾³ı¹¦ÄÜ
+// é‡å†™éƒ¨åˆ†é¼ æ ‡äº‹ä»¶
+// å®ç°æ‹¬å·ï¼Œå¼•å·åŒ¹é…è¾“å…¥åŠŸèƒ½
+// å®ç°æ‹¬å·ï¼Œå¼•å·çš„è”åŠ¨åˆ é™¤åŠŸèƒ½
 void PythonEditor::keyPressEvent(QKeyEvent * event)
 {
 	bool isOprate = false;
@@ -52,7 +52,7 @@ void PythonEditor::keyPressEvent(QKeyEvent * event)
 			insertMatchingCharacter("\'", "\'");
 			return;
 		case Qt::Key_Delete:
-		case Qt::Key_Backspace: // É¾³ıÀ¨ºÅ
+		case Qt::Key_Backspace: // åˆ é™¤æ‹¬å·
 			isOprate = deleteAction();
 			if (isOprate == true)
 				return;
@@ -62,29 +62,29 @@ void PythonEditor::keyPressEvent(QKeyEvent * event)
 		default:
 			break;
 	}
-	// ¶ÔÓÚÆäËûÇé¿ö£¬µ÷ÓÃ¸¸ÀàµÄ·½·¨
+	// å¯¹äºå…¶ä»–æƒ…å†µï¼Œè°ƒç”¨çˆ¶ç±»çš„æ–¹æ³•
 	QsciScintilla::keyPressEvent(event);
 }
 
 void PythonEditor::insertMatchingCharacter(const QString& openChar, const QString& closeChar)
 {
-	// »ñÈ¡µ±Ç°µÄ¹â±êÎ»ÖÃ
+	// è·å–å½“å‰çš„å…‰æ ‡ä½ç½®
 	int line, index;
 	this->getCursorPosition(&line, &index);
 
-	// ²åÈëÀ¨ºÅ
+	// æ’å…¥æ‹¬å·
 	this->insert(openChar + closeChar);
 
-	// ½«¹â±êÒÆÖÁÀ¨ºÅÖĞ¼ä
+	// å°†å…‰æ ‡ç§»è‡³æ‹¬å·ä¸­é—´
 	this->setCursorPosition(line, index + 1);
 }
 
 bool PythonEditor::deleteAction()
 {
-	// »ñÈ¡µ±Ç°µÄ¹â±êÎ»ÖÃ
+	// è·å–å½“å‰çš„å…‰æ ‡ä½ç½®
 	int pos = static_cast<int>(SendScintilla(SCI_GETCURRENTPOS));
 
-	// »ñÈ¡¹â±ê×óÓÒµÄ·ûºÅ
+	// è·å–å…‰æ ‡å·¦å³çš„ç¬¦å·
 	char rightChar = getCharAt(pos);
 	char leftChar = pos > 0 ? getCharAt(pos - 1) : '\0';
 

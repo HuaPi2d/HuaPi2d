@@ -31,6 +31,7 @@ SubSSJJWindow::SubSSJJWindow(QWidget *parent)
     });
     connect(subSSJJWidget, &SubSSJJWidget::sendStateInfo, this, &SubSSJJWindow::sendStateInfo);
     connect(subSSJJWidget, &SubSSJJWidget::updateMenuBar, this, &SubSSJJWindow::updateMenuBar);
+    connect(this, &SubSSJJWindow::getGlobalEditorConfig, subSSJJWidget, &SubSSJJWidget::getGlobalEditorConfig);
 
     subSSJJWidget->loadSettings();
 }
@@ -49,6 +50,7 @@ void SubSSJJWindow::addMenuBarAction()
     runAutoScriptMenu = new QMenu(tr("全自动脚本"), runMenu);
 
     settingMenu = new QMenu(tr("配置"), menuBar);
+    editorSettingsMenu = new QMenu(tr("脚本编辑器配置"), settingMenu);
     autoScriptMenu = new QMenu(tr("全自动脚本配置"), settingMenu);
 
     // 设置全局热键
@@ -106,6 +108,10 @@ void SubSSJJWindow::addMenuBarAction()
     connect(F11, &QHotkey::activated, stopAutoScriptAction, &QAction::trigger);
     runAutoScriptMenu->addAction(stopAutoScriptAction);
     connect(stopAutoScriptAction, &QAction::triggered, subSSJJWidget->ui->endPushButton, &QPushButton::click);
+    // 脚本编辑器配置
+    editorSettingsAction = new QAction(tr("外观"), editorSettingsMenu);
+    editorSettingsMenu->addAction(editorSettingsAction);
+    connect(editorSettingsAction, &QAction::triggered, subSSJJWidget, &SubSSJJWidget::resetEditorsAppearances);
     // 设置房间密码模式
     passWordModeAction = new QAction(tr("脚本房间密码设置"), fileMenu);
     autoScriptMenu->addAction(passWordModeAction);
@@ -123,6 +129,7 @@ void SubSSJJWindow::addMenuBarAction()
 
     fileMenu->addMenu(editMenu);
 
+    settingMenu->addMenu(editorSettingsMenu);
     settingMenu->addMenu(autoScriptMenu);
 
     runMenu->addMenu(scriptTestMenu);
@@ -168,10 +175,12 @@ void SubSSJJWindow::updateMenuBar(QWidget *currentWidget)
     disableMenuAndActions(scriptTestMenu);
     disableMenuAndActions(runAutoScriptMenu);
     disableMenuAndActions(bonusMenu);
+    disableMenuAndActions(editorSettingsMenu);
     if (currentWidget == subSSJJWidget->ui->writeScriptWidget)
     {
         enableMenuAndActions(editMenu);
         enableMenuAndActions(scriptTestMenu);
+        enableMenuAndActions(editorSettingsMenu);
     }
     else if (currentWidget == subSSJJWidget->ui->scriptWidget)
     {

@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include "euler_rotation_matrix.h"
 #include "engine.h"

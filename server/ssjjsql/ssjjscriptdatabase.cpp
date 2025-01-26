@@ -1,7 +1,7 @@
-#include "ssjjscriptdatabase.h"
+ï»¿#include "ssjjscriptdatabase.h"
 
 SSJJScriptDataBase::SSJJScriptDataBase()
-    : QSqlDatabase{ QSqlDatabase::addDatabase("QSQLITE")} // µ÷ÓÃ QSqlDatabase µÄ¹¹Ôìº¯Êı£¬Ìí¼ÓÒ»¸ö SQLite Êı¾İ¿â
+    : QSqlDatabase{ QSqlDatabase::addDatabase("QSQLITE")} // è°ƒç”¨ QSqlDatabase çš„æ„é€ å‡½æ•°ï¼Œæ·»åŠ ä¸€ä¸ª SQLite æ•°æ®åº“
 {
 
 }
@@ -12,15 +12,15 @@ SSJJScriptDataBase::~SSJJScriptDataBase()
 
 SSJJScriptDataBase SSJJScriptDataBase::getSSJJScriptDatabase(QString databaseName)
 {
-    // ÉùÃ÷Ò»¸ö SSJJScriptDataBase ¶ÔÏó
+    // å£°æ˜ä¸€ä¸ª SSJJScriptDataBase å¯¹è±¡
     SSJJScriptDataBase ssjjScriptDataBase;
-    // ÉèÖÃÊı¾İ¿âÃû³Æ
+    // è®¾ç½®æ•°æ®åº“åç§°
     ssjjScriptDataBase.setDatabaseName(databaseName);
-    // ·µ»Ø SSJJScriptDataBase ¶ÔÏó
+    // è¿”å› SSJJScriptDataBase å¯¹è±¡
     return ssjjScriptDataBase;
 }
 
 QStringList SSJJScriptDataBase::SSJJScriptDataBaseDriver()
 {
-    return QSqlDatabase::drivers(); // µ÷ÓÃ QSqlDatabase µÄ¾²Ì¬º¯Êı
+    return QSqlDatabase::drivers(); // è°ƒç”¨ QSqlDatabase çš„é™æ€å‡½æ•°
 }

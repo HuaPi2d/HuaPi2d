@@ -1,4 +1,4 @@
-#include "shenyu.h"
+ï»¿#include "shenyu.h"
 
 ShenYu::ShenYu(QObject *parent)
 	: SingleWeaponThread(parent)
@@ -13,10 +13,10 @@ ShenYu::~ShenYu()
 void ShenYu::run()
 {
 	qDebug() << name;
-	// °´ÏÂ 1 ¼ü
+	// æŒ‰ä¸‹ 1 é”®
 	keyPress(0x31);
-	// µÈ´ý 200ms
+	// ç­‰å¾… 200ms
 	QThread::msleep(200);
-	// °´ÏÂ E ¼ü
+	// æŒ‰ä¸‹ E é”®
 	keyPress(0x45);
 }

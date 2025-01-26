@@ -1,4 +1,4 @@
-#include "showtextinscreenwidget.h"
+ï»¿#include "showtextinscreenwidget.h"
 
 ShowTextInScreenWidget::ShowTextInScreenWidget(QWidget* parent, QString text, QPoint position, int durationMs)
 	: QWidget(parent), text_(text), position_(position), durationMs_(durationMs)
@@ -14,7 +14,7 @@ ShowTextInScreenWidget::ShowTextInScreenWidget(QWidget* parent, QString text, QP
 	label->setFont(QFont("Arial", 12, QFont::Bold));
 	label->adjustSize();
 
-	// ÉèÖÃ´°¿Ú´óĞ¡Óë QLabel ÏàÍ¬
+	// è®¾ç½®çª—å£å¤§å°ä¸ QLabel ç›¸åŒ
 	this->resize(label->size());
 }
 
@@ -35,7 +35,7 @@ void ShowTextInScreenWidget::showTextInScreen()
 {
 	this->show();
 
-	// µÈ´ıÖ¸¶¨Ê±¼äºóÏú»Ù´°¿Ú
+	// ç­‰å¾…æŒ‡å®šæ—¶é—´åé”€æ¯çª—å£
 	// QThread::msleep(durationMs_);
 	QTimer::singleShot(durationMs_, this, &ShowTextInScreenWidget::close);
 }

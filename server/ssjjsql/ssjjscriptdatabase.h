@@ -1,10 +1,10 @@
-#pragma once
+ï»¿#pragma once
 #include <QSqlDatabase>
 #include <QObject>
 #include <QStringList>
 #include <QSqlError>
 
-class SSJJScriptDataBase : public QSqlDatabase // ¸ÄÎª¼Ì³Ð QObject
+class SSJJScriptDataBase : public QSqlDatabase // æ”¹ä¸ºç»§æ‰¿ QObject
 {
 public:
     explicit SSJJScriptDataBase();

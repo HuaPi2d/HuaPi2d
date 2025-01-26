@@ -1,4 +1,4 @@
-#ifndef ENTERGAMETHREAD_H
+﻿#ifndef ENTERGAMETHREAD_H
 #define ENTERGAMETHREAD_H
 
 #include <QThread>

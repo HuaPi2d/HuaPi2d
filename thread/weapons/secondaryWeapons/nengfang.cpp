@@ -1,4 +1,4 @@
-#include "nengfang.h"
+ï»¿#include "nengfang.h"
 
 NengFang::NengFang(QObject *parent)
 	: SingleWeaponThread(parent)
@@ -13,18 +13,18 @@ NengFang::~NengFang()
 void NengFang::run()
 {
 	qDebug() << name;
-	// °´ÏÂ 2 ¼ü
+	// æŒ‰ä¸‹ 2 é”®
 	keyPress(0x32);
-	// »ñÈ¡ÆÁÄ»·Ö±æÂÊ
+	// èŽ·å–å±å¹•åˆ†è¾¨çŽ‡
 	cv::Point screeenSize = getScreenResolution();
-	// Êó±êÏÂÒÆ
+	// é¼ æ ‡ä¸‹ç§»
 	MoveMouse(screeenSize.x / 2, screeenSize.y);
-	// °´ÏÂÊó±ê×ó¼üÁ½´Î
+	// æŒ‰ä¸‹é¼ æ ‡å·¦é”®ä¸¤æ¬¡
 	for (int i = 0; i < 2; i++) {
 		QThread::msleep(200);
 		RightClick();
 		QThread::msleep(100);
 	}
-	// Êó±êÒÆ»ØÔ­Î»
+	// é¼ æ ‡ç§»å›žåŽŸä½
 	MoveMouse(screeenSize.x / 2, 1);
 }

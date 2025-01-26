@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 
 #include <QObject>
 #include <QThread>
@@ -17,9 +17,9 @@ public:
 
 private:
 	QVector<SingleWeaponThread*> bonusWeaponList;
-	int bonusType;         // 0: µ¥´Î¼Ó³É 1: ³ÖĞø¼Ó³É
-	bool isRandomMove;       // ÊÇ·ñËæ»úÒÆ¶¯Êó±ê
-	bool isSendMessage;      // ÊÇ·ñÊäÈëÏûÏ¢
+	int bonusType;         // 0: å•æ¬¡åŠ æˆ 1: æŒç»­åŠ æˆ
+	bool isRandomMove;       // æ˜¯å¦éšæœºç§»åŠ¨é¼ æ ‡
+	bool isSendMessage;      // æ˜¯å¦è¾“å…¥æ¶ˆæ¯
 
 protected:
 	void run() override;
@@ -31,8 +31,8 @@ public slots:
 	void setIsSendMessage(bool isSendMessage);
 	void randomMove();
 	void sendMessage();
-	// ×ª¶¯ÊÓÏß
+	// è½¬åŠ¨è§†çº¿
 	void rollGaze();
-	// »ñÈ¡µ±Ç°µÄ¼Ó³ÉÀàĞÍ
+	// è·å–å½“å‰çš„åŠ æˆç±»å‹
 	int getBonusType();
 };

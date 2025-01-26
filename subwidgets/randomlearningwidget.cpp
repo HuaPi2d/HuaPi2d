@@ -39,66 +39,36 @@ void RandomLearningWidget::closeEvent(QCloseEvent *event)
 void RandomLearningWidget::saveSetttings()
 {
     /* 声明对象 */
-    QSettings setting(qApp->applicationDirPath() + "/userSettings.ini", QSettings::IniFormat);
+    QSettings settings(qApp->applicationDirPath() + "/Settings/randomLearningSettings.ini", QSettings::IniFormat);
 
     /* 写入配置 */
-    setting.beginGroup("randomLearning");
-    setting.setValue("autoSave", ui->autoSaveCheckBox->isChecked());
-    setting.setValue("viewDataList", ui->viewDataListCheckBox->isChecked());
-    setting.setValue("readOnly", ui->readonlyCheckBox->isChecked());
-    setting.setValue("viewKeyWords", ui->viewKeyWordsCheckBox->isChecked());
-    setting.setValue("highlight", ui->highlightCheckBox->isChecked());
-    setting.endGroup();
+    settings.beginGroup("randomLearning");
+    settings.setValue("autoSave", ui->autoSaveCheckBox->isChecked());
+    settings.setValue("viewDataList", ui->viewDataListCheckBox->isChecked());
+    settings.setValue("readOnly", ui->readonlyCheckBox->isChecked());
+    settings.setValue("viewKeyWords", ui->viewKeyWordsCheckBox->isChecked());
+    settings.setValue("highlight", ui->highlightCheckBox->isChecked());
+    settings.endGroup();
 }
 
 void RandomLearningWidget::loadSettings()
 {
     /* 声明对象 */
-    QSettings setting(qApp->applicationDirPath() + "/userSettings.ini", QSettings::IniFormat);
+    QSettings settings(qApp->applicationDirPath() + "/Settings/randomLearningSettings.ini", QSettings::IniFormat);
 
     /* 读取配置 */
-    setting.beginGroup("randomLearning");
-    if (setting.value("autoSave").toString() != "")
-    {
-        ui->autoSaveCheckBox->setChecked(setting.value("autoSave").toBool());
-    }
-    else
-    {
-        ui->autoSaveCheckBox->setChecked(true);
-    }
-    if (setting.value("viewDataList").toString() != "")
-    {
-        ui->viewDataListCheckBox->setChecked(setting.value("viewDataList").toBool());
-    }
-    else
-    {
-        ui->viewDataListCheckBox->setChecked(false);
-    }
-    if (setting.value("readOnly").toString() != "")
-    {
-        ui->readonlyCheckBox->setChecked(setting.value("readOnly").toBool());
-    }
-    else
-    {
-        ui->readonlyCheckBox->setChecked(false);
-    }
-    if (setting.value("viewKeyWords").toString() != "")
-    {
-        ui->viewKeyWordsCheckBox->setChecked(setting.value("viewKeyWords").toBool());
-    }
-    else
-    {
-        ui->viewKeyWordsCheckBox->setChecked(false);
-    }
-    if (setting.value("highlight").toString() != "")
-    {
-        ui->highlightCheckBox->setChecked(setting.value("highlight").toBool());
-    }
-    else
-    {
-        ui->highlightCheckBox->setChecked(false);
-    }
-    setting.endGroup();
+    settings.beginGroup("randomLearning");
+    // 自动保存
+    ui->autoSaveCheckBox->setChecked(settings.value("autoSave", true).toBool());
+    // 显示数据列表
+    ui->viewDataListCheckBox->setChecked(settings.value("viewDataList", false).toBool());
+    // 只读
+    ui->readonlyCheckBox->setChecked(settings.value("readOnly", false).toBool());
+    // 显示关键词
+    ui->viewKeyWordsCheckBox->setChecked(settings.value("viewKeyWords", false).toBool());
+    // 高亮
+    ui->highlightCheckBox->setChecked(settings.value("highlight", false).toBool());
+    settings.endGroup();
 }
 
 void RandomLearningWidget::updateWidget()

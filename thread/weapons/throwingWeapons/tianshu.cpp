@@ -1,4 +1,4 @@
-#include "tianshu.h"
+ï»¿#include "tianshu.h"
 
 TianShu::TianShu(QObject *parent)
 	: SingleWeaponThread(parent)
@@ -13,10 +13,10 @@ TianShu::~TianShu()
 void TianShu::run()
 {
 	qDebug() << name;
-	// °´ÏÂ 4 ¼ü
+	// æŒ‰ä¸‹ 4 é”®
 	// keyPress(0x34);
-	// °´ÏÂ F ¼ü
+	// æŒ‰ä¸‹ F é”®
 	keyPress(0x46);
-	// µÈ´ý 100ms
+	// ç­‰å¾… 100ms
 	// QThread::msleep(100);
 }

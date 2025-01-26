@@ -1,24 +1,24 @@
-#include "ffmpegpro.h"
+ï»¿#include "ffmpegpro.h"
 
 void convertAviToMp4(const QString& aviFilePath, const QString& mp4FilePath) {
     QProcess ffmpegProcess;
 
-    // FFmpeg ÃüÁîĞĞ²ÎÊı£¬Ö¸¶¨ÊäÈëÎÄ¼şºÍÊä³öÎÄ¼ş
+    // FFmpeg å‘½ä»¤è¡Œå‚æ•°ï¼ŒæŒ‡å®šè¾“å…¥æ–‡ä»¶å’Œè¾“å‡ºæ–‡ä»¶
     QStringList arguments;
 
-    arguments << "-i" << aviFilePath  // ÊäÈë AVI ÎÄ¼ş
-        << "-c:v" << "libx264"  // Ê¹ÓÃ H.264 ÊÓÆµ±à½âÂëÆ÷
-        << "-c:a" << "aac"      // Ê¹ÓÃ AAC ÒôÆµ±à½âÂëÆ÷
-        << "-strict" << "experimental" // Ê¹ÓÃ AAC Ê±¿ÉÄÜĞèÒª
-        << "-b:a" << "192k"     // ÉèÖÃÒôÆµ±ÈÌØÂÊ
-        << "-b:v" << "1000k"    // ÉèÖÃÊÓÆµ±ÈÌØÂÊ£¨¿ÉÒÔµ÷Õû£©
-        << "-y"                 // ¸²¸ÇÊä³öÎÄ¼ş
-        << mp4FilePath;         // Êä³ö MP4 ÎÄ¼şÂ·¾¶
+    arguments << "-i" << aviFilePath  // è¾“å…¥ AVI æ–‡ä»¶
+        << "-c:v" << "libx264"  // ä½¿ç”¨ H.264 è§†é¢‘ç¼–è§£ç å™¨
+        << "-c:a" << "aac"      // ä½¿ç”¨ AAC éŸ³é¢‘ç¼–è§£ç å™¨
+        << "-strict" << "experimental" // ä½¿ç”¨ AAC æ—¶å¯èƒ½éœ€è¦
+        << "-b:a" << "192k"     // è®¾ç½®éŸ³é¢‘æ¯”ç‰¹ç‡
+        << "-b:v" << "1000k"    // è®¾ç½®è§†é¢‘æ¯”ç‰¹ç‡ï¼ˆå¯ä»¥è°ƒæ•´ï¼‰
+        << "-y"                 // è¦†ç›–è¾“å‡ºæ–‡ä»¶
+        << mp4FilePath;         // è¾“å‡º MP4 æ–‡ä»¶è·¯å¾„
 
-    // Æô¶¯ FFmpeg ½ø³Ì
+    // å¯åŠ¨ FFmpeg è¿›ç¨‹
     ffmpegProcess.start("ffmpeg", arguments);
 
-    // µÈ´ı½ø³Ì½áÊø
+    // ç­‰å¾…è¿›ç¨‹ç»“æŸ
     if (ffmpegProcess.waitForFinished(6000000)) {
         qDebug() << "Conversion finished successfully!";
     }

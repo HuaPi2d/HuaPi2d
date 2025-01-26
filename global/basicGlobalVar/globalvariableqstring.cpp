@@ -1,4 +1,4 @@
-#include "globalvariableqstring.h"
+﻿#include "globalvariableqstring.h"
 
 GlobalVariableQString::GlobalVariableQString(QObject *parent)
 	: QObject(parent)

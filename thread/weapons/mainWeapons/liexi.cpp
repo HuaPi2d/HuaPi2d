@@ -1,4 +1,4 @@
-#include "liexi.h"
+ï»¿#include "liexi.h"
 
 LieXi::LieXi(QObject *parent)
 	: SingleWeaponThread(parent)
@@ -13,19 +13,19 @@ LieXi::~LieXi()
 void LieXi::run()
 {
 	qDebug() << name;
-	// °´ÏÂ1¼ü
+	// æŒ‰ä¸‹1é”®
 	keyPress(0x31);
-	// »ñÈ¡ÆÁÄ»·Ö±æÂÊ
+	// èŽ·å–å±å¹•åˆ†è¾¨çŽ‡
 	cv::Point screeenSize = getScreenResolution();
-	// Êó±êÏÂÒÆ
+	// é¼ æ ‡ä¸‹ç§»
 	MoveMouse(screeenSize.x / 2, screeenSize.y);
 	QThread::msleep(100);
 	MoveMouse(screeenSize.x / 2, screeenSize.y);
 	QThread::msleep(100);
-	// °´ÏÂÊó±êÓÒ¼ü
+	// æŒ‰ä¸‹é¼ æ ‡å³é”®
 	RightClick();
 	QThread::msleep(100);
-	// Êó±êÒÆ»ØÔ­Î»
+	// é¼ æ ‡ç§»å›žåŽŸä½
 	MoveMouse(screeenSize.x / 2, 1);
 	QThread::msleep(100);
 	MoveMouse(screeenSize.x / 2, 360);

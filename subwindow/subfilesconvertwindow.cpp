@@ -1,4 +1,4 @@
-#include "subfilesconvertwindow.h"
+﻿#include "subfilesconvertwindow.h"
 
 SubFilesConvertWindow::SubFilesConvertWindow(QWidget *parent)
 	: QMdiSubWindow(parent)

@@ -1,4 +1,4 @@
-#include "standardairmodel.h"
+﻿#include "standardairmodel.h"
 
 double calculate_air_density(double altitude)
 {

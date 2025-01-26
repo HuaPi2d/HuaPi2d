@@ -1,4 +1,4 @@
-#include "runscriptthread.h"
+ï»¿#include "runscriptthread.h"
 
 RunScriptThread::RunScriptThread(QObject *parent)
     : BasicScriptThread{parent}
@@ -20,6 +20,6 @@ void RunScriptThread::run()
         emit threadFinished();
     }
     QThread::msleep(1000);
-    // ·¢ËÍÐÅºÅ
+    // å‘é€ä¿¡å·
     this->deleteLater();
 }

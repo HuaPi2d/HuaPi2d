@@ -1,4 +1,4 @@
-#ifndef SSJJCOREFUN_H
+ï»¿#ifndef SSJJCOREFUN_H
 #define SSJJCOREFUN_H
 
 #include "universal/programController.h"
@@ -9,13 +9,13 @@
 #include "ssjjCore/script/scriptcompiler/scriptcompiler.h"
 
 
-// ÏÂÒ»²½²Ù×÷
-// restartSSJJ: ÖØÆôÓÎÏ·
-// InitializeGameScreen£º³õÊ¼»¯ÓÎÏ·½çÃæ
-// enterGame£º½øÈëÓÎÏ·
-// runScriptFile£ºÔËĞĞ½Å±¾
-// settlement£º½áËã
-// fatalError£ºÖÂÃü´íÎó£¬ÔËĞĞÍ£Ö¹
+// ä¸‹ä¸€æ­¥æ“ä½œ
+// restartSSJJ: é‡å¯æ¸¸æˆ
+// InitializeGameScreenï¼šåˆå§‹åŒ–æ¸¸æˆç•Œé¢
+// enterGameï¼šè¿›å…¥æ¸¸æˆ
+// runScriptFileï¼šè¿è¡Œè„šæœ¬
+// settlementï¼šç»“ç®—
+// fatalErrorï¼šè‡´å‘½é”™è¯¯ï¼Œè¿è¡Œåœæ­¢
 struct SSJJRunState
 {
     QString remindText;
@@ -57,13 +57,13 @@ SSJJRunState settlement(SingleTask task);
 
 void turnToPage(FileAttribute chapter, FileAttribute level);
 
-// µã»÷¶ÔÓ¦¹Ø¿¨
+// ç‚¹å‡»å¯¹åº”å…³å¡
 bool clickLevel(FileAttribute level);
 
-// Ñ¡Ôñ¶ÔÓ¦ÄÑ¶È
+// é€‰æ‹©å¯¹åº”éš¾åº¦
 void chooseDifficulty(QString difficulty);
 
-// ½øÈëÖ÷Ïß¹Ø¿¨
+// è¿›å…¥ä¸»çº¿å…³å¡
 void enterZXGame();
 
 #endif // SSJJCOREFUN_H

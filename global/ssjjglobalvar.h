@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 #ifndef SSJJGLOBALVAR_H
 #define SSJJGLOBALVAR_H
 
@@ -10,10 +10,10 @@
 extern QString resolutionPath;
 extern bool isRunScriptThreadRunning;
 extern GlobalVariableQString* textToShowInScreen;
-// ÃÜÂëÄ£Ê½
-// 1: ¹Ì¶¨ÃÜÂë
-// 2: ÈÕÆÚÃÜÂë
-// 3: ÎŞÃÜÂë
+// å¯†ç æ¨¡å¼
+// 1: å›ºå®šå¯†ç 
+// 2: æ—¥æœŸå¯†ç 
+// 3: æ— å¯†ç 
 extern int passWordMode;
 extern QString enterGamePassWord;
 

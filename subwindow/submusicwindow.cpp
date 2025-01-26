@@ -1,4 +1,4 @@
-#include "submusicwindow.h"
+﻿#include "submusicwindow.h"
 #include "subwidgets/submusicwidget.h"
 
 #include <QTimer>

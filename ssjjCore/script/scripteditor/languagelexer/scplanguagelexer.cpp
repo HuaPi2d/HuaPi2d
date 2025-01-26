@@ -1,9 +1,12 @@
-#include "scplanguagelexer.h"
+ï»¿#include "scplanguagelexer.h"
 
-ScpLanguageLexer::ScpLanguageLexer(QObject *parent)
+
+ScpLanguageLexer::ScpLanguageLexer(EditorConfig editorConfig, QObject *parent)
 	: QsciLexerCustom(parent)
 {
+	m_editorConfig = editorConfig;
 	this->setupStyles();
+	
 }
 
 ScpLanguageLexer::~ScpLanguageLexer()
@@ -44,23 +47,20 @@ QString ScpLanguageLexer::description(int style) const
 
 void ScpLanguageLexer::styleText(int start, int end)
 {
-	// »ñÈ¡ÎÄ±¾ÄÚÈÝ
+	// èŽ·å–æ–‡æœ¬å†…å®¹
 	QString text = editor()->text(start, end);
 }
 
 void ScpLanguageLexer::setupStyles()
 {
-	// Éè¶¨ÌØ¶¨ÀàÐÍ×Ö·ûµÄÑÕÉ«
-	setColor(QColor("#000000"), Default);
-	setColor(QColor("#0000FF"), Keyword);
-	setColor(QColor("#FF0000"), Number);
-	setColor(QColor("#008000"), String);
-	setColor(QColor("#FF00FF"), Operator);
-	setColor(QColor("#800080"), Function);
-	setColor(QColor("#000080"), Variable);
-	setColor(QColor("#808080"), Comment);
-
-	// Éè¶¨×ÖÌå
-	// Ê¡ÂÔ
+	// è®¾å®šç‰¹å®šç±»åž‹å­—ç¬¦çš„é¢œè‰²
+	setColor(m_editorConfig.color.text, Default);
+	setColor(m_editorConfig.color.keyword, Keyword);
+	setColor(m_editorConfig.color.number, Number);
+	setColor(m_editorConfig.color.string, String);
+	setColor(m_editorConfig.color.operateur, Operator);
+	setColor(m_editorConfig.color.function, Function);
+	setColor(m_editorConfig.color.variable, Variable);
+	setColor(m_editorConfig.color.comment, Comment);
 }
 

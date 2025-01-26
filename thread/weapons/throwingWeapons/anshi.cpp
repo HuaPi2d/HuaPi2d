@@ -1,4 +1,4 @@
-#include "anshi.h"
+ï»¿#include "anshi.h"
 
 AnShi::AnShi(QObject *parent)
 	: SingleWeaponThread(parent)
@@ -13,11 +13,11 @@ AnShi::~AnShi()
 void AnShi::run()
 {
 	qDebug() << name;
-	// °´ÏÂ 4 ¼ü
+	// æŒ‰ä¸‹ 4 é”®
 	keyPress(0x34);
-	// µÈ´ýÈÓÍê
+	// ç­‰å¾…æ‰”å®Œ
 	QThread::msleep(1800);
-	// ËÉ¿ªÊó±ê×ó¼ü
+	// æ¾å¼€é¼ æ ‡å·¦é”®
 	LeftUp();
 	LeftDown();
 }

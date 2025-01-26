@@ -1,4 +1,4 @@
-#include "limingzhiguang.h"
+ï»¿#include "limingzhiguang.h"
 
 LiMingZhiGuang::LiMingZhiGuang(QObject *parent)
 	: SingleWeaponThread(parent)
@@ -13,8 +13,8 @@ LiMingZhiGuang::~LiMingZhiGuang()
 void LiMingZhiGuang::run()
 {
 	qDebug() << name;
-	// °´ÏÂ 1 ¼ü
+	// æŒ‰ä¸‹ 1 é”®
 	keyPress(0x31);
-	// °´ÏÂ E ¼ü
+	// æŒ‰ä¸‹ E é”®
 	keyPress(0x45);
 }

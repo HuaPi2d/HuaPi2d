@@ -25,6 +25,13 @@
 #define STRINGIFY(x) _STR(x)
 
 
+namespace Syntax {
+    enum Lexer {
+        scp = 0,
+    };
+}
+
+
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
@@ -181,70 +188,93 @@ void MainWindow::receiveDsizeInfo(int dwidth, int dheight)
     this->resize(QSize(currentSize.width() + dwidth, currentSize.height() + dheight));
 }
 
+// 保存配置
 void MainWindow::saveSettings()
 {
     /* 声明对象 */
-    QSettings setting(appDir + "/userSettings.ini", QSettings::IniFormat);
+    UsersSettings settings(appDir + "/Settings/globalSettings.ini");
 
     /* 写入配置 */
-    setting.beginGroup("window");
-    setting.setValue("theme", currentTheme); // 写入主题配置
-    setting.setValue("width", this->width());
-    setting.setValue("height", this->height());
-    setting.setValue("isMaximized", this->isMaximized()); // 窗口大小
-    setting.setValue("developeMode", developerMode); // 开发者模式
-    setting.endGroup();
+    settings.beginGroup("window");
+    settings.setValue("theme", currentTheme); // 写入主题配置
+    settings.setValue("width", this->width());
+    settings.setValue("height", this->height());
+    settings.setValue("isMaximized", this->isMaximized()); // 窗口大小
+    settings.setValue("developerMode", developerMode); // 开发者模式
+    settings.beginGroup("text");
+    settings.setValue("randomSentence", ui->randomSentenceLabel->text());
+    settings.endGroup();
+    settings.endGroup();
 
-    setting.beginGroup("text");
-    setting.setValue("randomSentence", ui->randomSentenceLabel->text());
-    setting.endGroup();
+    /* 声明对象 */
+    UsersSettings editorConfigSettings(appDir + "/Settings/editorConfig.ini");
+
+    /* 写入编辑器配置 */
+    editorConfigSettings.beginGroup("EditorConfig");
+    editorConfigSettings.setValue("font", editorConfig.font.font.toString());
+    editorConfigSettings.setValue("fontSize", editorConfig.font.size);
+    editorConfigSettings.beginGroup("color");
+    editorConfigSettings.setValue("background", editorConfig.color.background.name());
+    editorConfigSettings.setValue("text", editorConfig.color.text.name());
+    editorConfigSettings.setValue("keyword", editorConfig.color.keyword.name());
+    editorConfigSettings.setValue("number", editorConfig.color.number.name());
+    editorConfigSettings.setValue("string", editorConfig.color.string.name());
+    editorConfigSettings.setValue("operateur", editorConfig.color.operateur.name());
+    editorConfigSettings.setValue("function", editorConfig.color.function.name());
+    editorConfigSettings.setValue("variable", editorConfig.color.variable.name());
+    editorConfigSettings.setValue("comment", editorConfig.color.comment.name());
+    editorConfigSettings.endGroup();
+    editorConfigSettings.endGroup();
 }
 
+// 读取配置
 void MainWindow::loadSettings()
 {
     /* 声明对象 */
-    QSettings setting(appDir + "/userSettings.ini", QSettings::IniFormat);
+    UsersSettings settings(appDir + "/Settings/globalSettings.ini");
 
     /* 读取配置 */
-    setting.beginGroup("window");
-    if(setting.value("theme").toString() != "")
-    {
-        currentTheme = setting.value("theme").toString();
-    }
-    else
-    {
-        currentTheme = "light_blue";
-    }
-    updateTheme(); // 读取主题设置
-    if(setting.value("width").toString() != "")
-    {
-        this->resize(QSize(setting.value("width").toInt(), setting.value("height").toInt()));
-    }
-    else
-    {
-        this->resize(QSize(1385, 820));
-    }
-    if(setting.value("isMaximized") == "true")
-    {
+    //// 窗口配置
+    settings.beginGroup("window");
+    // 主题
+    currentTheme = settings.value("theme", "light_blue").toString();
+    updateTheme();
+    // 窗口大小
+    this->resize(settings.value("width", 1385).toInt(), settings.value("height", 820).toInt());
+    // 是否最大化
+    if (settings.value("isMaximized", false).toBool() == true)
         this->showMaximized();
-    }  // 改变窗口大小
     // 开发者模式
-    if (setting.value("developeMode").toBool() == true)
-    {
-        developerMode = true;
-        this->setWindowTitle(this->windowTitle() + " - 开发者模式");
-    }
-    else
-    {
-        developerMode = false;
-    }
-    setting.endGroup();
-
-    setting.beginGroup("text");
-    ui->randomSentenceLabel->setText(setting.value("randomSentence").toString());
-    setting.endGroup();
+    developerMode = settings.value("developerMode", false).toBool();
+    // 文本
+    settings.beginGroup("text");
+    ui->randomSentenceLabel->setText(settings.value("randomSentence", "正在获取随机句子...").toString());
+    settings.endGroup();
+    settings.endGroup();
 
     hideSomeItems();
+
+    // 全局编辑器配置
+    /* 声明对象 */
+    UsersSettings editorConfigSettings(appDir + "/Settings/editorConfig.ini");
+
+    /* 读取编辑器配置 */
+    //// 编辑器配置
+    editorConfigSettings.beginGroup("EditorConfig");
+    editorConfig.font.font = editorConfigSettings.value("font", QFont("Consolas")).value<QFont>();
+    editorConfig.font.size = editorConfigSettings.value("fontSize", 12).toInt();
+    editorConfigSettings.beginGroup("color");
+    editorConfig.color.background = QColor(editorConfigSettings.value("background", "#FFFFFF").toString());
+    editorConfig.color.text = QColor(editorConfigSettings.value("text", "#000000").toString());
+    editorConfig.color.keyword = QColor(editorConfigSettings.value("keyword", "#0077aa").toString());
+    editorConfig.color.number = QColor(editorConfigSettings.value("number", "#990000").toString());
+    editorConfig.color.string = QColor(editorConfigSettings.value("string", "#009999").toString());
+    editorConfig.color.operateur = QColor(editorConfigSettings.value("operateur", "#990099").toString());
+    editorConfig.color.function = QColor(editorConfigSettings.value("function", "#0000FF").toString());
+    editorConfig.color.variable = QColor(editorConfigSettings.value("variable", "#000099").toString());
+    editorConfig.color.comment = QColor(editorConfigSettings.value("comment", "#999999").toString());
+    editorConfigSettings.endGroup();
+    editorConfigSettings.endGroup();
 }
 
 void MainWindow::hideSomeItems()
@@ -713,6 +743,10 @@ void MainWindow::createSSJJSubWindow()
     /* 将任务栏按钮和子窗口连接起来 */
     connect(taskButton, &QPushButton::clicked, signalMapper, QOverload<>::of(&QSignalMapper::map));
     signalMapper->setMapping(taskButton, subSSJJWindow);
+
+    /* 传递全局编辑器配置 */
+    connect(this, &MainWindow::getGlobalEditorConfig, subSSJJWindow, &SubSSJJWindow::getGlobalEditorConfig);
+    emit getGlobalEditorConfig(editorConfig);
 
     connect(taskButton, &QPushButton::clicked, this, [=](){
         subSSJJWindow->showMaximized();

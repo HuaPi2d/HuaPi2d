@@ -1,4 +1,4 @@
-#include "subaawindow.h"
+﻿#include "subaawindow.h"
 
 
 SubAAWindow::SubAAWindow(QWidget *parent)

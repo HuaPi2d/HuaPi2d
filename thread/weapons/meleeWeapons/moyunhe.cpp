@@ -1,4 +1,4 @@
-#include "moyunhe.h"
+ï»¿#include "moyunhe.h"
 
 MoYunHe::MoYunHe(QObject *parent)
 	: SingleWeaponThread(parent)
@@ -13,13 +13,13 @@ MoYunHe::~MoYunHe()
 void MoYunHe::run()
 {
 	qDebug() << name;
-	// °´ÏÂ3¼ü
+	// æŒ‰ä¸‹3é”®
 	keyPress(0x33);
-	// °´ÏÂE¼üÁ½´Î
+	// æŒ‰ä¸‹Eé”®ä¸¤æ¬¡
 	msleep(100);
 	keyPress(0x45);
 	msleep(100);
 	keyPress(0x45);
-	// µÈ´ý1000ms
+	// ç­‰å¾…1000ms
 	msleep(1000);
 }

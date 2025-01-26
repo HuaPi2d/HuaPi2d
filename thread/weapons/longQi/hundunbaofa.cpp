@@ -1,4 +1,4 @@
-#include "hundunbaofa.h"
+ï»¿#include "hundunbaofa.h"
 
 HunDunBaoFa::HunDunBaoFa(QObject *parent)
 	: SingleWeaponThread(parent)
@@ -13,10 +13,10 @@ HunDunBaoFa::~HunDunBaoFa()
 void HunDunBaoFa::run()
 {
 	qDebug() << name;
-	// ×ó¼üËÉ¿ª
+	// å·¦é”®æ¾å¼€
 	LeftUp();
-	// °´ÏÂ C ¼ü
+	// æŒ‰ä¸‹ C é”®
 	keyPress(0x43);
-	// °´ÏÂ×ó¼ü
+	// æŒ‰ä¸‹å·¦é”®
 	LeftDown();
 }

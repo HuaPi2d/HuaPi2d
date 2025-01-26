@@ -42,27 +42,27 @@ void SubVideoWidget::closeEvent(QCloseEvent *event)
 void SubVideoWidget::saveSettings()
 {
     /* 声明对象 */
-    QSettings setting(qApp->applicationDirPath() + "/userSettings.ini", QSettings::IniFormat);
+    UsersSettings settings(qApp->applicationDirPath() + "/Settings/videoSettings.ini");
 
     /* 写入配置 */
-    setting.beginGroup("video");
-    setting.setValue("website", ui->website_comboBox->currentIndex()); // 解析视频网站
-    setting.setValue("videoUrl", ui->video_url->text());               // 解析视频网址
-    setting.setValue("videoSearchEngine", ui->searchEngineComboBox->currentIndex());
-    setting.endGroup();
+    settings.beginGroup("video");
+    settings.setValue("website", ui->website_comboBox->currentIndex()); // 解析视频网站
+    settings.setValue("videoUrl", ui->video_url->text());               // 解析视频网址
+    settings.setValue("videoSearchEngine", ui->searchEngineComboBox->currentIndex());
+    settings.endGroup();
 }
 
 void SubVideoWidget::loadSettings()
 {
     /* 声明对象 */
-    QSettings setting(qApp->applicationDirPath() + "/userSettings.ini", QSettings::IniFormat);
+    UsersSettings settings(qApp->applicationDirPath() + "/Settings/videoSettings.ini");
 
     /* 读取配置 */
-    setting.beginGroup("video");
-    ui->website_comboBox->setCurrentIndex(setting.value("website").toInt());
-    ui->video_url->setText(setting.value("videoUrl").toString());
-    ui->searchEngineComboBox->setCurrentIndex(setting.value("videoSearchEngine").toInt());
-    setting.endGroup();
+    settings.beginGroup("video");
+    ui->website_comboBox->setCurrentIndex(settings.value("website", "0").toInt());
+    ui->video_url->setText(settings.value("videoUrl", "").toString());
+    ui->searchEngineComboBox->setCurrentIndex(settings.value("videoSearchEngine", "0").toInt());
+    settings.endGroup();
 }
 
 /* 搜索视频 */

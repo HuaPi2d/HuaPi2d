@@ -1,4 +1,4 @@
-#include "caijue.h"
+ï»¿#include "caijue.h"
 
 CaiJue::CaiJue(QObject *parent)
 	: SingleWeaponThread(parent)
@@ -13,10 +13,10 @@ CaiJue::~CaiJue()
 void CaiJue::run()
 {
 	qDebug() << name;
-	// °´ÏÂ 1 ¼ü
+	// æŒ‰ä¸‹ 1 é”®
 	keyPress(0x31);
-	// µÈ´ý 100ms
+	// ç­‰å¾… 100ms
 	QThread::msleep(100);
-	// °´ÏÂ E ¼ü
+	// æŒ‰ä¸‹ E é”®
 	keyPress(0x45);
 }

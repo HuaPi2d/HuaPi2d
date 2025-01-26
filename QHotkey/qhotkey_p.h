@@ -1,4 +1,4 @@
-#ifndef QHOTKEY_P_H
+﻿#ifndef QHOTKEY_P_H
 #define QHOTKEY_P_H
 
 #include "qhotkey.h"

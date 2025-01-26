@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 
 #include <QSqlDatabase>
 #include <QSqlQuery>
@@ -23,22 +23,22 @@ public:
 
 	static KnowledgeItemsDataBase* getKnowledgeItemsDataBase(QString dbname = "knowledgeItems.db");
 
-	// ´´½¨±í
+	// åˆ›å»ºè¡¨
 	bool createKnowledgeItemsTable();
 
-	// ²åÈëÊı¾İ
+	// æ’å…¥æ•°æ®
 	bool insertKnowledgeItem(KnowledgeItem item);
 
-	// °´ÕÕË³Ğò²éÑ¯Êı¾İ
+	// æŒ‰ç…§é¡ºåºæŸ¥è¯¢æ•°æ®
 	// bool getKnowledgeItemByIndex(int index, KnowledgeItem& item);
 
-	// °´ÕÕÀàĞÍ²éÑ¯Êı¾İ
+	// æŒ‰ç…§ç±»å‹æŸ¥è¯¢æ•°æ®
 	QList<KnowledgeItem> getKnowledgeItems(QString type = "");
 
-	// Í¨¹ı ID É¾³ıÊı¾İ
+	// é€šè¿‡ ID åˆ é™¤æ•°æ®
 	bool deleteKnowledgeItemById(int id);
 
-	// Í¨¹ı ID ¸üĞÂÊı¾İ
+	// é€šè¿‡ ID æ›´æ–°æ•°æ®
 	bool updateKnowledgeItemById(int id, KnowledgeItem item);
 
 private:

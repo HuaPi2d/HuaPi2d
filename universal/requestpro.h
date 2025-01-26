@@ -1,4 +1,4 @@
-#ifndef REQUESTPRO_H
+﻿#ifndef REQUESTPRO_H
 #define REQUESTPRO_H
 
 #include <QNetworkAccessManager>

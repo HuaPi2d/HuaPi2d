@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include <QWidget>
 #include <QDoubleValidator>
@@ -8,6 +8,7 @@
 #include "ui_subaawidget.h"
 #include "Aerospace/air/standardairmodel.h"
 #include "Aerospace/universal/coordinate.h"
+#include "universal/file/userssettings.h"
 
 
 QT_BEGIN_NAMESPACE

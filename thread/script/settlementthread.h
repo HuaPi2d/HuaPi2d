@@ -1,4 +1,4 @@
-#ifndef SETTLEMENTTHREAD_H
+﻿#ifndef SETTLEMENTTHREAD_H
 #define SETTLEMENTTHREAD_H
 
 #include <QThread>

@@ -1,4 +1,4 @@
-#include "pctime.h"
+﻿#include "pctime.h"
 
 QString getYYYYMMDDHHMMSS()
 {

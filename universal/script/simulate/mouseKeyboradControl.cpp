@@ -1,10 +1,10 @@
-#include "mouseKeyboradControl.h"
+ï»¿#include "mouseKeyboradControl.h"
 
 void MoveMouse(int x, int y) {
     INPUT input = { 0 };
     input.type = INPUT_MOUSE;
-    input.mi.dx = (x * 65535) / GetSystemMetrics(SM_CXSCREEN); // ×ª»»ÎªÆÁÄ»×ø±ê
-    input.mi.dy = (y * 65535) / GetSystemMetrics(SM_CYSCREEN); // ×ª»»ÎªÆÁÄ»×ø±ê
+    input.mi.dx = (x * 65535) / GetSystemMetrics(SM_CXSCREEN); // è½¬æ¢ä¸ºå±å¹•åæ ‡
+    input.mi.dy = (y * 65535) / GetSystemMetrics(SM_CYSCREEN); // è½¬æ¢ä¸ºå±å¹•åæ ‡
     input.mi.dwFlags = MOUSEEVENTF_MOVE | MOUSEEVENTF_ABSOLUTE;
 
     SendInput(1, &input, sizeof(INPUT));
@@ -13,11 +13,11 @@ void MoveMouse(int x, int y) {
 void LeftClick() {
     INPUT input[2] = { 0 };
 
-    // °´ÏÂ×ó¼ü
+    // æŒ‰ä¸‹å·¦é”®
     input[0].type = INPUT_MOUSE;
     input[0].mi.dwFlags = MOUSEEVENTF_LEFTDOWN;
 
-    // ËÉ¿ª×ó¼ü
+    // æ¾å¼€å·¦é”®
     input[1].type = INPUT_MOUSE;
     input[1].mi.dwFlags = MOUSEEVENTF_LEFTUP;
 
@@ -28,7 +28,7 @@ void LeftDown()
 {
     INPUT input[1] = { 0 };
 
-    // °´ÏÂ×ó¼ü
+    // æŒ‰ä¸‹å·¦é”®
     input[0].type = INPUT_MOUSE;
     input[0].mi.dwFlags = MOUSEEVENTF_LEFTDOWN;
 
@@ -39,7 +39,7 @@ void LeftUp()
 {
     INPUT input[1] = { 0 };
 
-    // ËÉ¿ª×ó¼ü
+    // æ¾å¼€å·¦é”®
     input[0].type = INPUT_MOUSE;
     input[0].mi.dwFlags = MOUSEEVENTF_LEFTUP;
 
@@ -49,11 +49,11 @@ void LeftUp()
 void RightClick() {
     INPUT input[2] = { 0 };
 
-    // °´ÏÂÓÒ¼ü
+    // æŒ‰ä¸‹å³é”®
     input[0].type = INPUT_MOUSE;
     input[0].mi.dwFlags = MOUSEEVENTF_RIGHTDOWN;
 
-    // ËÉ¿ªÓÒ¼ü
+    // æ¾å¼€å³é”®
     input[1].type = INPUT_MOUSE;
     input[1].mi.dwFlags = MOUSEEVENTF_RIGHTUP;
 
@@ -63,11 +63,11 @@ void RightClick() {
 void MiddleClick() {
     INPUT input[2] = { 0 };
 
-    // °´ÏÂÖĞ¼ü
+    // æŒ‰ä¸‹ä¸­é”®
     input[0].type = INPUT_MOUSE;
     input[0].mi.dwFlags = MOUSEEVENTF_MIDDLEDOWN;
 
-    // ËÉ¿ªÖĞ¼ü
+    // æ¾å¼€ä¸­é”®
     input[1].type = INPUT_MOUSE;
     input[1].mi.dwFlags = MOUSEEVENTF_MIDDLEUP;
 
@@ -79,7 +79,7 @@ void ScrollMouse(int amount)
     INPUT input = { 0 };
     input.type = INPUT_MOUSE;
     input.mi.dwFlags = MOUSEEVENTF_WHEEL;
-    input.mi.mouseData = amount;  // ÕıÖµÏòÉÏ¹ö¶¯£¬¸ºÖµÏòÏÂ¹ö¶¯
+    input.mi.mouseData = amount;  // æ­£å€¼å‘ä¸Šæ»šåŠ¨ï¼Œè´Ÿå€¼å‘ä¸‹æ»šåŠ¨
 
     SendInput(1, &input, sizeof(INPUT));
 }

@@ -1,5 +1,6 @@
 ﻿#include "languageeditor.h"
 
+
 LanguageEditor::LanguageEditor(QWidget *parent)
 	: QsciScintilla(parent)
 {
@@ -11,6 +12,11 @@ LanguageEditor::LanguageEditor(QWidget *parent)
 	this->setMarginWidth(0, 30);
 
 	// 优化设置
+	this->setCaretLineVisible(true);                        // 显示光标所在行
+	this->SendScintilla(QsciScintilla::SCI_SETCARETLINEVISIBLEALWAYS, true);  // 光标所在行始终显示
+
+	// this->setMatchedBraceBackgroundColor();
+
 	this->setAutoCompletionSource(QsciScintilla::AcsAll);   // 设置源，自动补全所有地方出现的
 	this->setAutoCompletionThreshold(1);  // 设置自动补全的触发字符数
 	this->setAutoCompletionCaseSensitivity(true);  // 设置自动补全的大小写敏感

@@ -1,4 +1,4 @@
-#ifndef RANDOMLEARNINGWINDOW_H
+﻿#ifndef RANDOMLEARNINGWINDOW_H
 #define RANDOMLEARNINGWINDOW_H
 
 #include <QMainWindow>

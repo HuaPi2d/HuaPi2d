@@ -1,4 +1,4 @@
-#include "weaponbonusthread.h"
+ï»¿#include "weaponbonusthread.h"
 
 WeaponBonusThread::WeaponBonusThread(QObject *parent)
 	: QThread(parent)
@@ -9,7 +9,7 @@ WeaponBonusThread::~WeaponBonusThread()
 
 void WeaponBonusThread::run()
 {
-	// Ê×ÏÈµÈ´ı1ÃëÖÓ£¬È·±£¿ì½İ¼üµ¯¿ª
+	// é¦–å…ˆç­‰å¾…1ç§’é’Ÿï¼Œç¡®ä¿å¿«æ·é”®å¼¹å¼€
 	QThread::msleep(1000);
 	LeftDown();
 	if (bonusType == 0) {
@@ -38,7 +38,7 @@ void WeaponBonusThread::run()
 				keyPress(0x31);
 			}
 
-			/* ÅĞ¶ÏÊÇ·ñËæ»úÒÆ¶¯ */
+			/* åˆ¤æ–­æ˜¯å¦éšæœºç§»åŠ¨ */
 			if (isRandomMove)
 			{
 				randomMove();
@@ -48,7 +48,7 @@ void WeaponBonusThread::run()
 				QThread::msleep(1000);
 			}
 
-			/* Ã¿ 120 ´ÎÑ­»··¢ËÍÒ»´ÎÏûÏ¢ */
+			/* æ¯ 120 æ¬¡å¾ªç¯å‘é€ä¸€æ¬¡æ¶ˆæ¯ */
 			if(i % 120 == 0 && isSendMessage)
 			{
 				sendMessage();
@@ -77,37 +77,37 @@ void WeaponBonusThread::setIsSendMessage(bool isSendMessage)
 
 void WeaponBonusThread::randomMove()
 {
-	// ¶¨Òå W A S D ºÍ¿Õ¼üÂë
-	QList<BYTE> keys = { 0x57, 0x41, 0x53, 0x44, 0x00, 0x00, 0x00, 0x00 }; // W, A, S, D ºÍËÄ¸ö¿Õ¼üÂë
+	// å®šä¹‰ W A S D å’Œç©ºé”®ç 
+	QList<BYTE> keys = { 0x57, 0x41, 0x53, 0x44, 0x00, 0x00, 0x00, 0x00 }; // W, A, S, D å’Œå››ä¸ªç©ºé”®ç 
 
-	// Ëæ»úÑ¡ÔñÁ½¸ö¼üÂë
+	// éšæœºé€‰æ‹©ä¸¤ä¸ªé”®ç 
 	BYTE key1 = keys[QRandomGenerator::global()->bounded(keys.size())];
 	BYTE key2 = keys[QRandomGenerator::global()->bounded(keys.size())];
 
-	// Ëæ»ú×ª¶¯ÊÓ½Ç
+	// éšæœºè½¬åŠ¨è§†è§’
 	rollGaze();
 
-	// °´ÏÂ·Ç¿Õ¼ü
+	// æŒ‰ä¸‹éç©ºé”®
 	if (key1 != 0x00) keyDown(key1);
 	if (key2 != 0x00) keyDown(key2);
 
-	// Ä£Äâ°´¼ü³ÖĞøÊ±¼ä 1 Ãë
+	// æ¨¡æ‹ŸæŒ‰é”®æŒç»­æ—¶é—´ 1 ç§’
 	QThread::msleep(1000);
 
-	// ÊÍ·Å°´ÏÂµÄ¼ü
+	// é‡Šæ”¾æŒ‰ä¸‹çš„é”®
 	if (key1 != 0x00) keyRelease(key1);
 	if (key2 != 0x00) keyRelease(key2);
 }
 
 void WeaponBonusThread::sendMessage()
 {
-	// °´ÏÂEnter¼ü
+	// æŒ‰ä¸‹Enteré”®
 	keyPress(VK_RETURN);
 
-	// °´ÏÂ1¼ü
+	// æŒ‰ä¸‹1é”®
 	keyPress(0x31);
 
-	// °´ÏÂEnter¼ü
+	// æŒ‰ä¸‹Enteré”®
 	keyPress(VK_RETURN);
 }
 

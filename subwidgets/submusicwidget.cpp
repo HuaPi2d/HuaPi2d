@@ -318,51 +318,49 @@ void SubMusicWidget::setPlayMode()
 void SubMusicWidget::saveSettings()
 {
     /* 声明对象 */
-    QSettings setting(qApp->applicationDirPath() + "/userSettings.ini", QSettings::IniFormat);
+    UsersSettings settings(qApp->applicationDirPath() + "/Settings/musicSettings.ini");
 
     /* 写入配置 */
-    setting.beginGroup("music");
-    setting.setValue("playMode", playMode);
-    setting.setValue("currentSongName", currentSong.title);
-    setting.setValue("currentSongArtist", currentSong.artist);
-    setting.setValue("currentSourcePath", currentSong.filePath);
-    setting.setValue("currentSongCoverPath", currentSong.coverPath);
-    setting.setValue("currentSongLyricsPath", currentSong.lyricsPath);
-    setting.setValue("currentTime", ui->currentTimeSlider->value());
-    setting.setValue("currentSongTotalTime", ui->currentTimeSlider->maximum());
-    setting.endGroup();
+    settings.beginGroup("music");
+    settings.setValue("playMode", playMode);
+    settings.setValue("currentSongName", currentSong.title);
+    settings.setValue("currentSongArtist", currentSong.artist);
+    settings.setValue("currentSourcePath", currentSong.filePath);
+    settings.setValue("currentSongCoverPath", currentSong.coverPath);
+    settings.setValue("currentSongLyricsPath", currentSong.lyricsPath);
+    settings.setValue("currentTime", ui->currentTimeSlider->value());
+    settings.setValue("currentSongTotalTime", ui->currentTimeSlider->maximum());
+    settings.endGroup();
 }
 
 /* 加载相关配置 */
 void SubMusicWidget::loadSettings()
 {
     /* 声明对象 */
-    QSettings setting(qApp->applicationDirPath() + "/userSettings.ini", QSettings::IniFormat);
+    UsersSettings settings(qApp->applicationDirPath() + "/Settings/musicSettings.ini");
 
     /* 写入配置 */
-    setting.beginGroup("music");
-    if(setting.value("playMode").toString() == "")
-        playMode = "round";
-    else
-        playMode = setting.value("playMode").toString();
+    settings.beginGroup("music");
+    // 播放模式
+    playMode = settings.value("playMode", "round").toString();
     setPlayMode();
-    currentSong.title = setting.value("currentSongName").toString();
-    currentSong.artist = setting.value("currentSongArtist").toString();
-    currentSong.filePath = setting.value("currentSourcePath").toString();
-    if (setting.value("currentSongCoverPath").toString() == "")
-        currentSong.coverPath = ":/pic/defaultPic/resources/pic/defaultPic/defaultMusicPic.svg";
-    else
-        currentSong.coverPath = setting.value("currentSongCoverPath").toString();
+    // 歌曲信息
+    currentSong.title = settings.value("currentSongName").toString();
+    currentSong.artist = settings.value("currentSongArtist").toString();
+    currentSong.filePath = settings.value("currentSourcePath").toString();
+    currentSong.coverPath = settings.value("currentSongCoverPath", ":/pic/defaultPic/resources/pic/defaultPic/defaultMusicPic.svg").toString();
     setMainPixmap();
-    currentSong.lyricsPath = setting.value("currentSongLyricsPath").toString();
+    currentSong.lyricsPath = settings.value("currentSongLyricsPath").toString();
+    // 获取音源
     mediaPlayer->setSource(currentSong.filePath);
     ui->musicNameLabel->setText(currentSong.title);
     ui->ArtistLabel->setText(currentSong.artist);
-    ui->currentTimeSlider->setRange(0, setting.value("currentSongTotalTime").toInt());
-    ui->currentTimeSlider->setValue(setting.value("currentTime").toInt());
-    mediaPlayer->setPosition(setting.value("currentTime").toInt());
-    currentTime = setting.value("currentTime").toInt();
-    setting.endGroup();
+    // 调整进度条
+    ui->currentTimeSlider->setRange(0, settings.value("currentSongTotalTime", "0").toInt());
+    currentTime = settings.value("currentTime", "0").toInt();
+    ui->currentTimeSlider->setValue(currentTime);
+    mediaPlayer->setPosition(currentTime);
+    settings.endGroup();
 
     /* 其余配置 */
     ui->searchWidget->show();

@@ -1,18 +1,32 @@
-#pragma once
+﻿#ifndef SCPLANGUAGEEDITOR_H
+#define SCPLANGUAGEEDITOR_H
 
-#include "languageeditor.h"
-#include "languagelexer/scplanguagelexer.h"
 #include <Qsci/qsciapis.h>
 
-class ScpLanguageEditor  : public LanguageEditor
+#include "languageeditor.h"
+#include "ssjjCore/script/scripteditor/languagelexer/scplanguagelexer.h"
+
+
+
+class ScpLanguageEditor : public LanguageEditor
 {
 	/*Q_OBJECT*/
 
 public:
-	ScpLanguageEditor(QWidget *parent);
+	ScpLanguageEditor(EditorConfig config, QWidget* parent);
 	~ScpLanguageEditor();
 
+public slots:
+	void resetColors();
+	void setEditorConfig(EditorConfig config);
+
 private:
-	ScpLanguageLexer *lexer;
-	QsciAPIs *apis;
+	ScpLanguageLexer* lexer;
+	QsciAPIs* apis;
+	EditorConfig m_editorConfig;
 };
+
+
+
+
+#endif // SCPLANGUAGEEDITOR_H

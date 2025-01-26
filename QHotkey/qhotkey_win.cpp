@@ -1,4 +1,4 @@
-#include "qhotkey.h"
+﻿#include "qhotkey.h"
 #include "qhotkey_p.h"
 #include <qt_windows.h>
 #include <algorithm>

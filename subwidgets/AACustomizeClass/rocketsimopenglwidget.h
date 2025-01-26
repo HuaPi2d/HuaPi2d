@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 
 #include <QOpenGLWidget>
 #include <QOpenGLFunctions_4_3_Core>
@@ -12,7 +12,7 @@ public:
 	explicit RocketSimOpenGLWidget(QWidget* parent = nullptr);
 	~RocketSimOpenGLWidget();
 
-// ´ËÈı¸öº¯ÊıÊÇQOpenGLWidgetµÄĞéº¯Êı£¬ĞèÒªÖØĞ´
+// æ­¤ä¸‰ä¸ªå‡½æ•°æ˜¯QOpenGLWidgetçš„è™šå‡½æ•°ï¼Œéœ€è¦é‡å†™
 protected:
 	virtual void initializeGL();
 	virtual void resizeGL(int w, int h);
