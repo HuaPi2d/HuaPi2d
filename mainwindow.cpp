@@ -115,16 +115,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     // 开发者模式
     QHotkey* HUA = new QHotkey(QKeySequence("Ctrl+Shift+H"), true);
-    connect(HUA, &QHotkey::activated, this, [=]() {
-        if (developerMode == false) {
-            this->setWindowTitle(this->windowTitle() + tr(" - 开发者模式"));
-            developerMode = true;
-        }
-        else {
-            this->setWindowTitle(this->windowTitle().replace(tr(" - 开发者模式"), ""));
-            developerMode = false;
-        }
-        });
+    connect(HUA, &QHotkey::activated, this, &MainWindow::developeModeChanged);
 
     /* 获取随机句子 */
     connect(ui->getRandomSentencePushButton, &QPushButton::clicked, this, &MainWindow::getRandomSentence); // 获取随机好文好句
@@ -166,6 +157,7 @@ MainWindow::MainWindow(QWidget *parent)
         });
     connect(Language, &GlobalVariableQString::valueChanged, this, [=](QString language) {
         ui->retranslateUi(this);
+        changeWindowTitle();
         });
     connect(ui->qtLinguistPushButton, &QPushButton::clicked, this, &MainWindow::testPythonCode);
 
@@ -216,6 +208,28 @@ void MainWindow::testPythonCode()
     //}
     //
     ////PyRun_SimpleString("print('Hello, Python!')");
+}
+
+void MainWindow::developeModeChanged()
+{
+    if (developerMode == false) {
+        developerMode = true;
+    }
+    else {
+        developerMode = false;
+    }
+
+    changeWindowTitle();
+}
+
+void MainWindow::changeWindowTitle()
+{
+    if (developerMode == true) {
+        this->setWindowTitle(this->windowTitle() + QCoreApplication::translate("MainWindow", " - 开发者模式"));
+    }
+    else {
+        this->setWindowTitle(this->windowTitle().replace(QCoreApplication::translate("MainWindow", " - 开发者模式"), ""));
+    }
 }
 
 void MainWindow::changeLanguage(QString language)
@@ -328,6 +342,7 @@ void MainWindow::hideSomeItems()
         ui->filesConvert_action->setVisible(false);
         ui->video_action->setVisible(false);
         ui->ranLearning_action->setVisible(false);
+        ui->QTToolsGroupBox->setVisible(false);
     }
 }
 

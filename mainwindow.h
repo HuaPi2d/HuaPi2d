@@ -73,6 +73,8 @@ private slots:
     // 改变窗口大小
     void receiveDsizeInfo(int dwidth, int dheight);
     void testPythonCode();
+    void developeModeChanged();
+    void changeWindowTitle();
 
 public: signals:
     void isAnyChildWindow();
