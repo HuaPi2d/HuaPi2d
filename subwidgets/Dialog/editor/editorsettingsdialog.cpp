@@ -52,6 +52,12 @@ EditorSettingsDialog::EditorSettingsDialog(EditorConfig editorConfig, QWidget *p
 	// 初始界面
 	ui->toolBox->setCurrentIndex(0);
 	updateInterface(0);
+
+	// 更新语言
+	connect(Language, &GlobalVariableQString::valueChanged, this, [=]() {
+		ui->retranslateUi(this);
+		});
+	reloadLanguage(Language->value());
 }
 
 EditorSettingsDialog::~EditorSettingsDialog()

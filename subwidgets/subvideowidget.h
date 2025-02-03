@@ -17,6 +17,7 @@
 #include <QmlStyleUrlInterceptor.h>
 
 #include "universal/file/userssettings.h"
+#include "global/mainglobalvar.h"
 
 namespace Ui {
 class SubVideoWidget;
@@ -49,6 +50,7 @@ private:
     int currentPage;
     VideoInfoListModel *videoInfoListModel;
     QString currentWeb;
+    int currentWebIndex;
     QString currentSearchContent;
     QQuickItem *rootObject;
 

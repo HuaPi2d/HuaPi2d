@@ -9,9 +9,11 @@
 #include <QModelIndex>
 #include <QMessageBox>
 #include <QStringList>
+
 #include "ui_createnewfiledialog.h"
 #include "ssjjCore/zx/zxlevels.h"
 #include "universal/file/fileattributes.h"
+#include "global/mainglobalvar.h"
 
 namespace Ui { class CreateNewFileDialogClass; };
 

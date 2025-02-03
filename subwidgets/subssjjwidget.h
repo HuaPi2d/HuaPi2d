@@ -34,6 +34,7 @@
 #include "ssjjCore/script/scripteditor/scplanguageeditor.h"
 #include "subwidgets/Dialog/editor/editorsettingsdialog.h"
 #include "struct/editor/EditorConfig.h"
+#include "global/mainglobalvar.h"
 
 
 namespace Ui {

@@ -8,9 +8,15 @@ DeleteMusicDialog::DeleteMusicDialog(QWidget *parent)
     , ui(new Ui::DeleteMusicDialog)
 {
     ui->setupUi(this);
-    this->setWindowTitle("删除本地歌曲");
-    ui->buttonBox->button(QDialogButtonBox::Ok)->setText("确定");
-    ui->buttonBox->button(QDialogButtonBox::Cancel)->setText("取消");
+    this->setWindowTitle(tr("删除本地歌曲"));
+    ui->buttonBox->button(QDialogButtonBox::Ok)->setText(tr("确定"));
+    ui->buttonBox->button(QDialogButtonBox::Cancel)->setText(tr("取消"));
+
+    // 更新语言
+    connect(Language, &GlobalVariableQString::valueChanged, this, [=]() {
+        ui->retranslateUi(this);
+        });
+    reloadLanguage(Language->value());
 }
 
 DeleteMusicDialog::~DeleteMusicDialog()

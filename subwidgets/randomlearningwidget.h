@@ -6,9 +6,11 @@
 #include <QDateTime>
 #include <QSettings>
 #include <QListWidgetItem>
+
 #include "server/knowledgeItem/knowledgeitemsdatabase.h"
 #include "universal/string/stringcheck.h"
 #include "server/knowledgeItem/knowledgeItemWidget/knowledgeitemwidget.h"
+#include "global/mainglobalvar.h"
 
 namespace Ui {
 class RandomLearningWidget;

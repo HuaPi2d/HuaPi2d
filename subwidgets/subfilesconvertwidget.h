@@ -9,6 +9,7 @@
 #include <QFileInfo>
 
 #include "ui_subfilesconvertwidget.h"
+#include "global/mainglobalvar.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class SubFilesConvertWidgetClass; };

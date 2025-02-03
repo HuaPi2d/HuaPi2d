@@ -25,6 +25,7 @@
 
 #include "otherwidgets/singledownloadframe.h"
 #include "universal/file/userssettings.h"
+#include "global/mainglobalvar.h"
 
 
 class MusicInfo {

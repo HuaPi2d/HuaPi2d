@@ -20,6 +20,7 @@ class SubSSJJWindow : public QMdiSubWindow
     Q_OBJECT
 public:
     explicit SubSSJJWindow(QWidget *parent = nullptr);
+    ~SubSSJJWindow();
 
 public: signals:
     void getGlobalEditorConfig(EditorConfig globalEditorConfig);
@@ -48,6 +49,8 @@ private:
     void setPasswordMode();
     // 导入脚本文件
     void importScriptalFiles();
+    // 更新界面语言
+    void retranslateUi();
 
 // 菜单栏
 private:

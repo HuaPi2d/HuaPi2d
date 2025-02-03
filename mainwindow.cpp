@@ -45,9 +45,6 @@ MainWindow::MainWindow(QWidget *parent)
     /* 加载主题 */
     loadThemes();
 
-    /* 读取用户配置 */
-    loadSettings();
-
     /* 更新好文好句 */
     getRandomSentence();
 
@@ -65,7 +62,7 @@ MainWindow::MainWindow(QWidget *parent)
     /* 添加一个按钮到菜单栏右侧 */
     QPushButton *downloadContentButton = new QPushButton(QIcon(":/icon/resources/icons/downloading.svg"), "", this);
     downloadContentButton->setStyleSheet("QPushButton {border: none;}");
-    downloadContentButton->setToolTip("下载内容");
+    downloadContentButton->setToolTip(tr("下载内容"));
     ui->menubar->setCornerWidget(downloadContentButton, Qt::TopRightCorner);
 
     /* 加载QQuickWidget控件 */
@@ -120,11 +117,11 @@ MainWindow::MainWindow(QWidget *parent)
     QHotkey* HUA = new QHotkey(QKeySequence("Ctrl+Shift+H"), true);
     connect(HUA, &QHotkey::activated, this, [=]() {
         if (developerMode == false) {
-            this->setWindowTitle(this->windowTitle() + " - 开发者模式");
+            this->setWindowTitle(this->windowTitle() + tr(" - 开发者模式"));
             developerMode = true;
         }
         else {
-            this->setWindowTitle(this->windowTitle().replace(" - 开发者模式", ""));
+            this->setWindowTitle(this->windowTitle().replace(tr(" - 开发者模式"), ""));
             developerMode = false;
         }
         });
@@ -158,6 +155,22 @@ MainWindow::MainWindow(QWidget *parent)
         ui->mutiWindowWidget->setVisible(true);
         ui->mainWidget->setVisible(false);
     });
+    // 切换语言
+    connect(ui->englishAction, &QAction::triggered, this, [=]() {
+        changeLanguage("en_US");
+        emit languageChanged("en_US"); 
+        });
+    connect(ui->chineseAction, &QAction::triggered, this, [=]() {
+        changeLanguage("zh_CN");
+        emit languageChanged("zh_CN"); 
+        });
+    connect(Language, &GlobalVariableQString::valueChanged, this, [=](QString language) {
+        ui->retranslateUi(this);
+        });
+    connect(ui->qtLinguistPushButton, &QPushButton::clicked, this, &MainWindow::testPythonCode);
+
+    /* 读取用户配置 */
+    loadSettings();
 }
 
 MainWindow::~MainWindow()
@@ -188,6 +201,28 @@ void MainWindow::receiveDsizeInfo(int dwidth, int dheight)
     this->resize(QSize(currentSize.width() + dwidth, currentSize.height() + dheight));
 }
 
+void MainWindow::testPythonCode()
+{
+    ////Py_SetPythonHome(L"./");
+    //putenv("PYTHONHOME=D:\\VS code\\projects\\HuaPi_so\\x64\\Release");
+    //putenv("PYTHONPATH=D:\\python-idle");
+    //// 设置Python解释器路径
+    ////Py_SetPythonHome(L"D:\\python-idle");
+    //Py_SetPath(L"D:\\VS code\\projects\\HuaPi_so\\x64\\Release");
+    //Py_Initialize();
+    //if (Py_IsInitialized() == 0) {
+    //    qDebug() << "Python 初始化失败";
+    //    return;
+    //}
+    //
+    ////PyRun_SimpleString("print('Hello, Python!')");
+}
+
+void MainWindow::changeLanguage(QString language)
+{
+    reloadLanguage(language);
+}
+
 // 保存配置
 void MainWindow::saveSettings()
 {
@@ -197,10 +232,12 @@ void MainWindow::saveSettings()
     /* 写入配置 */
     settings.beginGroup("window");
     settings.setValue("theme", currentTheme); // 写入主题配置
+    settings.setValue("currentThemeType", currentThemeType);
     settings.setValue("width", this->width());
     settings.setValue("height", this->height());
     settings.setValue("isMaximized", this->isMaximized()); // 窗口大小
     settings.setValue("developerMode", developerMode); // 开发者模式
+    settings.setValue("language", Language->value()); // 语言
     settings.beginGroup("text");
     settings.setValue("randomSentence", ui->randomSentenceLabel->text());
     settings.endGroup();
@@ -238,6 +275,7 @@ void MainWindow::loadSettings()
     settings.beginGroup("window");
     // 主题
     currentTheme = settings.value("theme", "light_blue").toString();
+    currentThemeType = settings.value("currentThemeType", 0).toInt();
     updateTheme();
     // 窗口大小
     this->resize(settings.value("width", 1385).toInt(), settings.value("height", 820).toInt());
@@ -246,9 +284,11 @@ void MainWindow::loadSettings()
         this->showMaximized();
     // 开发者模式
     developerMode = settings.value("developerMode", false).toBool();
+    // 语言
+    changeLanguage(settings.value("language", "zh_CN").toString());
     // 文本
     settings.beginGroup("text");
-    ui->randomSentenceLabel->setText(settings.value("randomSentence", "正在获取随机句子...").toString());
+    ui->randomSentenceLabel->setText(settings.value("randomSentence", tr("正在获取随机句子...")).toString());
     settings.endGroup();
     settings.endGroup();
 
@@ -372,7 +412,7 @@ void MainWindow::onCustomizedThemesTriggered()
 }
 
 void MainWindow::updateTheme()
-{
+{   
     if (currentThemeType == 0) {
         if (currentTheme.contains("dark"))
         {
@@ -395,7 +435,6 @@ void MainWindow::updateTheme()
             qApp->setStyleSheet(styleSheet);  // 只对当前窗口应用 QSS 样式表
         }
     }
-    
 }
 
 void MainWindow::getRandomSentence()
@@ -408,7 +447,7 @@ void MainWindow::getRandomSentence()
         ui->randomSentenceLabel->setText(data);
     });
     connect(getSentence, &GetNetWork::sendError, this, [=](){
-        showStateInfo("请求出现错误，更新失败");
+        showStateInfo(tr("请求出现错误，更新失败"));
     });
 
     /* 发送请求 */

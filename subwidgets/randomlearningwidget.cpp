@@ -22,6 +22,12 @@ RandomLearningWidget::RandomLearningWidget(QWidget *parent)
 
     // 加载数据库至列表
     loadDatabaseToList();
+
+    // 更新语言
+    connect(Language, &GlobalVariableQString::valueChanged, this, [=]() {
+        ui->retranslateUi(this);
+        });
+    reloadLanguage(Language->value());
 }
 
 RandomLearningWidget::~RandomLearningWidget()
@@ -183,7 +189,7 @@ void RandomLearningWidget::saveCurrentKnowledgeItem()
     }
     else 
     {
-        sendStateInfo("问题处为空白，未保存");
+        sendStateInfo(tr("问题处为空白，未保存"));
     }
 
     // 更新数据库

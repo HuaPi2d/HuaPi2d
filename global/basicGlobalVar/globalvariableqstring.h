@@ -24,3 +24,4 @@ signals:
 private:
 	QString m_value;
 };
+

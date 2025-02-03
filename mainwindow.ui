@@ -400,6 +400,39 @@ QPushButton:pressed {
          </layout>
         </widget>
        </item>
+       <item>
+        <widget class="QGroupBox" name="QTToolsGroupBox">
+         <property name="title">
+          <string>QT工具</string>
+         </property>
+         <layout class="QGridLayout" name="gridLayout_4">
+          <item row="0" column="0">
+           <widget class="QPushButton" name="qtLinguistPushButton">
+            <property name="text">
+             <string>语言家PRO</string>
+            </property>
+            <property name="icon">
+             <iconset resource="resource.qrc">
+              <normaloff>:/icon/resources/icons/linguist.ico</normaloff>:/icon/resources/icons/linguist.ico</iconset>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <spacer name="horizontalSpacer_3">
+            <property name="orientation">
+             <enum>Qt::Orientation::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+         </layout>
+        </widget>
+       </item>
       </layout>
      </widget>
     </item>
@@ -443,7 +476,15 @@ QPushButton:pressed {
     <property name="title">
      <string>配置</string>
     </property>
+    <widget class="QMenu" name="languageMenu">
+     <property name="title">
+      <string>语言</string>
+     </property>
+     <addaction name="chineseAction"/>
+     <addaction name="englishAction"/>
+    </widget>
     <addaction name="reset_theme_action"/>
+    <addaction name="languageMenu"/>
    </widget>
    <widget class="QMenu" name="function_menu">
     <property name="title">
@@ -714,6 +755,16 @@ QPushButton:pressed {
    </property>
    <property name="text">
     <string>视频解析</string>
+   </property>
+  </action>
+  <action name="chineseAction">
+   <property name="text">
+    <string>中文</string>
+   </property>
+  </action>
+  <action name="englishAction">
+   <property name="text">
+    <string>English</string>
    </property>
   </action>
  </widget>

@@ -39,7 +39,12 @@ SubAAWidget::SubAAWidget(QWidget *parent)
 	connect(ui->closePushButton, &QPushButton::clicked, this, [=]() {
 		emit widgetClosed();
 	});
+
+	connect(Language, &GlobalVariableQString::valueChanged, this, [=]() {
+		ui->retranslateUi(this);
+		});
 	loadSettings();
+	ui->retranslateUi(this);
 }
 
 SubAAWidget::~SubAAWidget()
@@ -85,7 +90,7 @@ void SubAAWidget::loadSettings()
 
 void SubAAWidget::createRemindText()
 {
-	ui->eulerRotationParamsTextEdit->receivePlacholderText(QString("(旋转轴, 旋转角度)x-1,y-2,z-3\n如：\n(3, 45)\n(2, 15)\n(3, -30)"));
+	ui->eulerRotationParamsTextEdit->receivePlacholderText(QString(tr("(旋转轴, 旋转角度)x-1,y-2,z-3\n如：\n(3, 45)\n(2, 15)\n(3, -30)")));
 }
 
 void SubAAWidget::calculateEulerRotationMatrix()
@@ -122,6 +127,11 @@ void SubAAWidget::updateScreen()
 			m_Widget->hide();
 		}
 	}
+}
+
+void SubAAWidget::updateLanguage()
+{
+	ui->retranslateUi(this);
 }
 
 void SubAAWidget::on_singleFunctionTestPushButton_clicked()

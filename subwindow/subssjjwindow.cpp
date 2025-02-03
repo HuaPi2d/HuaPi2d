@@ -1,8 +1,10 @@
 ﻿#include "subssjjwindow.h"
+#include "ui_subssjjwindow.h"
 
 SubSSJJWindow::SubSSJJWindow(QWidget *parent)
-    : QMdiSubWindow{parent}
+    : QMdiSubWindow(parent)
 {
+
     this->setWindowFlags(Qt::FramelessWindowHint);
     // 创建主界面
     mainWidget = new QWidget(this);
@@ -34,6 +36,16 @@ SubSSJJWindow::SubSSJJWindow(QWidget *parent)
     connect(this, &SubSSJJWindow::getGlobalEditorConfig, subSSJJWidget, &SubSSJJWidget::getGlobalEditorConfig);
 
     subSSJJWidget->loadSettings();
+
+    // 更新语言
+    connect(Language, &GlobalVariableQString::valueChanged, this, [=]() {
+        retranslateUi();
+        });
+    reloadLanguage(Language->value());
+}
+
+SubSSJJWindow::~SubSSJJWindow()
+{
 }
 
 
@@ -210,6 +222,33 @@ void SubSSJJWindow::importScriptalFiles()
         return;
     }
     subSSJJWidget->readFilesIntoSSJJDatabase(dir);
+}
+
+void SubSSJJWindow::retranslateUi()
+{
+    fileMenu->setTitle(QCoreApplication::translate("SubSSJJWindow", "文件", nullptr));
+    editMenu->setTitle(QCoreApplication::translate("SubSSJJWindow", "脚本编辑器", nullptr));
+    runMenu->setTitle(QCoreApplication::translate("SubSSJJWindow", "运行", nullptr));
+    scriptTestMenu->setTitle(QCoreApplication::translate("SubSSJJWindow", "脚本测试", nullptr));
+    bonusMenu->setTitle(QCoreApplication::translate("SubSSJJWindow", "加成", nullptr));
+    runAutoScriptMenu->setTitle(QCoreApplication::translate("SubSSJJWindow", "全自动脚本", nullptr));
+    settingMenu->setTitle(QCoreApplication::translate("SubSSJJWindow", "配置", nullptr));
+    editorSettingsMenu->setTitle(QCoreApplication::translate("SubSSJJWindow", "脚本编辑器配置", nullptr));
+    autoScriptMenu->setTitle(QCoreApplication::translate("SubSSJJWindow", "全自动脚本配置", nullptr));
+
+    createNewFileAction->setText(QCoreApplication::translate("SubSSJJWindow", "新建", nullptr));
+    openFileAction->setText(QCoreApplication::translate("SubSSJJWindow", "打开", nullptr));
+    saveFileAction->setText(QCoreApplication::translate("SubSSJJWindow", "保存", nullptr));
+    testScriptAction->setText(QCoreApplication::translate("SubSSJJWindow", "测试 F10", nullptr));
+    stopTestScriptAction->setText(QCoreApplication::translate("SubSSJJWindow", "终止 F11", nullptr));
+    singleBonusAction->setText(QCoreApplication::translate("SubSSJJWindow", "单次加成 F10", nullptr));
+    continuousBonusAction->setText(QCoreApplication::translate("SubSSJJWindow", "连续加成 F9", nullptr));
+    stopBonusAction->setText(QCoreApplication::translate("SubSSJJWindow", "停止加成 F11", nullptr));
+    startAutoScriptAction->setText(QCoreApplication::translate("SubSSJJWindow", "运行脚本 F10", nullptr));
+    stopAutoScriptAction->setText(QCoreApplication::translate("SubSSJJWindow", "停止脚本 F11", nullptr));
+    editorSettingsAction->setText(QCoreApplication::translate("SubSSJJWindow", "外观", nullptr));
+    passWordModeAction->setText(QCoreApplication::translate("SubSSJJWindow", "脚本房间密码设置", nullptr));
+    importScriptalFilesAction->setText(QCoreApplication::translate("SubSSJJWindow", "导入脚本数据", nullptr));
 }
 
 void SubSSJJWindow::disableMenuAndActions(QMenu* menu)

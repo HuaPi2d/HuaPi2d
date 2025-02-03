@@ -11,6 +11,12 @@ KnowledgeItemWidget::KnowledgeItemWidget(QWidget* parent, int index, QString que
 	ui.answerTextLabel->setText(m_answer);
 	ui.questionTextLabel->setAlignment(Qt::AlignLeft | Qt::AlignTop);
 	ui.answerTextLabel->setAlignment(Qt::AlignLeft | Qt::AlignTop);
+
+	// 更新语言
+	connect(Language, &GlobalVariableQString::valueChanged, this, [=]() {
+		ui.retranslateUi(this);
+		});
+	reloadLanguage(Language->value());
 }
 
 KnowledgeItemWidget::~KnowledgeItemWidget()
@@ -23,7 +29,7 @@ void KnowledgeItemWidget::mousePressEvent(QMouseEvent * event)
 		if (m_index != -1)
 		{
 			QMenu menu(this);
-			QAction* deleteAction = new QAction("删除", this);
+			QAction* deleteAction = new QAction(tr("删除"), this);
 			deleteAction->setIcon(QIcon(":/icon/resources/icons/delete.svg"));
 			menu.addAction(deleteAction);
 			connect(deleteAction, &QAction::triggered, this, [=]() {

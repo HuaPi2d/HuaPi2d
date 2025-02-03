@@ -108,7 +108,7 @@ SubMusicWidget::SubMusicWidget(QWidget *parent)
         DeleteMusicDialog *deleteMusicDialog = new DeleteMusicDialog(this);
         /* 强制对话 */
         deleteMusicDialog->setModal(true);
-        deleteMusicDialog->ui->remindTextLabel->setText("是否删除" + chosenItem.title + "-" + chosenItem.artist + "?");
+        deleteMusicDialog->ui->remindTextLabel->setText(tr("是否删除") + chosenItem.title + "-" + chosenItem.artist + "?");
         if (deleteMusicDialog->exec() == QDialog::Accepted)
         {
             if(deleteMusicDialog->ui->checkBox->isChecked())
@@ -117,17 +117,17 @@ SubMusicWidget::SubMusicWidget(QWidget *parent)
                 {
                     if(QFile::remove(chosenItem.filePath))
                     {
-                        emit sendStateInfo("歌曲已成功删除");
+                        emit sendStateInfo(tr("歌曲已成功删除"));
                     }
                     else
                     {
-                        emit sendStateInfo("文件删除失败");
+                        emit sendStateInfo(tr("文件删除失败"));
                         return;
                     }
                 }
                 else
                 {
-                    emit sendStateInfo("文件已打开，删除失败");
+                    emit sendStateInfo(tr("文件已打开，删除失败"));
                 }
             }
             /* 从列表中删除 */
@@ -146,6 +146,12 @@ SubMusicWidget::SubMusicWidget(QWidget *parent)
     /* 加载配置 */
     ui->musicPicLabel->setPixmap(mainPixmap);
     loadSettings();
+
+    // 更新语言
+    connect(Language, &GlobalVariableQString::valueChanged, this, [=]() {
+        ui->retranslateUi(this);
+        });
+    reloadLanguage(Language->value());
 }
 
 SubMusicWidget::~SubMusicWidget()
@@ -167,7 +173,7 @@ void SubMusicWidget::searchMusic()
     if(ui->musicSourceComboBox->currentIndex() == 0){
         engineGeQuBao();
     }
-    else if(ui->musicSourceComboBox->currentText() == "酷我音乐"){
+    else if (ui->musicSourceComboBox->currentIndex() == 1) {
         engineKuWo();
     }
 }
@@ -210,7 +216,7 @@ void SubMusicWidget::engineGeQuBao()
 
     /* 请求失败状态栏显示 */
     connect(getSong, &GetNetWork::sendError, this, [=](){
-        emit sendStateInfo("歌曲宝搜索超时，可尝试换源");
+        emit sendStateInfo(tr("歌曲宝搜索超时，可尝试换源"));
     });
 
     /* 发送请求 */
@@ -261,7 +267,7 @@ void SubMusicWidget::engineKuWo()
     });
 
     QObject::connect(request, &RequestPro::requestError, [this](const QString &error){
-        emit sendStateInfo("酷我音乐搜索超时，可尝试换源");
+        emit sendStateInfo(tr("酷我音乐搜索超时，可尝试换源"));
     });
 
     request->sendRequest(headers, params, url, requestType);
@@ -527,7 +533,7 @@ void SubMusicWidget::playMusic()
 /* 打开本地文件夹 */
 void SubMusicWidget::on_openLocalDirPushButton_clicked()
 {
-    auto musicDirString = QFileDialog::getExistingDirectory(this, "选择音乐所在目录", "music");
+    auto musicDirString = QFileDialog::getExistingDirectory(this, tr("选择音乐所在目录"), "music");
     QDir musicDir(musicDirString);
     auto musicList = musicDir.entryList(QStringList() << "*.mp3" << "*.m4a" << "*.wav");
     MusicItem musicItem;
@@ -646,7 +652,7 @@ void SubMusicWidget::playIndexNetMusic(const QModelIndex &index)
                 xmlFree(content); // 释放获取到的内容
             }
             else {
-                sendStateInfo("获取script节点内容失败");
+                sendStateInfo(tr("获取script节点内容失败"));
                 return;
             }
 
@@ -658,7 +664,7 @@ void SubMusicWidget::playIndexNetMusic(const QModelIndex &index)
                 play_id = match.captured(1);
             }
             else {
-                sendStateInfo("获取id参数失败");
+                sendStateInfo(tr("获取id参数失败"));
                 return;
             }
 
@@ -678,7 +684,7 @@ void SubMusicWidget::playIndexNetMusic(const QModelIndex &index)
                 });
 
             QObject::connect(requestPro, &RequestPro::requestError, [=]() {
-                emit sendStateInfo("获取歌曲播放链接失败");
+                emit sendStateInfo(tr("获取歌曲播放链接失败"));
                 emit changeMusicProcessFinish();
                 });
 
@@ -687,7 +693,7 @@ void SubMusicWidget::playIndexNetMusic(const QModelIndex &index)
 
         /* 请求失败 */
         connect(getSongDetailInfo, &GetNetWork::sendError, this, [=](){
-            emit sendStateInfo("歌曲详细网址信息内容获取失败");
+            emit sendStateInfo(tr("歌曲详细网址信息内容获取失败"));
             currentSong.coverPath = ":/pic/defaultPic/resources/pic/defaultPic/defaultMusicPic.svg";
             setMainPixmap();
         });

@@ -52,7 +52,8 @@ SubSSJJWidget::SubSSJJWidget(QWidget *parent)
     /* 脚本框设置 */
     ui->remindTextEdit->setReadOnly(true);
     ui->taskTableWidget->setEditTriggers(QAbstractItemView::NoEditTriggers);
-    writeRemindInfo("<p>欢迎使用<b>生死狙击脚本</b>工具</p><p><span style=\"font-size: 13px; color: red;\">使用时注意本栏信息</span></p><p>请开启<span style=\"font-size: 13px; color: red;\"><b>自动登录</b></span></p>");
+    writeRemindInfo("<p>" + tr("欢迎使用") + "<b>" + tr("生死狙击脚本") + "</b>" + tr("工具") + "</p><p><span style=\"font-size: 13px; color: red;\">" 
+        + tr("使用时注意本栏信息") + "</span></p><p>" + tr("请开启") + "<span style = \"font-size: 13px; color: red;\"><b>" + tr("自动登录") + "</b></span></p>");
     ui->launcherPathLineEdit->setReadOnly(true);
     ui->LDScriptPathLineEdit->setReadOnly(true);
     QIntValidator *validator = new QIntValidator(0, 999, this);
@@ -115,6 +116,12 @@ SubSSJJWidget::SubSSJJWidget(QWidget *parent)
     connect(ui->scriptalTabWidget, &QTabWidget::tabCloseRequested, this, &SubSSJJWidget::closeTab);
     connect(ui->scriptalTabWidget, &QTabWidget::currentChanged, this, &SubSSJJWidget::currentTabChanged);
 
+    // 更新语言
+    connect(Language, &GlobalVariableQString::valueChanged, this, [=]() {
+        ui->retranslateUi(this);
+        });
+    reloadLanguage(Language->value());
+
     /* 主线关卡标签页的Combox的联动更新 */
     connect(ui->zxChapterChooseComboBox, &QComboBox::currentTextChanged, this, [=]() {
         currentChoosedZXChapter = ZXGameData::getChapterByName(ui->zxChapterChooseComboBox->currentText());
@@ -131,8 +138,8 @@ SubSSJJWidget::SubSSJJWidget(QWidget *parent)
         updateZXScriptPathComboBox();
         });
 
-    writeRemindInfo("<p><span style=\"color: red;\">请确保在每次启动游戏时不会弹出以下图片</p><br>");
-    writeRemindInfo("<img src=\"tips/ensure_ratio.png\" width=\"250\" alt=\"提示图片\"><br>");
+    writeRemindInfo("<p><span style=\"color: red;\">" + tr("请确保在每次启动游戏时不会弹出以下图片") + "</p><br>");
+    writeRemindInfo("<img src=\"tips/ensure_ratio.png\" width=\"250\" alt=\"" + tr("提示图片") + "\"><br>");
 
     // 创建数据库
     ssjjScriptalFilesDatabase = new SSJJScriptalFilesDatabase("ssjjScriptalFiles.db", this);
@@ -273,17 +280,17 @@ void SubSSJJWidget::loadSettings()
     if(settings.value("ssjjInstallPath").toString() != "")
     {
         ssjjInstallPath = settings.value("ssjjInstallPath").toString();
-        writeRemindInfo("<p>生死狙击程序安装路径:</p><b>" + ssjjInstallPath + "</b><br><br>");
+        writeRemindInfo("<p>" + tr("生死狙击程序安装路径:") + "</p><b>" + ssjjInstallPath + "</b><br><br>");
     }
     else
     {
         ssjjInstallPath = getRegDitValue("\\HKEY_CURRENT_USER\\Software\\Wooduan\\SSJJ-4399", "InstallPath") + "\\WDlauncher.exe";
         if( ssjjInstallPath == ""){
-            writeRemindInfo(tr("<p><span style=\"font-size: 13px; color: red;\">生死狙击程序安装路径读取失败，请手动添加<b>WDlauncher.exe</b>的路径</span></p><br>"));
-            writeRemindInfo("<br><img src=\"tips/choose_launcher_tip.png\" width=\"250\" alt=\"提示图片\"><br>");
+            writeRemindInfo("<p><span style=\"font-size: 13px; color: red;\">" + tr("生死狙击程序安装路径读取失败，请手动添加") + "<b>WDlauncher.exe</b>" + tr("的路径") + "</span></p><br>");
+            writeRemindInfo("<br><img src=\"tips/choose_launcher_tip.png\" width=\"250\" alt=\"" + tr("提示图片") + "\"><br>");
         }
         else{
-            writeRemindInfo("<p>生死狙击程序安装路径:<b>" + ssjjInstallPath + "</b></p><br>");
+            writeRemindInfo("<p>" + tr("生死狙击程序安装路径:") + "<b>" + ssjjInstallPath + "</b></p><br>");
         }
     }
     ui->launcherPathLineEdit->setText(ssjjInstallPath);
@@ -403,12 +410,12 @@ void SubSSJJWidget::loadSettings()
             // 判断文件是否被删除或改名
             QFile file(fileInfo.absoluteFilePath());
             if (!file.exists()) {
-                QMessageBox::StandardButton button = QMessageBox::warning(this, "错误",
-                    file.fileName() + "文件不在" + filePath + "路径下，是否重新选择文件所在位置？", QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes);
+                QMessageBox::StandardButton button = QMessageBox::warning(this, tr("错误"),
+                    file.fileName() + tr("文件不在") + filePath + tr("路径下，是否重新选择文件所在位置？"), QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes);
                 if (button == QMessageBox::Yes)
                 {
                     // 选择新文件，文件类型与当前文件相同
-                    QString newFilePath = QFileDialog::getOpenFileName(this, "选择文件", QDir::currentPath(), "脚本文件(*.scp);;乱斗脚本(*.lscp);;主线脚本(*.zscp)");
+                    QString newFilePath = QFileDialog::getOpenFileName(this, tr("选择文件"), QDir::currentPath(), tr("脚本文件(*.scp);;乱斗脚本(*.lscp);;主线脚本(*.zscp)"));
                     if (newFilePath.isEmpty()) {
                         return;
                     }
@@ -553,11 +560,11 @@ void SubSSJJWidget::on_terminateUnityPushButton_clicked()
 {
     if (TerminateProcessByNameAndCheck("SSJJ_BattleClient_Unity.exe"))
     {
-        writeRemindInfo("<p>已销毁SSJJ_BattleClient_Unity.exe进程</p><br>");
+        writeRemindInfo("<p>" + tr("已销毁SSJJ_BattleClient_Unity.exe进程") + "</p><br>");
     }
     else
     {
-        writeRemindInfo("<p>销毁SSJJ_BattleClient_Unity.exe进程失败</p><br>");
+        writeRemindInfo("<p>" + tr("销毁SSJJ_BattleClient_Unity.exe进程失败") + "</p><br>");
     }
 }
 
@@ -565,11 +572,11 @@ void SubSSJJWidget::on_terminateMicroClientPushButton_clicked()
 {
     if (TerminateProcessByNameAndCheck("MicroClient.exe"))
     {
-        writeRemindInfo("<p>已销毁MicroClient.exe进程</p><br>");
+        writeRemindInfo("<p>" + tr("已销毁MicroClient.exe进程") + "</p><br>");
     }
     else
     {
-        writeRemindInfo("<p>销毁MicroClient.exe进程失败</p><br>");
+        writeRemindInfo("<p>" + tr("销毁MicroClient.exe进程失败") + "</p><br>");
     }
 }
 
@@ -577,11 +584,11 @@ void SubSSJJWidget::on_terminateWDLaucherPushButton_clicked()
 {
     if (TerminateProcessByNameAndCheck("WDlauncher.exe"))
     {
-        writeRemindInfo("<p>已销毁WDlauncher.exe进程</p><br>");
+        writeRemindInfo("<p>" + tr("已销毁WDlauncher.exe进程") + "</p><br>");
     }
     else
     {
-        writeRemindInfo("<p>销毁WDlauncher.exe进程失败</p><br>");
+        writeRemindInfo("<p>" + tr("销毁WDlauncher.exe进程失败") + "</p><br>");
     }
 }
 
@@ -604,10 +611,10 @@ void SubSSJJWidget::updateScreen()
 void SubSSJJWidget::on_chooseLauncherPathPushButton_clicked()
 {
     // 设置文件过滤器，只允许选择 .exe 文件
-    QString filter = "Executable Files (*.exe)";
+    QString filter = tr("Executable Files (*.exe)");
 
     // 打开文件选择对话框
-    QString fileName = QFileDialog::getOpenFileName(this, "请选择 WDlauncher.exe",  "", filter);
+    QString fileName = QFileDialog::getOpenFileName(this, tr("请选择 WDlauncher.exe"),  "", filter);
 
     // 检查用户是否选择了文件
     if (!fileName.isEmpty()) {
@@ -616,12 +623,12 @@ void SubSSJJWidget::on_chooseLauncherPathPushButton_clicked()
         // qDebug() << fileInfo.fileName();
         if (fileInfo.fileName().contains("WDlauncher.exe")) {
             // 如果是 WDlauncher.exe，执行进一步操作
-            QMessageBox::information(this, "成功", "您已成功选择 WDlauncher.exe 文件！");
+            QMessageBox::information(this, tr("成功"), tr("您已成功选择 WDlauncher.exe 文件！"));
             ui->launcherPathLineEdit->setText(fileName);
             ssjjInstallPath = fileName;
         } else {
             // 如果不是 WDlauncher.exe，弹出警告提示
-            QMessageBox::warning(this, "错误", "请选择 WDlauncher.exe 文件！");
+            QMessageBox::warning(this, tr("错误"), tr("请选择 WDlauncher.exe 文件！"));
         }
     }
 }
@@ -651,17 +658,17 @@ void SubSSJJWidget::on_addTaskPushButton_clicked()
             currentRow = ui->taskTableWidget->rowCount();
         }
         else {
-            writeRemindInfo("<p>请<span style=\"color:red;\"><b>先选择关卡</b></span>后再添加任务</p><br>");
+            writeRemindInfo("<p>" + tr("请") + "<span style = \"color:red;\"><b>" + tr("先选择关卡") + "</b></span>" + tr("后再添加任务") + "</p><br>");
             return;
         }
 
         if (ui->LDRunTimesLineEdit->text() == "") {
-            writeRemindInfo("<p><span style=\"color:red;\"><b>关卡运行次数</b></span>未指定</p><br>");
+            writeRemindInfo("<p><span style=\"color:red;\"><b>" + tr("关卡运行次数") + "</b></span>" + tr("未指定") + "</p><br>");
             ui->taskTableWidget->removeRow(currentRow - 1);
             return;
         }
 
-        ui->taskTableWidget->setItem(currentRow - 1, 1, new QTableWidgetItem("无"));
+        ui->taskTableWidget->setItem(currentRow - 1, 1, new QTableWidgetItem(tr("无")));
         ui->taskTableWidget->setItem(currentRow - 1, 2, new QTableWidgetItem(ui->LDRunTimesLineEdit->text()));
         ui->taskTableWidget->setItem(currentRow - 1, 3, new QTableWidgetItem("0"));
         if (ui->LDScriptPathLineEdit->text() != "") {
@@ -686,12 +693,12 @@ void SubSSJJWidget::on_addTaskPushButton_clicked()
     else if (ui->tabWidget->currentWidget() == ui->ZXTab) {
         if (ui->zxRunTimesLineEdit->text() == "")
         {
-            writeRemindInfo("<p><span style=\"color:red;\"><b>关卡运行次数</b></span>未指定</p><br>");
+            writeRemindInfo("<p><span style=\"color:red;\"><b>" + tr("关卡运行次数") + "</b></span>" + tr("未指定") + "</p><br>");
             return;
         }
         if (ui->zxScriptPathComboBox->currentText() == "")
         {
-            writeRemindInfo("<p><span style=\"color:red;\"><b>脚本路径</b></span>未指定</p><br>");
+            writeRemindInfo("<p><span style=\"color:red;\"><b>" + tr("脚本路径") + "</b></span>" + tr("未指定") + "</p><br>");
             return;
         }
 
@@ -713,10 +720,10 @@ void SubSSJJWidget::on_addTaskPushButton_clicked()
 void SubSSJJWidget::on_chooseLDScriptPathPushButton_clicked()
 {
     // 设置文件过滤器，只允许选择 .scp或.lscp 文件
-    QString filter = "乱斗脚本 (*.lscp);; 脚本文件 (*.scp)";
+    QString filter = tr("乱斗脚本 (*.lscp);; 脚本文件 (*.scp)");
 
     // 打开文件选择对话框
-    QString fileName = QFileDialog::getOpenFileName(this, "请选择乱斗脚本文件",  "", filter);
+    QString fileName = QFileDialog::getOpenFileName(this, tr("请选择乱斗脚本文件"), "", filter);
 
     // 检查用户是否选择了文件
     if (!fileName.isEmpty()) {
@@ -730,7 +737,7 @@ void SubSSJJWidget::on_chooseLDScriptPathPushButton_clicked()
 void SubSSJJWidget::on_chooseZXScriptPathPushButton_clicked()
 {
     // 打开文件选择对话框
-    QString fileName = QFileDialog::getOpenFileName(this, "请选择主线关卡脚本文件", "", "主线脚本 (*.zscp);; 脚本文件 (*.scp)");
+    QString fileName = QFileDialog::getOpenFileName(this, tr("请选择主线关卡脚本文件"), "", tr("主线脚本 (*.zscp);; 脚本文件 (*.scp)"));
     if (!fileName.isEmpty()) {
         // 查看文件是否在 zxScriptPathComboBox 中
         if (ui->zxScriptPathComboBox->findText(fileName) != -1) 
@@ -752,7 +759,7 @@ void SubSSJJWidget::on_startPushButton_clicked()
 {
     // 检查是否有脚本任务
     if(ui->taskTableWidget->rowCount() == 0){
-        writeRemindInfo("<p><span style=\"color:red;\"><b>请先添加脚本任务</b></span></p><br>");
+        writeRemindInfo("<p><span style=\"color:red;\"><b>" + tr("请先添加脚本任务") + "</b></span></p><br>");
         return;
     }
 
@@ -766,10 +773,10 @@ void SubSSJJWidget::on_startPushButton_clicked()
 
     qDebug() << "开始运行脚本";
     if(checkThreadRunningState(ssjjMainThread) == 1){
-        writeRemindInfo("<p><span style=\"color:red;\"><b>脚本正在运行中，请勿重复点击</b></span></p><br>");
+        writeRemindInfo("<p><span style=\"color:red;\"><b>" + tr("脚本正在运行中，请勿重复点击") + "</b></span></p><br>");
         return;
     }
-    writeRemindInfo("<p><span style=\"color:lightgreen;\"><b>脚本开始运行</b></span></p><br>");
+    writeRemindInfo("<p><span style=\"color:lightgreen;\"><b>" + tr("脚本开始运行") + "</b></span></p><br>");
 
     // 脚本逻辑
     /* 创建脚本线程 */
@@ -794,7 +801,7 @@ void SubSSJJWidget::on_endPushButton_clicked()
 {
     // 检查是否有脚本正在运行
     if(checkThreadRunningState(ssjjMainThread) != 1) {
-        writeRemindInfo("<p><span style=\"color:red;\"><b>当前没有脚本运行</b></span></p><br>");
+        writeRemindInfo("<p><span style=\"colorred;\"><b>" + tr("当前没有脚本运行") + "</b></span></p><br>");
         return;
     }
 
@@ -803,7 +810,7 @@ void SubSSJJWidget::on_endPushButton_clicked()
         forceQuitSSJJThread();
     }
 
-    writeRemindInfo("<p><span style=\"color:lightgreen;\"><b>脚本运行已结束</b></span></p><br>");
+    writeRemindInfo("<p><span style=\"color:lightgreen;\"><b>" + tr("脚本运行已结束") + "</b></span></p><br>");
 }
 
 void SubSSJJWidget::forceQuitSSJJThread()
@@ -931,9 +938,9 @@ void SubSSJJWidget::getSingleTask()
             }
 
             // 检查脚本文件是否存在
-            if (currentTask.script != "未选择" && !QFile::exists(currentTask.script))
+            if (currentTask.script != tr("未选择") && !QFile::exists(currentTask.script))
             {
-                writeRemindInfo("<p><span style=\"color:red;\"><b>" + currentTask.script + "脚本文件不存在</b></span></p><br>");
+                writeRemindInfo("<p><span style=\"color:red;\"><b>" + currentTask.script + tr("脚本文件不存在") + "</b></span></p><br>");
                 // 清除该行
                 ui->taskTableWidget->removeRow(i);
                 i--;
@@ -991,8 +998,8 @@ void SubSSJJWidget::sendNextTask(SSJJRunState res)
                 forceQuitSSJJThread();
             }
         }*/
-        writeRemindInfo("<p><span style=\"color:lightgreen;\"><b>全部任务已执行完毕</b></span></p><br>");
-        writeRemindInfo("<p><span style=\"color:lightgreen;\"><b>脚本运行已结束</b></span></p><br>");
+        writeRemindInfo("<p><span style=\"color:lightgreen;\"><b>" + tr("全部任务已执行完毕") + "</b></span></p><br>");
+        writeRemindInfo("<p><span style=\"color:lightgreen;\"><b>" + tr("脚本运行已结束") + "</b></span></p><br>");
     }
 }
 
@@ -1010,7 +1017,6 @@ void SubSSJJWidget::clearRow(QTableWidgetItem *item)
 void SubSSJJWidget::createNodeEditor()
 {
     QGraphicsScene* graphicsScene;
-
 }
 
 /* 更新武器列表 */
@@ -1261,7 +1267,7 @@ void SubSSJJWidget::loadBounsSettings(QString filePath)
 {
     QFile file(filePath);
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        qWarning() << "Unable to open file for reading:" << filePath;
+        qWarning() << tr("Unable to open file for reading:") << filePath;
         return;
     }
 
@@ -1270,7 +1276,7 @@ void SubSSJJWidget::loadBounsSettings(QString filePath)
 
     QJsonDocument jsonDoc(QJsonDocument::fromJson(fileData));
     if (jsonDoc.isNull() || !jsonDoc.isObject()) {
-        qWarning() << "Invalid JSON file format:" << filePath;
+        qWarning() << tr("Invalid JSON file format:") << filePath;
         return;
     }
 
@@ -1605,7 +1611,7 @@ void SubSSJJWidget::testCurrentScript()
 {
     if (checkThreadRunningState(testScriptThread) == 1)
     {
-        textToShowInScreen->setValue("当前有脚本正在测试");
+        textToShowInScreen->setValue(tr("当前有脚本正在测试"));
         return;
     }
 

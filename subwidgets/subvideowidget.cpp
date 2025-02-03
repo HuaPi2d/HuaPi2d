@@ -26,6 +26,12 @@ SubVideoWidget::SubVideoWidget(QWidget *parent)
     connect(ui->closePushButton, &QPushButton::clicked, this, [=](){
         emit widgetClosed();
     });
+
+    // 更新语言
+    connect(Language, &GlobalVariableQString::valueChanged, this, [=]() {
+        ui->retranslateUi(this);
+        });
+    reloadLanguage(Language->value());
 }
 
 SubVideoWidget::~SubVideoWidget()
@@ -86,13 +92,14 @@ void SubVideoWidget::searchVideo()
 
         // 记住当前搜索信息，方便后续动态加载相同内容
         currentWeb = ui->searchEngineComboBox->currentText();
+        currentWebIndex = ui->website_comboBox->currentIndex();
         currentSearchContent = ui->videoSearchContentLineEdit->text();
 
-        if(currentWeb == "bilibili")
+        if(currentWeb == "bilibili" || currentWebIndex == 0)
         {
             searchByBiliBili();
         }
-        else if(currentWeb == "风花雪月")
+        else if(currentWeb == "风花雪月" || currentWebIndex == 1)
         {
             searchByMoGu();
         }
@@ -168,7 +175,7 @@ void SubVideoWidget::searchByBiliBili()
     });
 
     QObject::connect(request, &RequestPro::requestError, [this](const QString &error) {
-        emit sendStateInfo("搜索失败，可尝试换源");
+        emit sendStateInfo(tr("搜索失败，可尝试换源"));
         videoInfoListModel->state = 0;
     });
 
@@ -229,7 +236,7 @@ void SubVideoWidget::searchByMoGu()
     });
 
     QObject::connect(request, &RequestPro::requestError, [this](const QString &error) {
-        emit sendStateInfo("搜索失败，可尝试换源");
+        emit sendStateInfo(tr("搜索失败，可尝试换源"));
         videoInfoListModel->state = 0;
     });
 

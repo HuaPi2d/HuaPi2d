@@ -5,7 +5,9 @@
 #include <qabstractitemmodel.h>
 #include <QRegularExpressionValidator>
 #include <QRegularExpression>
+
 #include "global/ssjjglobalvar.h"
+#include "global/mainglobalvar.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class PasswordModeDialogClass; };

@@ -109,3 +109,11 @@
 **`Ubuntu` 界面：**
 
 <img src="README_img/image-20241120171402115.png" alt="image-20241120171402115" style="zoom:67%;" />
+
+### 2.2 多语言
+
+> 利用 `Qt` 提供的翻译模块实现了对于界面大部分内容的批量机翻工作，主要处理利用的是 `lupdate` 生成的 `.ts` 文件以及 `Qt Linguist` 生成的 `.qm` 文件。
+>
+>  由于利用 `Qt Linguist` 手动翻译的工作量巨大，因此采用 `Python` 脚本进行了批量的处理工作，具体可以参考项目： https://github.com/HuaPi2d/QT-Liguist-Promax 
+>
+> <img src="README_img/language.gif" alt="image-20241120171402115" style="zoom:67%;" />

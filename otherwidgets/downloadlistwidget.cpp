@@ -16,6 +16,12 @@ DownloadListWidget::DownloadListWidget(QWidget *parent)
     ui->scrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 
     ui->scrollArea->setWidgetResizable(true);
+
+    // 更新语言
+    connect(Language, &GlobalVariableQString::valueChanged, this, [=]() {
+        ui->retranslateUi(this);
+        });
+    reloadLanguage(Language->value());
 }
 
 DownloadListWidget::~DownloadListWidget()

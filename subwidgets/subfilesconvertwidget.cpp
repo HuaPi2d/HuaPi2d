@@ -6,7 +6,7 @@ SubFilesConvertWidget::SubFilesConvertWidget(QWidget *parent)
 {
 	ui->setupUi(this);
 	ui->remindTextEdit->setReadOnly(true);
-	wirteRemindInfo("<p><span style=\"font-size: 13px; color: red;\">请选择需要转换的文件，输出结果保存在原文件夹</span></p><br>");
+	wirteRemindInfo("<p><span style=\"font-size: 13px; color: red;\">" + tr("请选择需要转换的文件，输出结果保存在原文件夹") + "</span></p><br>");
 
 	// 进度条归零
 	ui->convertProgressBar->setValue(0);
@@ -33,6 +33,12 @@ SubFilesConvertWidget::SubFilesConvertWidget(QWidget *parent)
 
 	// 加载配置
 	loadSettings();
+
+	// 更新语言
+	connect(Language, &GlobalVariableQString::valueChanged, this, [=]() {
+		ui->retranslateUi(this);
+		});
+	reloadLanguage(Language->value());
 }
 
 SubFilesConvertWidget::~SubFilesConvertWidget()

@@ -1,7 +1,7 @@
 ﻿#include "createnewfiledialog.h"
 
 
-FileType emptyScriptalFileType = { ".scp (空的脚本)", ".scp", QList<FileType>()};
+FileType emptyScriptalFileType = { ".scp (空的脚本)", ".scp", QList<FileType>() };
 FileType luanDouScriptalFileType = { ".lscp (乱斗脚本)", ".lscp", QList<FileType>() };
 FileType zhuXianScriptalFileType = { ".zscp (主线脚本)", ".zscp", QList<FileType>() };
 QList<FileType> scriptalChildFileTypes = { emptyScriptalFileType, luanDouScriptalFileType, zhuXianScriptalFileType };
@@ -107,17 +107,23 @@ CreateNewFileDialog::CreateNewFileDialog(QWidget* parent, QList<FileType> fileTy
 	connect(ui->confirmPushButton, &QPushButton::clicked, this, [=]() {
 		// 检查文件名是否为空
 		if (ui->fileNameLineEdit->text().isEmpty()) {
-			QMessageBox::warning(this, "警告", "文件名不能为空！");
+			QMessageBox::warning(this, tr("警告"), tr("文件名不能为空！"));
 			return;
 		}
 		// 检查文件是否已经存在
 		QFile file(ui->savePathLineEdit->text() + "/" + ui->fileNameLineEdit->text() + selectedChildFileType.suffix);
 		if (file.exists()) {
-			QMessageBox::warning(this, "警告", "文件已经存在！");
+			QMessageBox::warning(this, tr("警告"), tr("文件已经存在！"));
 			return;
 		}
 		accept();
 		});
+
+	// 更新语言
+	connect(Language, &GlobalVariableQString::valueChanged, this, [=]() {
+		ui->retranslateUi(this);
+		});
+	reloadLanguage(Language->value());
 }
 
 CreateNewFileDialog::~CreateNewFileDialog()

@@ -9,6 +9,7 @@
 #include "Aerospace/air/standardairmodel.h"
 #include "Aerospace/universal/coordinate.h"
 #include "universal/file/userssettings.h"
+#include "global/mainglobalvar.h"
 
 
 QT_BEGIN_NAMESPACE
@@ -39,6 +40,8 @@ private:
 	void createRemindText();
 	void calculateEulerRotationMatrix();
 	void updateScreen();
+	// 更新语言
+	void updateLanguage();
 
 private slots:
 	void on_singleFunctionTestPushButton_clicked();

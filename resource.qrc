@@ -64,6 +64,7 @@
         <file>resources/pic/script/zx_settlementConfirm.png</file>
         <file>resources/pic/script/zx_settlementExit.png</file>
         <file>resources/icons/color_board.svg</file>
+        <file>resources/icons/linguist.ico</file>
     </qresource>
     <qresource prefix="/pic/defaultPic">
         <file>resources/pic/defaultPic/defaultMusicPic.jpg</file>
@@ -197,5 +198,9 @@
         <file>resources/pic/script/zx_settlementConfirm.png</file>
         <file>resources/pic/script/zx_settlementExit.png</file>
         <file>resources/pic/script/zx_inGamePlayingPage.png</file>
+    </qresource>
+    <qresource prefix="/">
+        <file>translations/zh_CN.qm</file>
+        <file>translations/en_US.qm</file>
     </qresource>
 </RCC>

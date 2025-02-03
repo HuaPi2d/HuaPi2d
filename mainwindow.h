@@ -1,6 +1,7 @@
 ﻿#ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
+#include <Python.h>
 #include <QMainWindow>
 #include <QSignalMapper>
 #include <QButtonGroup>
@@ -51,6 +52,8 @@ public:
     void createFilesConvertSubWindow();
     void createHardwareDevelopmentSubWindow();
     void addDownloadTask(SingleDownloadFrame *singleDownloadFrame);
+    // 切换语言
+    void changeLanguage(QString language);
 
 private:
     Ui::MainWindow *ui;
@@ -69,10 +72,13 @@ private slots:
     void onStyleManagerStylesheetChanged();
     // 改变窗口大小
     void receiveDsizeInfo(int dwidth, int dheight);
+    void testPythonCode();
 
 public: signals:
     void isAnyChildWindow();
     void updateQuickWidgetTheme(acss::QtAdvancedStylesheet* advancedStyleSheet);
     void getGlobalEditorConfig(EditorConfig globalEditorConfig);
+    // 切换语言
+    void languageChanged(QString language);
 };
 #endif // MAINWINDOW_H

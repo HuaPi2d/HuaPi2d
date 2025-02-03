@@ -3,6 +3,7 @@
 #include <QColorDialog>
 #include <QLocale>
 #include "ui_colorpickerdialog.h"
+#include "global/mainglobalvar.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class ColorPickerDialogClass; };

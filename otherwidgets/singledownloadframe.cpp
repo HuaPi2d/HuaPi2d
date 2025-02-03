@@ -9,12 +9,18 @@ SingleDownloadFrame::SingleDownloadFrame(QString name,  QUrl url, QString filePa
     this->url = url;
     this->name = name;
     this->filePath = filePath;
-    ui->urlLabel->setScrollingText(name + "-源:" + url.toString());
+    ui->urlLabel->setScrollingText(name + tr("-源:") + url.toString());
     ui->urlLabel->setFixedWidth(200);
     if(type == "audio")
     {
         ui->iconLabel->setPixmap(QPixmap(":/icon/resources/icons/audio.svg"));
     }
+
+    // 更新语言
+    connect(Language, &GlobalVariableQString::valueChanged, this, [=]() {
+        ui->retranslateUi(this);
+        });
+    reloadLanguage(Language->value());
 }
 
 SingleDownloadFrame::~SingleDownloadFrame()
@@ -40,7 +46,7 @@ void SingleDownloadFrame::startDownload()
         {
             localFile.setFileName(filePath);
             if (!localFile.open(QIODevice::WriteOnly)) {
-                sendStateInfo(filePath + "打开失败");
+                sendStateInfo(filePath + tr("打开失败"));
                 return;
             }
             localFile.write(reply->readAll());
@@ -49,7 +55,7 @@ void SingleDownloadFrame::startDownload()
         }
         else  // 失败返回错误信息
         {
-            emit sendStateInfo(name + "下载失败");
+            emit sendStateInfo(name + tr("下载失败"));
         }
     });
 

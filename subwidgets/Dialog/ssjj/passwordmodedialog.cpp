@@ -25,6 +25,12 @@ PasswordModeDialog::PasswordModeDialog(QWidget *parent)
 
 	connect(ui->confirmPushButton, &QPushButton::clicked, this, &PasswordModeDialog::accept);
 	connect(ui->cancelPushButton, &QPushButton::clicked, this, &PasswordModeDialog::reject);
+
+	// 更新语言
+	connect(Language, &GlobalVariableQString::valueChanged, this, [=]() {
+		ui->retranslateUi(this);
+		});
+	reloadLanguage(Language->value());
 }
 
 PasswordModeDialog::~PasswordModeDialog()

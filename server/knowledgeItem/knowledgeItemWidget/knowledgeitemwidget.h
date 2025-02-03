@@ -4,7 +4,9 @@
 #include <QMenu>
 #include <QModelIndex>
 #include <QMouseEvent>
+
 #include "ui_knowledgeitemwidget.h"
+#include "global/mainglobalvar.h"
 
 class KnowledgeItemWidget : public QWidget
 {

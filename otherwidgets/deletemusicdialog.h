@@ -3,6 +3,8 @@
 
 #include <QDialog>
 
+#include "global/mainglobalvar.h"
+
 namespace Ui {
 class DeleteMusicDialog;
 }

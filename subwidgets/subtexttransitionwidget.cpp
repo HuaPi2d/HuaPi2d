@@ -42,6 +42,12 @@ SubTextTransitionWidget::SubTextTransitionWidget(QWidget *parent)
     connect(ui->currentTimeSlider, &QSlider::sliderMoved, mediaPlayer, &QMediaPlayer::setPosition);
 
     loadSettings();
+
+    // 更新语言
+    connect(Language, &GlobalVariableQString::valueChanged, this, [=]() {
+        ui->retranslateUi(this);
+        });
+    reloadLanguage(Language->value());
 }
 
 SubTextTransitionWidget::~SubTextTransitionWidget()
@@ -168,19 +174,19 @@ void SubTextTransitionWidget::sendRequest()
 
     QObject::connect(request, &RequestPro::requestCompleted, [=](const QJsonObject &response) {
         qDebug() << response;
-        ui->requestPushButton->setText("生成语音");
+        ui->requestPushButton->setText(tr("生成语音"));
         mediaPlayer->setSource(response["data"]["audio_url"].toString());
         currentUrl = response["data"]["audio_url"].toString();
         playMusic();
     });
 
     QObject::connect(request, &RequestPro::requestError, [this](const QString &error) {
-        ui->requestPushButton->setText("生成语音");
-        emit sendStateInfo("生成失败，可尝试切换音源");
+        ui->requestPushButton->setText(tr("生成语音"));
+        emit sendStateInfo(tr("生成失败，可尝试切换音源"));
     });
 
     request->sendRequest(headers, params, url, requestType);
-    ui->requestPushButton->setText("生成中...");
+    ui->requestPushButton->setText(tr("生成中..."));
 }
 
 
@@ -211,19 +217,19 @@ void SubTextTransitionWidget::changePlayPushButtonStyle()
     case QMediaPlayer::PlaybackState::PlayingState:
     {
         ui->playPushButton->setIcon(QIcon(":/icon/resources/icons/pause.svg"));
-        ui->playPushButton->setToolTip("暂停");
+        ui->playPushButton->setToolTip(tr("暂停"));
         break;
     }
     case QMediaPlayer::PlaybackState::StoppedState:
     {
         ui->playPushButton->setIcon(QIcon(":/icon/resources/icons/pause.svg"));
-        ui->playPushButton->setToolTip("暂停");
+        ui->playPushButton->setToolTip(tr("暂停"));
         break;
     }
     default:
     {
         ui->playPushButton->setIcon(QIcon(":/icon/resources/icons/musicPlay.svg"));
-        ui->playPushButton->setToolTip("播放");
+        ui->playPushButton->setToolTip(tr("播放"));
         break;
     }
     }
@@ -243,7 +249,7 @@ void SubTextTransitionWidget::playMusic()
 void SubTextTransitionWidget::on_downloadPushButton_clicked()
 {
     // 打开文件保存对话框，获取用户选择的保存路径
-    QString savePath = QFileDialog::getSaveFileName(this, "Save Audio", "textTransitionResult", "Audio Files (*.mp3 *.wav)");
+    QString savePath = QFileDialog::getSaveFileName(this, tr("Save Audio"), tr("textTransitionResult"), tr("Audio Files (*.mp3 *.wav)"));
 
     // 创建下载任务
     SingleDownloadFrame *singleDownloadFrame = new SingleDownloadFrame(ui->voiceClassComboBox->currentText() + ui->voiceComboBox->currentText(), currentUrl, savePath, "audio");

@@ -4,6 +4,8 @@
 #include <QWidget>
 #include <QVBoxLayout>
 
+#include "global/mainglobalvar.h"
+
 namespace Ui {
 class DownloadListWidget;
 }

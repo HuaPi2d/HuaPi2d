@@ -14,6 +14,8 @@
 #include <QUrl>
 #include <QDebug>
 
+#include "global/mainglobalvar.h"
+
 namespace Ui {
 class SingleDownloadFrame;
 }
