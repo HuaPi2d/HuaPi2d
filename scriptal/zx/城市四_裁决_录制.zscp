@@ -1,0 +1,11 @@
+
+move_forward(1000)
+sleep_ms(1219)
+move_left(687)
+sleep_ms(1781)
+move_back(938)
+sleep_ms(1469)
+move_right(953)
+sleep_ms(1281)
+move_left(1203)
+sleep_ms(2968)

@@ -147,11 +147,13 @@ SubMusicWidget::SubMusicWidget(QWidget *parent)
     ui->musicPicLabel->setPixmap(mainPixmap);
     loadSettings();
 
+    hideSomeItems();
+
     // 更新语言
-    connect(Language, &GlobalVariableQString::valueChanged, this, [=]() {
+    /*connect(Language, &GlobalVariableQString::valueChanged, this, [=]() {
         ui->retranslateUi(this);
         });
-    reloadLanguage(Language->value());
+    reloadLanguage(Language->value());*/
 }
 
 SubMusicWidget::~SubMusicWidget()
@@ -792,6 +794,14 @@ bool SubMusicWidget::isLocal()
         return true;
     else
         return false;
+}
+
+void SubMusicWidget::hideSomeItems()
+{
+    if (developerMode == false) {
+        ui->music_source_label->setVisible(false);
+        ui->musicSourceComboBox->setVisible(false);
+    }
 }
 
 /* 下载 */

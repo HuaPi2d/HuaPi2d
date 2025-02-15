@@ -15,9 +15,13 @@ public:
 
 public: signals:
 	void sendWarningMessage(QString title, QString message);
+	void sendRunInfo(QString info);
 
 private:
 	QFileInfo m_fileInfo;
+	QList<FileAttribute> m_fileAttributes;
+	ScriptCompiler* m_compiler;
+	int m_speed;
 
 protected:
 	void run() override;

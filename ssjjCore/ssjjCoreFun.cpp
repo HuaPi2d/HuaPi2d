@@ -17,6 +17,12 @@ QString checkCurrentState(int waitTime)
 {
     QThread::msleep(waitTime);
 
+    cv::Point mousePicPos = findPicInFullScreen(":/pic/script/resources/pic/script/mouse.png");
+    if (mousePicPos != cv::Point(-1, -1)) {
+        mouseClick(mousePicPos.x, mousePicPos.y);
+        QThread::msleep(100);
+    }
+
     // 声明返回对象
     if (findPicInFullScreen(":/pic/script/resources/pic/script/" + resolutionPath + "loading_pic.png") != cv::Point(-1, -1))
     {
@@ -57,8 +63,7 @@ QString checkCurrentState(int waitTime)
         // 处于游戏界面，但不包括开始界面
         return "hallPage";
     }
-    else if (/*findPicInFullScreen(":/pic/script/resources/pic/script/zx_settlementConfirm.png") != cv::Point(-1, -1)
-        || */findPicInFullScreen(":/pic/script/resources/pic/script/zx_settlementExit.png") != cv::Point(-1, -1))
+    else if (findPicInFullScreen(":/pic/script/resources/pic/script/zx_settlementExit.png") != cv::Point(-1, -1))
     {
         // 处于主线结算界面
         return "settlementPage";
@@ -192,7 +197,7 @@ SSJJRunState restartSSJJ(QString ssjjInstallPath){
         return ssjjRunState;
     }
     mouseClick(2, 2);
-    QThread::msleep(8000);
+    QThread::msleep(15000);
 
     /* 判断是否弹出活动界面 */
     res = competeFindPic(picList, 3000, 1000);
@@ -347,9 +352,6 @@ SSJJRunState initiallizeGameScreen(SingleTask task){
             ssjjRunState.nextStep = "initializeGameScreen";
             return ssjjRunState;
         }
-        
-        // 选择指定难度
-        chooseDifficulty(task.difficulty);
 
         ssjjRunState.errorType = "NoError";
         ssjjRunState.remindText = "";
@@ -486,6 +488,9 @@ SSJJRunState enterGame(SingleTask task, int loadingTimes){
         }
     }
     if (task.taskType == Task::ZhuXian) {
+        // 选择指定难度
+        chooseDifficulty(task.difficulty);
+
         // 主线关卡
         // 读取脚本信息
         QList<FileAttribute> scriptAttributes = readFileAttributes(task.script);
@@ -509,6 +514,7 @@ SSJJRunState enterGame(SingleTask task, int loadingTimes){
             QThread::msleep(loadingTimes * 1000 - 3000);
             for (int i = 0; i < 20; i++) {
                 state = checkCurrentState(1000);
+                textToShowInScreen->setValue(QString("循环%1").arg(i));
                 textToShowInScreen->setValue(state);
                 if (state == "loadingPage") {
                 }
@@ -619,7 +625,8 @@ SSJJRunState runScript(SingleTask task, int speed)
     }
     else if (task.taskType == Task::ZhuXian) {
         // 主线关卡
-        ScriptCompiler::runScript(task.script, speed);
+        ScriptCompiler scriptCompiler(task.script, speed);
+        scriptCompiler.runScript();
 
         while (true)
         {
@@ -627,9 +634,7 @@ SSJJRunState runScript(SingleTask task, int speed)
             QString state = checkCurrentState();
             textToShowInScreen->setValue(state);
             if (state == "gamePage")
-            {
-
-            }
+            {}
             // 开启结算页面
             else if (state == "settlementPage")
             {
@@ -945,11 +950,14 @@ bool clickLevel(FileAttribute level)
 // 选择难度
 void chooseDifficulty(QString difficulty)
 {
+    if (checkCurrentState() != "startPage") {
+        QThread::msleep(3000);
+    }
     if (difficulty == "挑战" || difficulty == "普通" || difficulty == "困难" || difficulty == "噩梦" || difficulty == "极速"
         || difficulty == "专家一" || difficulty == "专家二" || difficulty == "专家三" || difficulty == "专家四"
         || difficulty == "专家五" || difficulty == "专家六")
     {
-        findAndClick(":/pic/script/resources/pic/script/difficulty_NightMare.png", 3000);
+        findAndClick(":/pic/script/resources/pic/script/difficulty_combox1_arrow.png", 3000);
         if (difficulty == "挑战")
             findAndClick(":/pic/script/resources/pic/script/difficulty_TiaoZhan.png", 3000);
         else if (difficulty == "普通")
@@ -963,7 +971,7 @@ void chooseDifficulty(QString difficulty)
         else 
         {
             findAndClick(":/pic/script/resources/pic/script/difficulty_Expert.png", 3000);
-            findAndClick(":/pic/script/resources/pic/script/difficulty_Expert1.png", 3000);
+            findAndClick(":/pic/script/resources/pic/script/difficulty_combox2_arrow.png", 3000);
             if (difficulty == "专家一")
                 findAndClick(":/pic/script/resources/pic/script/difficulty_Expert1.png", 3000);
             else if (difficulty == "专家二")

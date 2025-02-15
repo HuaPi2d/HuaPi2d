@@ -35,6 +35,12 @@
 #include "subwidgets/Dialog/editor/editorsettingsdialog.h"
 #include "struct/editor/EditorConfig.h"
 #include "global/mainglobalvar.h"
+#include "Dialog/ssjj/scriptrecordoptiondialog.h"
+#include "Dialog/ssjj/recordteachingdialog.h"
+#include "universal/filepath/filepath.h"
+#include "thread/scriptRecord/scriptrecordthread.h"
+#include "ssjjCore/script/recordToScp/keyboradrecordconvert.h"
+#include "universal/file/excel.h"
 
 
 namespace Ui {
@@ -53,6 +59,10 @@ public:
     // 全局代码编辑器样式设置
     void loadSettings();
 
+public:signals:
+    void unregiseterHotkey();
+    void regiseterHotkey();
+
 public slots:
     // 创建新的文件编辑标签页
     void creatNewScriptEditorTab(QString fileName, QString filePath, QList<FileAttribute> fileAttributes);
@@ -60,9 +70,18 @@ public slots:
     void saveFile();
     void testCurrentScript();
     void stopTestScript();
+    // 调出代码编辑器设置对话框
+    void showEditorSettingsDialog();
     // 更改编辑器配色
     void resetEditorsAppearances();
     void getGlobalEditorConfig(EditorConfig editorConfig);
+    // 开始脚本录制
+    void startScriptRecord();
+    // 脚本录制设置对话框
+    void showScriptRecordOptionDialog();
+    // 任务列表操作
+    void importTaskList();
+    void exportTaskList();
 
 protected:
     void closeEvent(QCloseEvent *event) override;
@@ -76,17 +95,30 @@ private:
     SingleTask currentTask;
     QPointer<SSJJMainThread> ssjjMainThread;
     QsciScintilla* scriptEditor;
-    WeaponBonusThread* weaponBonusThread;
+    QPointer<WeaponBonusThread> weaponBonusThread;
     QPointer<TestScriptThread> testScriptThread;
+    QPointer<ScriptRecordThread> scriptRecordThread;
     QString resolutionPath;
     QList<ScpLanguageEditor *> scpLanguageEditors;
     ZXChapter currentChoosedZXChapter;                    // 当前页面选中的章节
     ZXLevel currentChoosedZXLevel;                        // 当前页面选中的关卡
     SSJJScriptalFilesDatabase* ssjjScriptalFilesDatabase; // 脚本文件数据库
     ScpLanguageEditor* currentScriptEditor;
-    EditorConfig scpEditorConfig;
+    EditorConfig scpEditorConfig_dark;
+    EditorConfig scpEditorConfig_light;
     EditorConfig globalEditorConfig;
-    QString appDir;
+    // 是否显示录制教学对话框
+    bool ifShowRecordTeachingDialog;
+    // 醒目的提示信息样式
+    QString outlineStyleSheet;
+    QHotkey* up_arrow;
+    QHotkey* down_arrow;
+    QHotkey* left_arrow;
+    QHotkey* right_arrow;
+    QHotkey* enter;
+    QHotkey* middle;
+    // 当前键盘是否可以控制鼠标
+    bool ifCanControlMouse;
 
 private: signals:
     void widgetClosed();
@@ -120,8 +152,11 @@ private slots:
     void on_chooseZXScriptPathPushButton_clicked();
     void on_startPushButton_clicked();
     void on_endPushButton_clicked();
+    // 录制脚本按钮按下
+    void on_scriptRecordPushButton_clicked();
     void forceQuitSSJJThread();
     void receiveDisplayText(QString text);
+    void showTextOnScreen(QString text, QPoint pos, int time, QString labelStyleSheet);
     void on_singleBonusPushButton_clicked();
     void on_contineBonusPushButton_clicked();
     void on_stopBounsPushButton_clicked();
@@ -144,6 +179,13 @@ private slots:
     void currentTabChanged(int index);
     void getCurrentScriptEditor();
     void receiveWarningMessage(QString title, QString message);
+    // 检测是否有线程在运行
+    bool checkThreadState();
+    // 处理录制结果
+    void convertRecordResult();
+    // 注册方向键
+    void regiseterMouseHotkey();
+    void unregiseterMouseHotkey();
 };
 
 #endif // SUBSSJJWIDGET_H

@@ -21,7 +21,6 @@ void EnterGameThread::run()
     {
         emit threadFinished();
     }
-    QThread::msleep(1000);
     // 发送信号
     this->deleteLater();
 }

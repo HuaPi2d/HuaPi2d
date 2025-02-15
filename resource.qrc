@@ -65,6 +65,8 @@
         <file>resources/pic/script/zx_settlementExit.png</file>
         <file>resources/icons/color_board.svg</file>
         <file>resources/icons/linguist.ico</file>
+        <file>resources/icons/typora.ico</file>
+        <file>resources/icons/record.png</file>
     </qresource>
     <qresource prefix="/pic/defaultPic">
         <file>resources/pic/defaultPic/defaultMusicPic.jpg</file>
@@ -198,9 +200,16 @@
         <file>resources/pic/script/zx_settlementConfirm.png</file>
         <file>resources/pic/script/zx_settlementExit.png</file>
         <file>resources/pic/script/zx_inGamePlayingPage.png</file>
+        <file>resources/pic/script/mouse.png</file>
+        <file>resources/pic/script/difficulty_combox1_arrow.png</file>
+        <file>resources/pic/script/difficulty_combox2_arrow.png</file>
     </qresource>
     <qresource prefix="/">
         <file>translations/zh_CN.qm</file>
         <file>translations/en_US.qm</file>
+    </qresource>
+    <qresource prefix="/default">
+        <file>resources/default/Default.md</file>
+        <file>QSS/README.md</file>
     </qresource>
 </RCC>

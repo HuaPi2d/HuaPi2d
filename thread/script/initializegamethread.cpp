@@ -17,7 +17,6 @@ void InitializeGameThread::run()
     {
         emit threadFinished();
     }
-    QThread::msleep(1000);
     /* 返回初始化结果 */
     this->deleteLater();
 }

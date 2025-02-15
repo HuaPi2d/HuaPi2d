@@ -7,35 +7,7 @@
 #include "universal/file/fileattributes.h"
 #include "universal/timeFun/pctime.h"
 #include "ssjjCore/script/scriptcompiler/scriptcompiler.h"
-
-
-// 下一步操作
-// restartSSJJ: 重启游戏
-// InitializeGameScreen：初始化游戏界面
-// enterGame：进入游戏
-// runScriptFile：运行脚本
-// settlement：结算
-// fatalError：致命错误，运行停止
-struct SSJJRunState
-{
-    QString remindText;
-    QString errorType; // FatalError, Error, NoError, Remind, Success
-    QString nextStep;
-};
-
-namespace Task {
-    enum TaskType {
-        LuanDou = 0,
-        ZhuXian
-    };
-};
-
-struct SingleTask{
-    QString taskName;
-    QString difficulty;
-    QString script;
-    Task::TaskType taskType;
-};
+#include "struct/ssjj/ssjjstruct.h"
 
 QString checkCurrentState(int waitTime = 0);
 
@@ -49,7 +21,7 @@ SSJJRunState restartSSJJ(QString ssjjInstallPath);
 
 SSJJRunState initiallizeGameScreen(SingleTask task);
 
-SSJJRunState enterGame(SingleTask task, int loadingTimes);
+SSJJRunState enterGame(SingleTask task, int loadingTimes = 20);
 
 SSJJRunState runScript(SingleTask task, int speed);
 

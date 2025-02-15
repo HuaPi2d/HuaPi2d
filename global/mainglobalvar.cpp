@@ -2,6 +2,7 @@
 
 bool developerMode = false;
 GlobalVariableQString* Language = new GlobalVariableQString(nullptr);
+GlobalVariableQString* themeType = new GlobalVariableQString(nullptr);
 
 void reloadLanguage(QString language)
 {

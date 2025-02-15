@@ -37,11 +37,6 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    /* 隐藏内容 */
-    // ui->defend_groupBox->hide();
-    // ui->learning_groupBox->hide();
-    // ui->net_groupBox->hide();
-    // ui->menubar->hide();
     /* 加载主题 */
     loadThemes();
 
@@ -50,6 +45,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     /* 隐藏工作区，任务栏，禁用返回按钮 */
     ui->processToolBar->hide();
+    ui->processToolBar->setMovable(false);
     ui->mutiWindowWidget->hide();
 
     /* 构建关于子窗口的簇 */
@@ -112,6 +108,10 @@ MainWindow::MainWindow(QWidget *parent)
     // 文件转换窗口
     connect(ui->filesConvert_action, &QAction::triggered, ui->filesConvertPushButton, &QPushButton::click);
     connect(ui->filesConvertPushButton, &QPushButton::clicked, this, &MainWindow::createFilesConvertSubWindow);
+    // MD编辑器窗口
+    connect(ui->mdFilesPushButton, &QPushButton::clicked, this, &MainWindow::createMDSubWindow);
+    // 关于软件
+    connect(ui->aboutSoftwareAction, &QAction::triggered, this, &MainWindow::showAboutSoftWareDialog);
 
     // 开发者模式
     QHotkey* HUA = new QHotkey(QKeySequence("Ctrl+Shift+H"), true);
@@ -232,6 +232,16 @@ void MainWindow::changeWindowTitle()
     }
 }
 
+void MainWindow::showAboutSoftWareDialog()
+{
+    // 声明对象
+    AboutSoftwareDialog * aboutSoftwareDialog = new AboutSoftwareDialog(this);
+
+    // 显示对话框
+    aboutSoftwareDialog->exec();
+    
+}
+
 void MainWindow::changeLanguage(QString language)
 {
     reloadLanguage(language);
@@ -274,6 +284,9 @@ void MainWindow::saveSettings()
     editorConfigSettings.setValue("function", editorConfig.color.function.name());
     editorConfigSettings.setValue("variable", editorConfig.color.variable.name());
     editorConfigSettings.setValue("comment", editorConfig.color.comment.name());
+    editorConfigSettings.setValue("caret_line_color", editorConfig.color.caret_line_color.name());
+    editorConfigSettings.setValue("line_number_color", editorConfig.margin.line_number_color.name());
+    editorConfigSettings.setValue("background_color", editorConfig.margin.background_color.name());
     editorConfigSettings.endGroup();
     editorConfigSettings.endGroup();
 }
@@ -327,6 +340,9 @@ void MainWindow::loadSettings()
     editorConfig.color.function = QColor(editorConfigSettings.value("function", "#0000FF").toString());
     editorConfig.color.variable = QColor(editorConfigSettings.value("variable", "#000099").toString());
     editorConfig.color.comment = QColor(editorConfigSettings.value("comment", "#999999").toString());
+    editorConfig.color.caret_line_color = QColor(editorConfigSettings.value("caret_line_color", "#303030").toString());
+    editorConfig.margin.line_number_color = QColor(editorConfigSettings.value("line_number_color", "#8a8a8a").toString());
+    editorConfig.margin.background_color = QColor(editorConfigSettings.value("background_color", "#313335").toString());
     editorConfigSettings.endGroup();
     editorConfigSettings.endGroup();
 }
@@ -343,6 +359,7 @@ void MainWindow::hideSomeItems()
         ui->video_action->setVisible(false);
         ui->ranLearning_action->setVisible(false);
         ui->QTToolsGroupBox->setVisible(false);
+        ui->aboutMakerAction->setVisible(false);
     }
 }
 
@@ -432,10 +449,14 @@ void MainWindow::updateTheme()
         if (currentTheme.contains("dark"))
         {
             ui->processToolBar->setStyleSheet("QToolBar{background-color:rgb(55, 61, 67)}");
+            themeType->setValue("dark");
+            emit themeType->valueChanged("dark");
         }
         else if (currentTheme.contains("light"))
         {
             ui->processToolBar->setStyleSheet("QToolBar{background-color:rgb(250,250,250)}");
+            themeType->setValue("light");
+            emit themeType->valueChanged("light");
         }
         advancedStyleSheet->setCurrentTheme(currentTheme);
         advancedStyleSheet->updateStylesheet();
@@ -449,6 +470,8 @@ void MainWindow::updateTheme()
             QString styleSheet = QLatin1String(file.readAll());
             qApp->setStyleSheet(styleSheet);  // 只对当前窗口应用 QSS 样式表
         }
+        themeType->setValue("light");
+        emit themeType->valueChanged("light");
     }
 }
 
@@ -935,6 +958,68 @@ void MainWindow::createFilesConvertSubWindow()
 
     /* 窗口销毁时的事件 */
     connect(subFilesConvertWindow, &SubFilesConvertWindow::windowDestroyed, [this, taskButton](QMdiSubWindow* window) {
+        /* 在List中剔除对应窗口，按钮 */
+        this->taskButtonList->removeButton(taskButton);
+        for (int i = 0; i < this->subWindowList->count(); i++)
+        {
+            if (this->subWindowList->at(i) == window)
+            {
+                this->subWindowList->remove(i);
+                break;
+            }
+        }
+
+        /* 判断是否回到主界面 */
+        if (this->subWindowList->empty() == true)
+        {
+            ui->processToolBar->setVisible(false);
+            ui->mutiWindowWidget->setVisible(false);
+            ui->mainWidget->setVisible(true);
+        }
+        else
+        {
+            this->subWindowList->at(0)->showMaximized();
+        }
+
+        /* 销毁任务栏按钮 */
+        taskButton->deleteLater();
+        });
+}
+
+void MainWindow::createMDSubWindow()
+{
+    /* 隐藏主界面，显示功能界面 */
+    if (ui->mainWidget->isHidden() == false)
+        changeToWorkingUI();
+
+    /* MD编辑窗口 */
+    SubMDWindow* subMDWindow = new SubMDWindow(this);  // 创建子窗口
+    ui->functionArea->addSubWindow(subMDWindow);  // 添加到工作区
+    subMDWindow->showMaximized();  // 最大化显示
+    subWindowList->append(subMDWindow); // 加入子窗口列表
+
+    /* 创建任务栏按钮 */
+    QPushButton* taskButton = new QPushButton(this);
+    taskButton->setIcon(QIcon(":/icon/resources/icons/typora.ico"));
+    taskButton->setCheckable(true);
+    taskButton->setChecked(true);
+    taskButton->setStyleSheet("QPushButton {border: none; background-color:rgb(231, 234, 248);}QPushButton:hover {background-color:rgb(249, 239, 241);}QPushButton:checked {background-color:grey;}");
+    ui->processToolBar->addWidget(taskButton);
+    this->taskButtonList->addButton(taskButton);
+
+    /* 状态信息接收 */
+    connect(subMDWindow, &SubMDWindow::sendStateInfo, this, &MainWindow::showStateInfo);
+
+    /* 将任务栏按钮和子窗口连接起来 */
+    connect(taskButton, &QPushButton::clicked, signalMapper, QOverload<>::of(&QSignalMapper::map));
+    signalMapper->setMapping(taskButton, subMDWindow);
+
+    connect(taskButton, &QPushButton::clicked, this, [=]() {
+        subMDWindow->showMaximized();
+        });
+
+    /* 窗口销毁时的事件 */
+    connect(subMDWindow, &SubMDWindow::windowDestroyed, [this, taskButton](QMdiSubWindow* window) {
         /* 在List中剔除对应窗口，按钮 */
         this->taskButtonList->removeButton(taskButton);
         for (int i = 0; i < this->subWindowList->count(); i++)

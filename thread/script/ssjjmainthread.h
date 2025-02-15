@@ -20,6 +20,7 @@ public:
     BasicScriptThread* currentThread;
 
 private:
+    SingleTask lastTask;
     SingleTask task;
     QString ssjjInstallPath;
     int moveSpeed;

@@ -9,6 +9,8 @@
 #include <QMap>
 #include <QSqlRecord>
 
+#include "universal/filepath/filepath.h"
+
 
 // 本地数据库类
 class LocalDatabase  : public QObject

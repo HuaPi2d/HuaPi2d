@@ -1,0 +1,27 @@
+"""
+进入游戏，活动筋骨
+"""
+move_back(3000)
+move_forward(5000)
+move_left(1000)
+move_right(1000)
+"""
+打红墙，开始第一回合
+"""
+left_click()
+# 开启加成
+sleep_s(3)
+key_press("X")
+sleep_ms(100)
+middle_click()
+sleep_ms(2000)
+# 调整位置
+key_down("w")
+sleep_ms(1000)
+key_up("w")
+turn_around(-45)
+turn_around(-45)
+key_down("w")
+sleep_ms(3000)
+key_up("w")
+

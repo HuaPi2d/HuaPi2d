@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>914</width>
-    <height>1182</height>
+    <height>1247</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -623,15 +623,31 @@ QPushButton:pressed {
         <item>
          <layout class="QHBoxLayout" name="horizontalLayout_5">
           <item>
-           <widget class="QTabWidget" name="scriptalTabWidget">
-            <property name="currentIndex">
-             <number>0</number>
-            </property>
-            <widget class="QWidget" name="welcomeTab">
-             <attribute name="title">
-              <string>Welcome</string>
-             </attribute>
-            </widget>
+           <widget class="QWidget" name="leftPartWidget" native="true">
+            <layout class="QVBoxLayout" name="verticalLayout_7">
+             <item>
+              <widget class="QTabWidget" name="scriptalTabWidget">
+               <property name="currentIndex">
+                <number>0</number>
+               </property>
+               <widget class="QWidget" name="welcomeTab">
+                <attribute name="title">
+                 <string>Welcome</string>
+                </attribute>
+               </widget>
+              </widget>
+             </item>
+             <item>
+              <widget class="QListWidget" name="runInfoListWidget">
+               <property name="maximumSize">
+                <size>
+                 <width>16777215</width>
+                 <height>150</height>
+                </size>
+               </property>
+              </widget>
+             </item>
+            </layout>
            </widget>
           </item>
           <item>
@@ -654,6 +670,30 @@ QPushButton:pressed {
                 <string>值</string>
                </property>
               </column>
+             </widget>
+            </item>
+            <item>
+             <widget class="QCheckBox" name="testKeyMouseCheckBox">
+              <property name="text">
+               <string>键盘控制鼠标</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="scriptRecordPushButton">
+              <property name="text">
+               <string>脚本录制（F9）</string>
+              </property>
+              <property name="icon">
+               <iconset resource="../resource.qrc">
+                <normaloff>:/icon/resources/icons/record.png</normaloff>:/icon/resources/icons/record.png</iconset>
+              </property>
+              <property name="iconSize">
+               <size>
+                <width>32</width>
+                <height>32</height>
+               </size>
+              </property>
              </widget>
             </item>
            </layout>
@@ -875,7 +915,7 @@ QPushButton:pressed {
              <string>点击右侧打开文件或从下拉框中选择</string>
             </property>
             <property name="currentIndex">
-             <number>1</number>
+             <number>0</number>
             </property>
             <widget class="QWidget" name="LDTab">
              <attribute name="title">

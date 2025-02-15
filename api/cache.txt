@@ -1,0 +1,47 @@
+# 人物转向
+def turn_around_angle(angle):
+    size = pyautogui.size()
+    bbox = [0, 0, size[0], size[1]]
+    i = 2
+    error = 0
+    while i > 0:
+        screenshot = ImageGrab.grab(bbox)
+        screenshot = np.array(screenshot)
+        last_pic = cvtColor(screenshot, COLOR_RGB2GRAY)
+        sleep(0.5)
+        pyautogui.moveTo(size[0] / 2 - angle * 10, size[1] / 2)
+        screenshot = ImageGrab.grab(bbox)
+        screenshot = np.array(screenshot)
+        now_pic = cvtColor(screenshot, COLOR_RGB2GRAY)
+        if match(now_pic, last_pic, 0.9) is not None:
+            error = error + 1
+            if error == 2:
+                break
+            continue
+        else:
+            i = i - 1
+        sleep(0.5)
+
+
+def turn_up_and_down(angle):
+    size = pyautogui.size()
+    bbox = [0, 0, size[0], size[1]]
+    i = 2
+    error = 0
+    while i > 0:
+        screenshot = ImageGrab.grab(bbox)
+        screenshot = np.array(screenshot)
+        last_pic = cvtColor(screenshot, COLOR_RGB2GRAY)
+        sleep(0.5)
+        pyautogui.moveTo(size[0] / 2, size[1] / 2 + angle * 10)
+        screenshot = ImageGrab.grab(bbox)
+        screenshot = np.array(screenshot)
+        now_pic = cvtColor(screenshot, COLOR_RGB2GRAY)
+        if match(now_pic, last_pic, 0.9) is not None:
+            error = error + 1
+            if error == 2:
+                break
+            continue
+        else:
+            i = i - 1
+        sleep(0.5)

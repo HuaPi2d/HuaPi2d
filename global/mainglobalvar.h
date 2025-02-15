@@ -8,6 +8,7 @@
 
 extern bool developerMode;
 extern GlobalVariableQString* Language;
+extern GlobalVariableQString* themeType;
 
 void reloadLanguage(QString language);
 

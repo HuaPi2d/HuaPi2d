@@ -25,6 +25,10 @@ public:
 public: signals:
     void getGlobalEditorConfig(EditorConfig globalEditorConfig);
 
+public slots:
+    void unregiseterHotkey();
+    void regiseterHotkey();
+
 signals:
     void sendStateInfo(QString state);
     void windowDestroyed(QMdiSubWindow *window);
@@ -51,9 +55,16 @@ private:
     void importScriptalFiles();
     // 更新界面语言
     void retranslateUi();
+    // 开发者选项设置
+    void developerOption();
 
 // 菜单栏
 private:
+    // 设置全局热键
+    QHotkey* F9;
+    QHotkey* F10;
+    QHotkey* F11;
+
     QMenu* fileMenu;
     QMenu* editMenu;
     QAction* createNewFileAction;
@@ -62,6 +73,7 @@ private:
 
     QMenu* runMenu;
     QMenu* scriptTestMenu;
+    QAction* recordScriptAction;
     QAction* testScriptAction;
     QAction* stopTestScriptAction;
     QMenu* bonusMenu;
@@ -74,10 +86,15 @@ private:
 
     QMenu* settingMenu;
     QMenu* editorSettingsMenu;
+    QAction* scriptRecordOptionAction;
     QAction* editorSettingsAction;
     QMenu* autoScriptMenu;
     QAction* passWordModeAction;
+    QMenu* scriptFilesMenu;
     QAction* importScriptalFilesAction;
+    QMenu* taskListMenu;
+    QAction* importTaskListAction;
+    QAction* exportTaskListAction;
 
 private:
     void disableMenuAndActions(QMenu* menu);

@@ -1,6 +1,6 @@
 ﻿#include "showtextinscreenwidget.h"
 
-ShowTextInScreenWidget::ShowTextInScreenWidget(QWidget* parent, QString text, QPoint position, int durationMs)
+ShowTextInScreenWidget::ShowTextInScreenWidget(QWidget* parent, QString text, QPoint position, int durationMs, QString styleSheet)
 	: QWidget(parent), text_(text), position_(position), durationMs_(durationMs)
 {
 	this->setWindowFlags(Qt::Tool | Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint);
@@ -10,7 +10,10 @@ ShowTextInScreenWidget::ShowTextInScreenWidget(QWidget* parent, QString text, QP
 
 	label = new QLabel(this);
 	label->setText(text_);
-	label->setStyleSheet("color: white; background-color: rgba(0, 0, 0, 128); padding: 10px; border-radius: 5px;");
+	if (styleSheet.isEmpty() || styleSheet == "")
+		label->setStyleSheet("color: white; background-color: rgba(0, 0, 0, 128); padding: 10px; border-radius: 5px;");
+	else
+		label->setStyleSheet(styleSheet);
 	label->setFont(QFont("Arial", 12, QFont::Bold));
 	label->adjustSize();
 

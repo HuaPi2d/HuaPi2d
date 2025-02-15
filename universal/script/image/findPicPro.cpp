@@ -62,6 +62,13 @@ cv::Point findPicInFullScreen(QString picPath){
     return templateMatch(screenImage, templateImage, 0.9);
 }
 
+cv::Point findPicInFullScreen(cv::Mat& image)
+{
+    QPixmap screenShoot = captureFullScreen();
+    cv::Mat screenImage = QImageToMat(screenShoot.toImage());
+    return templateMatch(screenImage, image, 0.95);
+}
+
 cv::Point findPicInLimitedTime(QString picPath, int timeLimit, int interval) {
     QElapsedTimer timer;
     timer.start();
@@ -82,6 +89,72 @@ cv::Point findPicInLimitedTime(QString picPath, int timeLimit, int interval) {
 
     // 如果超时则返回 (-1, -1)
     return cv::Point(-1, -1);
+}
+
+cv::Mat getPartOfScreen(int x_part, int y_part, int x_index, int y_index)
+{
+    QPixmap screenShoot = captureFullScreen();
+    cv::Mat screenImage = QImageToMat(screenShoot.toImage());
+    cv::Mat partImage = cutImage(x_part, y_part, x_index, y_index, screenImage);
+    return partImage;
+}
+
+cv::Mat getPartsOfScreen(int x_part, int y_part, int x_index, int y_index, int x_num, int y_num)
+{
+    QPixmap screenShoot = captureFullScreen();
+    cv::Mat screenImage = QImageToMat(screenShoot.toImage());
+    cv::Mat partImage = cutImages(x_part, y_part, x_index, y_index, x_num, y_num, screenImage);
+    return partImage;
+}
+
+cv::Mat cutImage(int x_part, int y_part, int x_index, int y_index, cv::Mat& image)
+{
+    // 裁剪图片
+    // 原图大小
+    int width = image.cols;
+    int height = image.rows;
+
+    // 新图片大小
+    int new_width = width / x_part;
+    int new_height = height / y_part;
+
+    // 裁剪坐标
+    int x_start = new_width * x_index;
+    int y_start = new_height * y_index;
+
+    // 裁剪图片
+    cv::Mat new_image = image(cv::Rect(x_start, y_start, new_width, new_height));
+
+    return new_image;
+}
+
+cv::Mat cutImages(int x_part, int y_part, int x_index, int y_index, int x_num, int y_num, cv::Mat& image)
+{
+    // 裁剪图片
+    // 原图大小
+    int width = image.cols;
+    int height = image.rows;
+
+    // 新图片大小
+    int new_width = width / x_part * x_num;
+    int new_height = height / y_part * y_num;
+
+    // 裁剪坐标
+    int x_start = new_width * x_index;
+    int y_start = new_height * y_index;
+
+    // 裁剪图片
+    cv::Mat new_image = image(cv::Rect(x_start, y_start, new_width, new_height));
+
+    return new_image;
+}
+
+cv::Mat captureScreen(int x_begin, int y_begin, int x_end, int y_end)
+{
+    QPixmap screenShoot = captureFullScreen();
+    cv::Mat screenImage = QImageToMat(screenShoot.toImage());
+    cv::Mat partImage = screenImage(cv::Rect(x_begin, y_begin, x_end - x_begin, y_end - y_begin));
+    return partImage;
 }
 
 CompeteRes competeFindPic(QStringList picList, int timeLimit, int interval)

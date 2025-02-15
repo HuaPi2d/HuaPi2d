@@ -22,3 +22,12 @@ cv::Point getScreenResolution() {
         return cv::Point();
     }
 }
+
+float getScreenScale()
+{
+    // 获取系统DPI
+    float dpi = static_cast<float>(GetDpiForSystem());
+    // 计算缩放比
+    float scale = dpi / 96.0f;
+    return scale;
+}

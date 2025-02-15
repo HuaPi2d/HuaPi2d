@@ -4,6 +4,7 @@
 #include <Qsci/qscilexercustom.h>
 #include <Qsci/qsciscintilla.h>
 #include <QSettings>
+#include <QRegularExpression>
 
 #include "struct/editor/EditorConfig.h"
 
@@ -11,7 +12,7 @@
 class ScpLanguageLexer  : public QsciLexerCustom
 {
 public:
-	ScpLanguageLexer(EditorConfig editorConfig, QObject *parent);
+	ScpLanguageLexer(QObject *parent);
 	~ScpLanguageLexer();
 
 protected:
@@ -25,9 +26,6 @@ protected:
 	void styleText(int start, int end) override;
 
 private:
-	// 对字符类型设定样式
-	void setupStyles();
-
 	// 样式类型枚举
 	enum {
 		Default = 0,
@@ -42,6 +40,9 @@ private:
 
 	QStringList keywords;  // 关键字列表
 	EditorConfig m_editorConfig;  // 编辑器配置
+
+public slots:
+	void resetStyles(EditorConfig editorConfig);
 };
 
 #endif // SCPLANGUAGELEXER_H

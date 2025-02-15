@@ -92,7 +92,7 @@ bool TerminateProcessByNameAndCheck(const std::string& processName, int nums)
         else {
             return true;
         }
-        QThread::msleep(3000);
+        QThread::msleep(5000);
     }
     return false;
 }

@@ -286,6 +286,7 @@ public:
     void playNextMusic();
     void playLastMusic();
     bool isLocal();
+    void hideSomeItems();
 
 protected:
     void closeEvent(QCloseEvent *event) override;

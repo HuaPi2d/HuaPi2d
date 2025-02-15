@@ -3,8 +3,8 @@
 
 #include <QTimer>
 
-SSJJMainThread::SSJJMainThread(QObject *parent)
-    : BasicScriptThread{parent}
+SSJJMainThread::SSJJMainThread(QObject* parent)
+    : BasicScriptThread{ parent }
 {
     nextStep = "initializeGameScreen";
     currentThread = nullptr;
@@ -137,30 +137,32 @@ void SSJJMainThread::run()
 {
     /* 开始运行 */
     QThread::msleep(1000);
-    if(task.taskName != ""){
-        while(true){
+    lastTask = task;
+    if (task.taskName != "") {
+        while (true) {
             emit sendDisplayText(nextStep);
-            if(nextStep == "initializeGameScreen"){
+            QThread::msleep(3000);
+            if (nextStep == "initializeGameScreen") {
                 this->initializeGameScreen();
             }
-            else if(nextStep == "enterGame"){
+            else if (nextStep == "enterGame") {
                 this->enterGame();
             }
-            else if(nextStep == "restartSSJJ"){
+            else if (nextStep == "restartSSJJ") {
                 this->restartSSJJ();
             }
-            else if(nextStep == "fatalError"){
+            else if (nextStep == "fatalError") {
                 emit sendFatalError();
                 QThread::msleep(1000);
                 break;
             }
-            else if(nextStep == "runScriptFile"){
+            else if (nextStep == "runScriptFile") {
                 this->runScript();
             }
-            else if(nextStep == "settlement"){
+            else if (nextStep == "settlement") {
                 this->settlement();
             }
-            else if(nextStep == "stopThread"){
+            else if (nextStep == "stopThread") {
                 break;
             }
             else {
@@ -183,7 +185,7 @@ void SSJJMainThread::receiveTask(SingleTask m_task, QString m_ssjjInstallPath, i
 
 void SSJJMainThread::stopThread()
 {
-    if(currentThread != nullptr){
+    if (currentThread != nullptr) {
         currentThread->quit();
         currentThread->terminate();
     }
@@ -194,76 +196,46 @@ void SSJJMainThread::receiveInitializeGameStates(SSJJRunState ssjjRunState)
 {
     emit sendRemindInfo(ssjjRunState.remindText);
     nextStep = ssjjRunState.nextStep;
-    //if(ssjjRunState.errorType == "NoError"){
-    //    nextStep = "enterGame";
-    //}
-    //else if(ssjjRunState.errorType == "Error"){
-    //    nextStep = "restartSSJJ";
-    //}
-    //else if (ssjjRunState.errorType == "Remind") {
-    //    nextStep = "enterGame";
-    //}
 }
 
 void SSJJMainThread::receiveRestartSSJJStates(SSJJRunState ssjjRunState)
 {
     emit sendRemindInfo(ssjjRunState.remindText);
     nextStep = ssjjRunState.nextStep;
-    //if(ssjjRunState.errorType == "FatalError"){
-    //    nextStep = "fatalError";
-    //}
-    //else if(ssjjRunState.errorType == "Error"){
-    //    nextStep = "restartSSJJ";
-    //}
-    //else if(ssjjRunState.errorType == "NoError"){
-    //    nextStep = "initializeGameScreen";
-    //}
 }
 
 void SSJJMainThread::receiveEnterGameStates(SSJJRunState ssjjRunState)
 {
     emit sendRemindInfo(ssjjRunState.remindText);
     nextStep = ssjjRunState.nextStep;
-    //if(ssjjRunState.errorType == "NoError"){
-    //    nextStep = "runScriptFile";
-    //}
-    //else if(ssjjRunState.errorType == "Error"){
-    //    nextStep = "restartSSJJ";
-    //}
-    //else if(ssjjRunState.errorType == "Remind"){
-    //    nextStep = "enterGame";
-    //}
-    //else if(ssjjRunState.errorType == "FatalError"){
-    //    nextStep = "fatalError";
-    //}
-    //else if(ssjjRunState.errorType == "Ini"){
-    //    nextStep = "InitializeGameScreen";
-    //}
 }
 
 void SSJJMainThread::receiveRunScriptStates(SSJJRunState ssjjRunState)
 {
     emit sendRemindInfo(ssjjRunState.remindText);
     nextStep = ssjjRunState.nextStep;
-    //if(ssjjRunState.errorType == "NoError"){
-    //    nextStep = "settlement";
-    //}
-    //else if(ssjjRunState.errorType == "FatalError"){
-    //    nextStep = "fatalError";
-    //}
-    //else if(ssjjRunState.errorType == "Error"){
-    //    nextStep = "restartSSJJ";
-    //}
+    if (ssjjRunState.errorType == "Success") {
+        lastTask = task;
+        emit singleTaskFinished(ssjjRunState);
+        QThread::msleep(100);
+        if (task.taskName != lastTask.taskName) {
+            nextStep = "initializeGameScreen";
+        }
+    }
 }
 
 void SSJJMainThread::receiveSettlementStates(SSJJRunState ssjjRunState)
 {
-    if(ssjjRunState.errorType == "Success"){
+    if (ssjjRunState.errorType == "Success") {
+        lastTask = task;
         emit singleTaskFinished(ssjjRunState);
     }
     emit sendRemindInfo(ssjjRunState.remindText);
     nextStep = ssjjRunState.nextStep;
     QThread::msleep(100);
+    if (task.taskName != lastTask.taskName) {
+        nextStep = "initializeGameScreen";
+    }
 }
 
 void SSJJMainThread::receiveResolutionPath(QString m_resolution_path)

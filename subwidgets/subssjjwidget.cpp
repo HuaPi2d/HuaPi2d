@@ -44,16 +44,63 @@ SubSSJJWidget::SubSSJJWidget(QWidget *parent)
     widgetList.append(ui->writeScriptWidget);
     widgetList.append(ui->nodeEditorWidget);
     widgetList.append(ui->bonusWidget);
-    appDir = qApp->applicationDirPath();
 
     /* 搭建图形编辑器 */
     createNodeEditor();
+
+    up_arrow = new QHotkey(QKeySequence(Qt::Key_Up), this);
+    down_arrow = new QHotkey(QKeySequence(Qt::Key_Down), this);
+    left_arrow = new QHotkey(QKeySequence(Qt::Key_Left), this);
+    right_arrow = new QHotkey(QKeySequence(Qt::Key_Right), this);
+    enter = new QHotkey(QKeySequence("Enter"), this);
+    middle = new QHotkey(QKeySequence("/"), this);
+
+    connect(left_arrow, &QHotkey::activated, [=]() {
+        qDebug() << "left arrow";
+        turn_around(45, false);
+        });
+    connect(right_arrow, &QHotkey::activated, [=]() {
+        turn_around(-45, false);
+        });
+    connect(up_arrow, &QHotkey::activated, [=]() {
+        turn_up_down(30, false);
+        });
+    connect(down_arrow, &QHotkey::activated, [=]() {
+        turn_up_down(-30, false);
+        });
+    bool isShooting = false;
+    connect(enter, &QHotkey::activated, [&]() {
+        if (isShooting) {
+            isShooting = false;
+            LeftDown();
+        }
+        else {
+            isShooting = true;
+            LeftUp();
+        }
+        });
+    connect(middle, &QHotkey::activated, [=]() {
+        MiddleClick();
+        });
+
+    connect(ui->testKeyMouseCheckBox, &QCheckBox::clicked, [=](bool checked) {
+        if (checked) {
+            regiseterMouseHotkey();
+        }
+        else {
+            unregiseterMouseHotkey();
+        }
+        });
+
+    // 注销鼠标热键
+    ifCanControlMouse = true;
+    unregiseterMouseHotkey();
 
     /* 脚本框设置 */
     ui->remindTextEdit->setReadOnly(true);
     ui->taskTableWidget->setEditTriggers(QAbstractItemView::NoEditTriggers);
     writeRemindInfo("<p>" + tr("欢迎使用") + "<b>" + tr("生死狙击脚本") + "</b>" + tr("工具") + "</p><p><span style=\"font-size: 13px; color: red;\">" 
-        + tr("使用时注意本栏信息") + "</span></p><p>" + tr("请开启") + "<span style = \"font-size: 13px; color: red;\"><b>" + tr("自动登录") + "</b></span></p>");
+        + tr("使用时注意本栏信息") + "</span></p><p>" + tr("请开启") + "<span style = \"font-size: 13px; color: red;\"><b>" + tr("自动登录") + "</b></span><br><span>游戏内鼠标灵敏度设为40</span><br></p>");
     ui->launcherPathLineEdit->setReadOnly(true);
     ui->LDScriptPathLineEdit->setReadOnly(true);
     QIntValidator *validator = new QIntValidator(0, 999, this);
@@ -64,6 +111,12 @@ SubSSJJWidget::SubSSJJWidget(QWidget *parent)
     ui->loadingTimeLineEdit->setValidator(loadingTimeValidator);
     QIntValidator *validatorScriptTime = new QIntValidator(0, 20, this);
     ui->singleScriptTimeLineEdit->setValidator(validatorScriptTime);
+
+    /* 设置显示在屏幕上的文本label标签样式 */
+    outlineStyleSheet = "QLabel{border: 2px solid red; border-radius: 5px; padding: 5px; background-color: white; color: black;}";
+    cv::Point cvPoint = getScreenResolution();
+    float scale = getScreenScale();
+    centerPoint = QPoint(cvPoint.x / 2 / scale, cvPoint.y / 2 / scale);
 
     /* 热键设置 */
     runningState = 0;
@@ -122,6 +175,11 @@ SubSSJJWidget::SubSSJJWidget(QWidget *parent)
         });
     reloadLanguage(Language->value());
 
+    // 更新主题
+    connect(themeType, &GlobalVariableQString::valueChanged, this, [=]() {
+        resetEditorsAppearances();
+        });
+
     /* 主线关卡标签页的Combox的联动更新 */
     connect(ui->zxChapterChooseComboBox, &QComboBox::currentTextChanged, this, [=]() {
         currentChoosedZXChapter = ZXGameData::getChapterByName(ui->zxChapterChooseComboBox->currentText());
@@ -139,7 +197,7 @@ SubSSJJWidget::SubSSJJWidget(QWidget *parent)
         });
 
     writeRemindInfo("<p><span style=\"color: red;\">" + tr("请确保在每次启动游戏时不会弹出以下图片") + "</p><br>");
-    writeRemindInfo("<img src=\"tips/ensure_ratio.png\" width=\"250\" alt=\"" + tr("提示图片") + "\"><br>");
+    writeRemindInfo("<img src=\"" + tips_file_path("tips/ensure_ratio.png") + "\" width=\"250\" alt=\"" + tr("提示图片") + "\"><br>");
 
     // 创建数据库
     ssjjScriptalFilesDatabase = new SSJJScriptalFilesDatabase("ssjjScriptalFiles.db", this);
@@ -178,6 +236,7 @@ void SubSSJJWidget::saveSettings()
     settings.setValue("ifResetTimes", ui->ifResetTimesCheckBox->isChecked());
     settings.setValue("passWordMode", passWordMode);
     settings.setValue("enterGamePassWord", enterGamePassWord);
+    settings.setValue("tabWidgetPage", ui->tabWidget->currentIndex());
 
     settings.beginGroup("bonusWeapenList");
     settings.setValue("mainWeaponList", ui->mainWeaponComboBox->currentText());
@@ -208,6 +267,8 @@ void SubSSJJWidget::saveSettings()
         openFiles.append(savePath + "/" + fileName);
     }
     settings.setValue("openFiles", openFiles);
+    settings.setValue("currentScriptEditorTabIndex", ui->scriptalTabWidget->currentIndex());
+    settings.setValue("ifShowRecordTeachingDialog", ifShowRecordTeachingDialog);
     settings.endGroup();
 
     // 保存主线关卡设置
@@ -222,53 +283,104 @@ void SubSSJJWidget::saveSettings()
     settings.endGroup();
 
 
-    /* 声明对象 */
-    UsersSettings editorConfigSettings(appDir + "/Settings/editorConfig.ini");
+    // 任务数据
+    exportToXlsx(ui->taskTableWidget, qApp->applicationDirPath() + "/Settings/taskList.xlsx");
 
-    /* 写入编辑器配置 */
-    editorConfigSettings.beginGroup("scpEditorConfig");
-    editorConfigSettings.setValue("font", scpEditorConfig.font.font.toString());
-    editorConfigSettings.setValue("fontSize", scpEditorConfig.font.size);
-    editorConfigSettings.beginGroup("color");
-    editorConfigSettings.setValue("background", scpEditorConfig.color.background.name());
-    editorConfigSettings.setValue("text", scpEditorConfig.color.text.name());
-    editorConfigSettings.setValue("keyword", scpEditorConfig.color.keyword.name());
-    editorConfigSettings.setValue("number", scpEditorConfig.color.number.name());
-    editorConfigSettings.setValue("string", scpEditorConfig.color.string.name());
-    editorConfigSettings.setValue("operateur", scpEditorConfig.color.operateur.name());
-    editorConfigSettings.setValue("function", scpEditorConfig.color.function.name());
-    editorConfigSettings.setValue("variable", scpEditorConfig.color.variable.name());
-    editorConfigSettings.setValue("comment", scpEditorConfig.color.comment.name());
-    editorConfigSettings.endGroup();
-    editorConfigSettings.endGroup();
+    if (1) {
+        /* 声明对象 */
+        UsersSettings editorConfigSettings(qApp->applicationDirPath() + "/Settings/editorConfig.ini");
+
+        /* 写入编辑器配置 */
+        editorConfigSettings.beginGroup("scpEditorConfig_dark_dark");
+        editorConfigSettings.setValue("font", scpEditorConfig_dark.font.font.toString());
+        editorConfigSettings.setValue("fontSize", scpEditorConfig_dark.font.size);
+        editorConfigSettings.beginGroup("color");
+        editorConfigSettings.setValue("background", scpEditorConfig_dark.color.background.name());
+        editorConfigSettings.setValue("text", scpEditorConfig_dark.color.text.name());
+        editorConfigSettings.setValue("keyword", scpEditorConfig_dark.color.keyword.name());
+        editorConfigSettings.setValue("number", scpEditorConfig_dark.color.number.name());
+        editorConfigSettings.setValue("string", scpEditorConfig_dark.color.string.name());
+        editorConfigSettings.setValue("operateur", scpEditorConfig_dark.color.operateur.name());
+        editorConfigSettings.setValue("function", scpEditorConfig_dark.color.function.name());
+        editorConfigSettings.setValue("variable", scpEditorConfig_dark.color.variable.name());
+        editorConfigSettings.setValue("comment", scpEditorConfig_dark.color.comment.name());
+        editorConfigSettings.setValue("caret_line_color", scpEditorConfig_dark.color.caret_line_color.name());
+        editorConfigSettings.setValue("line_number_color", scpEditorConfig_dark.margin.line_number_color.name());
+        editorConfigSettings.setValue("background_color", scpEditorConfig_dark.margin.background_color.name());
+        editorConfigSettings.endGroup();
+        editorConfigSettings.endGroup();
+
+        editorConfigSettings.beginGroup("scpEditorConfig_light_light");
+        editorConfigSettings.setValue("font", scpEditorConfig_light.font.font.toString());
+        editorConfigSettings.setValue("fontSize", scpEditorConfig_light.font.size);
+        editorConfigSettings.beginGroup("color");
+        editorConfigSettings.setValue("background", scpEditorConfig_light.color.background.name());
+        editorConfigSettings.setValue("text", scpEditorConfig_light.color.text.name());
+        editorConfigSettings.setValue("keyword", scpEditorConfig_light.color.keyword.name());
+        editorConfigSettings.setValue("number", scpEditorConfig_light.color.number.name());
+        editorConfigSettings.setValue("string", scpEditorConfig_light.color.string.name());
+        editorConfigSettings.setValue("operateur", scpEditorConfig_light.color.operateur.name());
+        editorConfigSettings.setValue("function", scpEditorConfig_light.color.function.name());
+        editorConfigSettings.setValue("variable", scpEditorConfig_light.color.variable.name());
+        editorConfigSettings.setValue("comment", scpEditorConfig_light.color.comment.name());
+        editorConfigSettings.setValue("caret_line_color", scpEditorConfig_light.color.caret_line_color.name());
+        editorConfigSettings.setValue("line_number_color", scpEditorConfig_light.margin.line_number_color.name());
+        editorConfigSettings.setValue("background_color", scpEditorConfig_light.margin.background_color.name());
+        editorConfigSettings.endGroup();
+        editorConfigSettings.endGroup();
+    }
 }
 
 // 读取配置
 void SubSSJJWidget::loadSettings()
 {
-    // 全局编辑器配置
+    if (1) {
+        // 全局编辑器配置
     /* 声明对象 */
-    UsersSettings editorConfigSettings(appDir + "/Settings/editorConfig.ini");
+        UsersSettings editorConfigSettings(qApp->applicationDirPath() + "/Settings/editorConfig.ini");
 
-    /* 读取编辑器配置 */
-    //// 编辑器配置
-    editorConfigSettings.beginGroup("scpEditorConfig");
-    scpEditorConfig.font.font = editorConfigSettings.value("font", QFont("Consolas")).value<QFont>();
-    scpEditorConfig.font.size = editorConfigSettings.value("fontSize", 12).toInt();
-    editorConfigSettings.beginGroup("color");
-    scpEditorConfig.color.background = QColor(editorConfigSettings.value("background", "#2E2E2E").toString());
-    scpEditorConfig.color.foreground = QColor(editorConfigSettings.value("foreground", "#FAFAFA").toString());
-    scpEditorConfig.color.text = QColor(editorConfigSettings.value("text", "#000000").toString());
-    scpEditorConfig.color.keyword = QColor(editorConfigSettings.value("keyword", "#6A7FCC").toString());
-    scpEditorConfig.color.number = QColor(editorConfigSettings.value("number", "#1793D0").toString());
-    scpEditorConfig.color.string = QColor(editorConfigSettings.value("string", "#8CD000").toString());
-    scpEditorConfig.color.operateur = QColor(editorConfigSettings.value("operateur", "#FF8F00").toString());
-    scpEditorConfig.color.function = QColor(editorConfigSettings.value("function", "#FF3DB5").toString());
-    scpEditorConfig.color.variable = QColor(editorConfigSettings.value("variable", "#000099").toString());
-    scpEditorConfig.color.comment = QColor(editorConfigSettings.value("comment", "#999999").toString());
-    editorConfigSettings.endGroup();
-    editorConfigSettings.endGroup();
+        /* 读取编辑器配置 */
+        //// 编辑器配置
+        editorConfigSettings.beginGroup("scpEditorConfig_dark");
+        scpEditorConfig_dark.font.font = editorConfigSettings.value("font", QFont("Consolas")).value<QFont>();
+        scpEditorConfig_dark.font.size = editorConfigSettings.value("fontSize", 12).toInt();
+        editorConfigSettings.beginGroup("color");
+        scpEditorConfig_dark.color.background = QColor(editorConfigSettings.value("background", "#2b2b2b").toString());
+        scpEditorConfig_dark.color.foreground = QColor(editorConfigSettings.value("foreground", "#FAFAFA").toString());
+        scpEditorConfig_dark.color.text = QColor(editorConfigSettings.value("text", "#FFFFFF").toString());
+        scpEditorConfig_dark.color.keyword = QColor(editorConfigSettings.value("keyword", "#cb7731").toString());
+        scpEditorConfig_dark.color.number = QColor(editorConfigSettings.value("number", "#1793D0").toString());
+        scpEditorConfig_dark.color.string = QColor(editorConfigSettings.value("string", "#6a8759").toString());
+        scpEditorConfig_dark.color.operateur = QColor(editorConfigSettings.value("operateur", "#FF8F00").toString());
+        scpEditorConfig_dark.color.function = QColor(editorConfigSettings.value("function", "#FF3DB5").toString());
+        scpEditorConfig_dark.color.variable = QColor(editorConfigSettings.value("variable", "#a9b7c6").toString());
+        scpEditorConfig_dark.color.comment = QColor(editorConfigSettings.value("comment", "#3ef112").toString());
+        scpEditorConfig_dark.color.caret_line_color = QColor(editorConfigSettings.value("caret_line_color", "#323232").toString());
+        scpEditorConfig_dark.margin.line_number_color = QColor(editorConfigSettings.value("line_number_color", "#8a8a8a").toString());
+        scpEditorConfig_dark.margin.background_color = QColor(editorConfigSettings.value("background_color", "#313335").toString());
+        editorConfigSettings.endGroup();
+        editorConfigSettings.endGroup();
 
+        editorConfigSettings.beginGroup("scpEditorConfig_light");
+        scpEditorConfig_light.font.font = editorConfigSettings.value("font", QFont("Consolas")).value<QFont>();
+        scpEditorConfig_light.font.size = editorConfigSettings.value("fontSize", 12).toInt();
+        editorConfigSettings.beginGroup("color");
+        scpEditorConfig_light.color.background = QColor(editorConfigSettings.value("background", "#FFFFFF").toString());
+        scpEditorConfig_light.color.foreground = QColor(editorConfigSettings.value("foreground", "#000000").toString());
+        scpEditorConfig_light.color.text = QColor(editorConfigSettings.value("text", "#000000").toString());
+        scpEditorConfig_light.color.keyword = QColor(editorConfigSettings.value("keyword", "#0000FF").toString());
+        scpEditorConfig_light.color.number = QColor(editorConfigSettings.value("number", "#008000").toString());
+        scpEditorConfig_light.color.string = QColor(editorConfigSettings.value("string", "#008080").toString());
+        scpEditorConfig_light.color.operateur = QColor(editorConfigSettings.value("operateur", "#800080").toString());
+        scpEditorConfig_light.color.function = QColor(editorConfigSettings.value("function", "#0000FF").toString());
+        scpEditorConfig_light.color.variable = QColor(editorConfigSettings.value("variable", "#000000").toString());
+        scpEditorConfig_light.color.comment = QColor(editorConfigSettings.value("comment", "#808000").toString());
+        scpEditorConfig_light.color.caret_line_color = QColor(editorConfigSettings.value("caret_line_color", "#FFFFFF").toString());
+        scpEditorConfig_light.margin.line_number_color = QColor(editorConfigSettings.value("line_number_color", "#808080").toString());
+        scpEditorConfig_light.margin.background_color = QColor(editorConfigSettings.value("background_color", "#FFFFFF").toString());
+        editorConfigSettings.endGroup();
+        editorConfigSettings.endGroup();
+    }
 
 
     /* 声明对象 */
@@ -287,7 +399,7 @@ void SubSSJJWidget::loadSettings()
         ssjjInstallPath = getRegDitValue("\\HKEY_CURRENT_USER\\Software\\Wooduan\\SSJJ-4399", "InstallPath") + "\\WDlauncher.exe";
         if( ssjjInstallPath == ""){
             writeRemindInfo("<p><span style=\"font-size: 13px; color: red;\">" + tr("生死狙击程序安装路径读取失败，请手动添加") + "<b>WDlauncher.exe</b>" + tr("的路径") + "</span></p><br>");
-            writeRemindInfo("<br><img src=\"tips/choose_launcher_tip.png\" width=\"250\" alt=\"" + tr("提示图片") + "\"><br>");
+            writeRemindInfo("<br><img src=\"" + tips_file_path("tips/choose_launcher_tip.png") + "\" width=\"250\" alt=\"" + tr("提示图片") + "\"><br>");
         }
         else{
             writeRemindInfo("<p>" + tr("生死狙击程序安装路径:") + "<b>" + ssjjInstallPath + "</b></p><br>");
@@ -310,6 +422,8 @@ void SubSSJJWidget::loadSettings()
     passWordMode = settings.value("passWordMode", 1).toInt();
     // 房间密码
     enterGamePassWord = settings.value("enterGamePassWord", "HuaPi2D").toString();
+    // tabWidget
+    ui->tabWidget->setCurrentIndex(settings.value("tabWidgetPage", "0").toInt());
 
     settings.beginGroup("bonusWeapenList");
     // 加载武器 combox 内容
@@ -431,6 +545,8 @@ void SubSSJJWidget::loadSettings()
             this->creatNewScriptEditorTab(fileInfo.fileName(), fileInfo.path(), readFileAttributes(fileInfo.absoluteFilePath()));
         }
     }
+    ui->scriptalTabWidget->setCurrentIndex(settings.value("currentScriptEditorTabIndex", "0").toInt());
+    ifShowRecordTeachingDialog = settings.value("ifShowRecordTeachingDialog", true).toBool();
     settings.endGroup();
 
     // 读取主线关卡设置
@@ -479,6 +595,8 @@ void SubSSJJWidget::loadSettings()
     settings.endGroup();
     settings.endGroup();
 
+    importFromXlsx(ui->taskTableWidget, qApp->applicationDirPath() + "/Settings/taskList.xlsx");
+
     readBonusJsonFiles();
     hideSomeItems();
 }
@@ -499,8 +617,8 @@ void SubSSJJWidget::hideSomeItems()
 
 void SubSSJJWidget::on_testPushButton_clicked()
 {
-    EditorSettingsDialog dialog(scpEditorConfig, this);
-    dialog.exec();
+    //unregiseterDirectionHotkey();
+    convertRecordResult();
 }
 
 void SubSSJJWidget::on_closePushButton_clicked()
@@ -711,7 +829,13 @@ void SubSSJJWidget::on_addTaskPushButton_clicked()
         ui->taskTableWidget->setItem(currentRow - 1, 1, new QTableWidgetItem(ui->diffcultyChooseComboBox->currentText()));
         ui->taskTableWidget->setItem(currentRow - 1, 2, new QTableWidgetItem(ui->zxRunTimesLineEdit->text()));
         ui->taskTableWidget->setItem(currentRow - 1, 3, new QTableWidgetItem("0"));
-        ui->taskTableWidget->setItem(currentRow - 1, 4, new QTableWidgetItem(ui->zxScriptPathComboBox->currentText()));
+        if (ui->zxScriptPathComboBox->currentText().contains(qApp->applicationDirPath().replace("/x64/Release", "")))
+        {
+            ui->taskTableWidget->setItem(currentRow - 1, 4, new QTableWidgetItem(ui->zxScriptPathComboBox->currentText().replace(qApp->applicationDirPath().replace("/x64/Release", "") + "/", "")));
+        }
+        else {
+            ui->taskTableWidget->setItem(currentRow - 1, 4, new QTableWidgetItem(ui->zxScriptPathComboBox->currentText()));
+        }
         ui->taskTableWidget->setItem(currentRow - 1, 5, new QTableWidgetItem("主线关卡"));
     }
 }
@@ -772,7 +896,7 @@ void SubSSJJWidget::on_startPushButton_clicked()
     }
 
     qDebug() << "开始运行脚本";
-    if(checkThreadRunningState(ssjjMainThread) == 1){
+    if(checkThreadState() == 1) {
         writeRemindInfo("<p><span style=\"color:red;\"><b>" + tr("脚本正在运行中，请勿重复点击") + "</b></span></p><br>");
         return;
     }
@@ -813,6 +937,11 @@ void SubSSJJWidget::on_endPushButton_clicked()
     writeRemindInfo("<p><span style=\"color:lightgreen;\"><b>" + tr("脚本运行已结束") + "</b></span></p><br>");
 }
 
+void SubSSJJWidget::on_scriptRecordPushButton_clicked()
+{
+    startScriptRecord();
+}
+
 void SubSSJJWidget::forceQuitSSJJThread()
 {
     ssjjMainThread->stopThread();
@@ -823,12 +952,21 @@ void SubSSJJWidget::forceQuitSSJJThread()
 
 void SubSSJJWidget::receiveDisplayText(QString text)
 {
-    ShowTextInScreenWidget::showText(this, text, QPoint(50, 50), 1000);
+    showTextOnScreen(text, QPoint(50, 50), 1000, "");
+}
+
+void SubSSJJWidget::showTextOnScreen(QString text, QPoint pos, int time, QString labelStyleSheet)
+{
+    ShowTextInScreenWidget *textShowWidget = new ShowTextInScreenWidget(this, text, pos, time, labelStyleSheet);
+    textShowWidget->showTextInScreen();
 }
 
 /* 执行单次加成任务 */
 void SubSSJJWidget::on_singleBonusPushButton_clicked()
 {
+    if (checkThreadState()){
+        return;
+    }
     ui->singleBonusPushButton->setEnabled(false);
     ui->contineBonusPushButton->setEnabled(false);
     
@@ -940,11 +1078,16 @@ void SubSSJJWidget::getSingleTask()
             // 检查脚本文件是否存在
             if (currentTask.script != tr("未选择") && !QFile::exists(currentTask.script))
             {
-                writeRemindInfo("<p><span style=\"color:red;\"><b>" + currentTask.script + tr("脚本文件不存在") + "</b></span></p><br>");
-                // 清除该行
-                ui->taskTableWidget->removeRow(i);
-                i--;
-                continue;
+                if (!QFile::exists(qApp->applicationDirPath().replace("/x64/Release", "") + "/" + currentTask.script)) {
+                    writeRemindInfo("<p><span style=\"color:red;\"><b>" + currentTask.script + tr("脚本文件不存在") + "</b></span></p><br>");
+                    // 清除该行
+                    ui->taskTableWidget->removeRow(i);
+                    i--;
+                    continue;
+                }
+                else {
+                    currentTask.script = qApp->applicationDirPath().replace("/x64/Release", "") + "/" + currentTask.script;
+                }
             }
             else
             {
@@ -992,12 +1135,6 @@ void SubSSJJWidget::sendNextTask(SSJJRunState res)
         emit sendSingleTask(currentTask, ssjjInstallPath, ui->moveSpeedLineEdit->text().toInt(), ui->singleScriptTimeLineEdit->text().toInt(), ui->loadingTimeLineEdit->text().toInt());
     }
     else{
-        // 强制停止逻辑
-        /*if(ssjjMainThread->isFinished() == false){
-            if(ssjjMainThread->currentThread != new QThread()){
-                forceQuitSSJJThread();
-            }
-        }*/
         writeRemindInfo("<p><span style=\"color:lightgreen;\"><b>" + tr("全部任务已执行完毕") + "</b></span></p><br>");
         writeRemindInfo("<p><span style=\"color:lightgreen;\"><b>" + tr("脚本运行已结束") + "</b></span></p><br>");
     }
@@ -1436,11 +1573,17 @@ void SubSSJJWidget::updateZXLevelChooseComboBox()
 
 void SubSSJJWidget::updateZXDiffcultyChooseComboBox()
 {
+    int currentIndex = ui->diffcultyChooseComboBox->currentIndex();
+    QString currentDifficulty = ui->diffcultyChooseComboBox->currentText();
     ui->diffcultyChooseComboBox->clear();
     for (DifficultyMode mode : currentChoosedZXLevel.modes)
     {
         ui->diffcultyChooseComboBox->addItem(mode.name);
     }
+    if (ui->diffcultyChooseComboBox->count() > currentIndex)
+        ui->diffcultyChooseComboBox->setCurrentIndex(currentIndex);
+    else
+        ui->diffcultyChooseComboBox->setCurrentText(currentDifficulty);
 }
 
 void SubSSJJWidget::updateZXScriptPathComboBox()
@@ -1514,27 +1657,93 @@ void SubSSJJWidget::receiveWarningMessage(QString title, QString message)
     QMessageBox::warning(this, title, message);
 }
 
-// 更改编辑器配色
-void SubSSJJWidget::resetEditorsAppearances()
+bool SubSSJJWidget::checkThreadState()
 {
-    EditorSettingsDialog dialog(scpEditorConfig, this);
+    if (checkThreadRunningState(testScriptThread) == 1 || checkThreadRunningState(scriptRecordThread) == 1
+        || checkThreadRunningState(ssjjMainThread) == 1 || checkThreadRunningState(weaponBonusThread) == 1)
+    {
+        textToShowInScreen->setValue(tr("当前有脚本正在运行"));
+        return true;
+    }
+    else {
+        return false;
+    }
+}
+
+void SubSSJJWidget::convertRecordResult()
+{
+    getCurrentScriptEditor();
+    // 读取录制结果文件
+    QFile recordResultFile("output.txt");
+    if (!recordResultFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        qWarning() << tr("Unable to open file for reading:") << "output.txt";
+        return;
+    }
+    QTextStream in(&recordResultFile);
+    QString result = in.readAll();
+    recordResultFile.close();
+    // 转换为脚本语言
+    currentScriptEditor->insert(convertRecordToScp(result));
+}
+
+void SubSSJJWidget::regiseterMouseHotkey()
+{
+    qDebug() << "注册鼠标热键";
+    // 当 ifCanControlMouse 为 true 时，说明鼠标热键已经被注册，不需要再次注册
+    if (!ifCanControlMouse) {
+        up_arrow->setRegistered(true);
+        down_arrow->setRegistered(true);
+        left_arrow->setRegistered(true);
+        right_arrow->setRegistered(true);
+        enter->setRegistered(true);
+        middle->setRegistered(true);
+        ifCanControlMouse = true;
+        ui->testKeyMouseCheckBox->setChecked(true);
+    }
+}
+
+void SubSSJJWidget::unregiseterMouseHotkey()
+{
+    // 当 ifCanControlMouse 为 false 时，说明鼠标热键已经被释放，不需要再次释放
+    if (ifCanControlMouse) {
+        up_arrow->setRegistered(false);
+        down_arrow->setRegistered(false);
+        left_arrow->setRegistered(false);
+        right_arrow->setRegistered(false);
+        enter->setRegistered(false);
+        middle->setRegistered(false);
+        ifCanControlMouse = false;
+        ui->testKeyMouseCheckBox->setChecked(false);
+    }
+}
+
+// 更改编辑器配色
+void SubSSJJWidget::showEditorSettingsDialog()
+{
+    EditorSettingsDialog dialog(scpEditorConfig_dark, this);
     connect(&dialog, &EditorSettingsDialog::applySettings, this, [=](EditorConfig config) {
-        for (ScpLanguageEditor* editor : scpLanguageEditors)
-        {
-            editor->setEditorConfig(config);
-        }
+        scpEditorConfig_dark = config;
+        resetEditorsAppearances();
         });
 
     dialog.exec();
     if (dialog.result() == QDialog::Accepted) {
-        scpEditorConfig = dialog.getEditorConfig();
-        for (ScpLanguageEditor* editor : scpLanguageEditors)
-        {
-            editor->setEditorConfig(scpEditorConfig);
-        }
+        scpEditorConfig_dark = dialog.getEditorConfig();
+        resetEditorsAppearances();
     }
     else if (dialog.result() == QDialog::Rejected) {
         return;
+    }
+}
+
+void SubSSJJWidget::resetEditorsAppearances()
+{
+    for (ScpLanguageEditor* editor : scpLanguageEditors)
+    {
+        if(themeType->value() == "dark")
+            editor->m_signalsHelper->resetStyles(scpEditorConfig_dark);
+        else if(themeType->value() == "light")
+            editor->m_signalsHelper->resetStyles(scpEditorConfig_light);
     }
 }
 
@@ -1543,11 +1752,112 @@ void SubSSJJWidget::getGlobalEditorConfig(EditorConfig editorConfig)
     globalEditorConfig = editorConfig;
 }
 
+void SubSSJJWidget::startScriptRecord()
+{
+    if (checkThreadState())
+    {
+        return;
+    }
+    // 获取脚本类型
+    int type;
+    getCurrentScriptEditor();
+    if (currentScriptEditor == nullptr) {
+        QMessageBox::warning(this, tr("警告"), tr("请先打开一个脚本文件"));
+        return;  // 当前标签页无效，直接返回
+    }
+    currentScriptEditor->saveFile();
+    if (currentScriptEditor->getFileInfo().suffix() == "scp") {
+        type = 0;
+    }
+    else if (currentScriptEditor->getFileInfo().suffix() == "zscp") {
+        type = 1;
+    }
+    else if (currentScriptEditor->getFileInfo().suffix() == "lscp") {
+        type = 2;
+    }
+    else {
+        return;
+    }
+    // 显示教学对话框
+    bool startRecord = true;
+    if (ifShowRecordTeachingDialog == true) {
+        RecordTeachingDialog* recordTeachingDialog = new RecordTeachingDialog(this);
+        recordTeachingDialog->receiveRecordType(type);
+        if (recordTeachingDialog->exec() == QDialog::Rejected) {
+            startRecord = false;
+        }
+        ifShowRecordTeachingDialog = !recordTeachingDialog->getIfShowNextTime();
+        recordTeachingDialog->deleteLater();
+    }
+    // 开始录制
+    if (startRecord) {
+        QFile output("output.txt");
+        output.remove();
+        if (checkThreadState()) {
+            return;
+        }
+        if (type == 1) {
+            showTextOnScreen("请确保当前画面处于关卡界面", QPoint(500, 50), 5000, 
+                "QLabel{border: 2px solid red; border-radius: 5px; padding: 5px; background-color: white; color: black;}");
+            QList<FileAttribute> fileAttributes = currentScriptEditor->getFileAttributes();
+            SingleTask task;
+            for (FileAttribute attribute : fileAttributes) {
+                if (attribute.name == "difficulty") {
+                    task.difficulty = attribute.value;
+                }
+                if (attribute.name == "level") {
+                    task.taskName = attribute.value;
+                }
+            }
+            task.taskType = Task::ZhuXian;
+            task.script = currentScriptEditor->getFileInfo().absoluteFilePath();
+            scriptRecordThread = new ScriptRecordThread(this, task);
+            scriptRecordThread->receiveLoadingTime(ui->loadingTimeLineEdit->text().toInt());
+            connect(scriptRecordThread, &ScriptRecordThread::showRemindText, this, &SubSSJJWidget::showTextOnScreen);
+            connect(scriptRecordThread, &ScriptRecordThread::unregiseterHotkey, this, &SubSSJJWidget::unregiseterHotkey);
+            connect(scriptRecordThread, &ScriptRecordThread::regiseterHotkey, this, &SubSSJJWidget::regiseterHotkey);
+            connect(scriptRecordThread, &ScriptRecordThread::regiseterMouseHotkey, this, &SubSSJJWidget::regiseterMouseHotkey);
+            connect(scriptRecordThread, &ScriptRecordThread::unregiseterMouseHotkey, this, &SubSSJJWidget::unregiseterMouseHotkey);
+            connect(scriptRecordThread, &ScriptRecordThread::forceQuitRecording, this, [=]() {
+                forceQuitThread(scriptRecordThread);
+                });
+            connect(scriptRecordThread, &ScriptRecordThread::finished, this, [=]() {
+                receiveDisplayText("录制完成");
+                scriptRecordThread->deleteLater();
+
+                // 开始处理录制结果
+                convertRecordResult();
+                });
+            scriptRecordThread->start();
+        }
+    }
+}
+
+void SubSSJJWidget::showScriptRecordOptionDialog()
+{
+    ScriptRecordOptionDialog scriptRecordOptionDialog(this);
+    scriptRecordOptionDialog.setIfShowTeachingDialogOption(ifShowRecordTeachingDialog);
+    if (scriptRecordOptionDialog.exec() == QDialog::Accepted)
+    {
+        ifShowRecordTeachingDialog = scriptRecordOptionDialog.ifShowTeachingDialogOption();
+    }
+}
+
+void SubSSJJWidget::importTaskList()
+{
+    importFromXlsx(ui->taskTableWidget);
+}
+
+void SubSSJJWidget::exportTaskList()
+{
+    exportToXlsx(ui->taskTableWidget);
+}
+
 // 创建新的文件编辑标签页
 void SubSSJJWidget::creatNewScriptEditorTab(QString fileName, QString filePath, QList<FileAttribute> fileAttributes)
 {
     // 新建编辑器对象
-    ScpLanguageEditor* newEditor = new ScpLanguageEditor(scpEditorConfig, this);
+    ScpLanguageEditor* newEditor = new ScpLanguageEditor(this);
     // 判断文件是否已经打开
     for (ScpLanguageEditor* editor : scpLanguageEditors)
     {
@@ -1584,6 +1894,9 @@ void SubSSJJWidget::creatNewScriptEditorTab(QString fileName, QString filePath, 
 
     // 隐藏欢迎页
     ui->scriptalTabWidget->setTabVisible(0, false);
+
+    // 重设编辑器配色
+    resetEditorsAppearances();
 }
 
 void SubSSJJWidget::readFilesIntoSSJJDatabase(QDir dir)
@@ -1609,20 +1922,24 @@ void SubSSJJWidget::saveFile()
 
 void SubSSJJWidget::testCurrentScript()
 {
-    if (checkThreadRunningState(testScriptThread) == 1)
+    ui->runInfoListWidget->clear();
+    if (checkThreadState())
     {
-        textToShowInScreen->setValue(tr("当前有脚本正在测试"));
         return;
     }
 
     getCurrentScriptEditor();
     if (currentScriptEditor == nullptr) {
+        textToShowInScreen->setValue(tr("当前标签页无效"));
         return;  // 当前标签页无效，直接返回
     }
      
     currentScriptEditor->saveFile();
     testScriptThread = new TestScriptThread(currentScriptEditor->getFileInfo(), this);
     connect(testScriptThread, &TestScriptThread::sendWarningMessage, this, &SubSSJJWidget::receiveWarningMessage);
+    connect(testScriptThread, &TestScriptThread::sendRunInfo, this, [=](QString info) {
+        ui->runInfoListWidget->addItem(info);
+        });
 
     testScriptThread->start();
     connect(testScriptThread, &TestScriptThread::finished, [=]() {testScriptThread->deleteLater(); });
@@ -1631,12 +1948,12 @@ void SubSSJJWidget::testCurrentScript()
 void SubSSJJWidget::stopTestScript()
 {
     int state = checkThreadRunningState(testScriptThread);
-    if (state == -1)
-    {
-        return;
-    }
-    else if (state == 1)
+    if (state == 1)
     {
         forceQuitThread(testScriptThread);
+    }
+    state = checkThreadRunningState(scriptRecordThread);
+    if (state == 1) {
+        forceQuitThread(scriptRecordThread);
     }
 }

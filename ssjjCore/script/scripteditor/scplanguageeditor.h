@@ -13,12 +13,8 @@ class ScpLanguageEditor : public LanguageEditor
 	/*Q_OBJECT*/
 
 public:
-	ScpLanguageEditor(EditorConfig config, QWidget* parent);
+	ScpLanguageEditor(QWidget* parent);
 	~ScpLanguageEditor();
-
-public slots:
-	void resetColors();
-	void setEditorConfig(EditorConfig config);
 
 private:
 	ScpLanguageLexer* lexer;

@@ -8,7 +8,9 @@
 #include <QKeyEvent>
 #include <QList>
 #include <QSettings>
+
 #include "universal/file/fileattributes.h"
+#include "languageeditorsignalshelper.h"
 
 
 class LanguageEditor  : public QsciScintilla
@@ -18,6 +20,8 @@ class LanguageEditor  : public QsciScintilla
 public:
 	LanguageEditor(QWidget *parent);
 	~LanguageEditor();
+
+	LanguageEditorSignalsHelper* m_signalsHelper;
 
 protected:
 	void keyPressEvent(QKeyEvent* event) override;
@@ -38,12 +42,15 @@ private:
 
 public slots:
 	virtual void receiveFileInfo(const QString& fileName, const QString& savePath, QList<FileAttribute> attributes);
+	virtual void receiveFileInfo(const QString& fileName, const QString& savePath);
+	virtual void receiveFileInfo(const QString& resourcesFilePath);
 	QString getFileName() const;
 	QString getSavePath() const;
 	QFileInfo getFileInfo() const;
 	void saveFile();
 	void receiveFileAttributes(QList<FileAttribute> attributes);
 	QList<FileAttribute> getFileAttributes();
+	void resetStyles();
 
 public:
 	char getCharAt(int pos) const;

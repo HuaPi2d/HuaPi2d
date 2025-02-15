@@ -120,7 +120,7 @@ height:40px;
 }</string>
                 </property>
                 <property name="text">
-                 <string>愿你我共勉</string>
+                 <string/>
                 </property>
                </widget>
               </item>
@@ -270,6 +270,19 @@ QPushButton:pressed {
           <string>文件处理</string>
          </property>
          <layout class="QGridLayout" name="gridLayout_2">
+          <item row="0" column="2">
+           <spacer name="horizontalSpacerOfFiles">
+            <property name="orientation">
+             <enum>Qt::Orientation::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
           <item row="0" column="0">
            <widget class="QPushButton" name="filesConvertPushButton">
             <property name="toolTip">
@@ -285,17 +298,15 @@ QPushButton:pressed {
            </widget>
           </item>
           <item row="0" column="1">
-           <spacer name="horizontalSpacerOfFiles">
-            <property name="orientation">
-             <enum>Qt::Orientation::Horizontal</enum>
+           <widget class="QPushButton" name="mdFilesPushButton">
+            <property name="text">
+             <string>MD编辑器</string>
             </property>
-            <property name="sizeHint" stdset="0">
-             <size>
-              <width>40</width>
-              <height>20</height>
-             </size>
+            <property name="icon">
+             <iconset resource="resource.qrc">
+              <normaloff>:/icon/resources/icons/typora.ico</normaloff>:/icon/resources/icons/typora.ico</iconset>
             </property>
-           </spacer>
+           </widget>
           </item>
          </layout>
         </widget>

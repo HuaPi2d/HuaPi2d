@@ -5,6 +5,7 @@
 #include <QString>
 #include <QThread>
 #include <QLabel>
+#include <QPoint>
 #include "global/basicGlobalVar/globalvariableqstring.h"
 
 extern QString resolutionPath;
@@ -16,5 +17,7 @@ extern GlobalVariableQString* textToShowInScreen;
 // 3: 无密码
 extern int passWordMode;
 extern QString enterGamePassWord;
+// 屏幕中心点
+extern QPoint centerPoint;
 
 #endif // SSJJGLOBALVAR_H

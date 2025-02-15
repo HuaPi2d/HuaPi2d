@@ -4,6 +4,10 @@
 SubSSJJWindow::SubSSJJWindow(QWidget *parent)
     : QMdiSubWindow(parent)
 {
+    // 设置全局热键
+    F9 = new QHotkey(QKeySequence("F9"), true, this);
+    F10 = new QHotkey(QKeySequence("F10"), true, this);
+    F11 = new QHotkey(QKeySequence("F11"), true, this);
 
     this->setWindowFlags(Qt::FramelessWindowHint);
     // 创建主界面
@@ -33,6 +37,8 @@ SubSSJJWindow::SubSSJJWindow(QWidget *parent)
     });
     connect(subSSJJWidget, &SubSSJJWidget::sendStateInfo, this, &SubSSJJWindow::sendStateInfo);
     connect(subSSJJWidget, &SubSSJJWidget::updateMenuBar, this, &SubSSJJWindow::updateMenuBar);
+    connect(subSSJJWidget, &SubSSJJWidget::unregiseterHotkey, this, &SubSSJJWindow::unregiseterHotkey);
+    connect(subSSJJWidget, &SubSSJJWidget::regiseterHotkey, this, &SubSSJJWindow::regiseterHotkey);
     connect(this, &SubSSJJWindow::getGlobalEditorConfig, subSSJJWidget, &SubSSJJWidget::getGlobalEditorConfig);
 
     subSSJJWidget->loadSettings();
@@ -42,12 +48,32 @@ SubSSJJWindow::SubSSJJWindow(QWidget *parent)
         retranslateUi();
         });
     reloadLanguage(Language->value());
+
+    // 开发者选项设置‘
+    developerOption();
+    
 }
 
 SubSSJJWindow::~SubSSJJWindow()
 {
 }
 
+
+void SubSSJJWindow::unregiseterHotkey() {
+    F9->setRegistered(false);
+    F10->setRegistered(false);
+    F11->setRegistered(false);
+    F9->destroyed();
+    F10->destroyed();
+    F11->destroyed();
+}
+
+void SubSSJJWindow::regiseterHotkey()
+{
+    F9 = new QHotkey(QKeySequence("F9"), true, this);
+    F10 = new QHotkey(QKeySequence("F10"), true, this);
+    F11 = new QHotkey(QKeySequence("F11"), true, this);
+}
 
 void SubSSJJWindow::addMenuBarAction()
 {
@@ -64,11 +90,8 @@ void SubSSJJWindow::addMenuBarAction()
     settingMenu = new QMenu(tr("配置"), menuBar);
     editorSettingsMenu = new QMenu(tr("脚本编辑器配置"), settingMenu);
     autoScriptMenu = new QMenu(tr("全自动脚本配置"), settingMenu);
-
-    // 设置全局热键
-    QHotkey* F9 = new QHotkey(QKeySequence("F9"), true);
-    QHotkey* F10 = new QHotkey(QKeySequence("F10"), true);
-    QHotkey* F11 = new QHotkey(QKeySequence("F11"), true);
+    scriptFilesMenu = new QMenu(tr("脚本文件"), fileMenu);
+    taskListMenu = new QMenu(tr("任务列表数据"), fileMenu);
 
     // 新建文件
     createNewFileAction = new QAction(tr("新建"), fileMenu);
@@ -85,6 +108,11 @@ void SubSSJJWindow::addMenuBarAction()
     saveFileAction->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_S));
     editMenu->addAction(saveFileAction);
     connect(saveFileAction, &QAction::triggered, this, &SubSSJJWindow::saveFile);
+    // 录制脚本
+    recordScriptAction = new QAction(tr("录制脚本 F9"), scriptTestMenu);
+    connect(F9, &QHotkey::activated, recordScriptAction, &QAction::trigger);
+    scriptTestMenu->addAction(recordScriptAction);
+    connect(recordScriptAction, &QAction::triggered, subSSJJWidget, &SubSSJJWidget::startScriptRecord);
     // 测试代码
     testScriptAction = new QAction(tr("测试 F10"), scriptTestMenu);
     connect(F10, &QHotkey::activated, testScriptAction, &QAction::trigger);
@@ -120,18 +148,30 @@ void SubSSJJWindow::addMenuBarAction()
     connect(F11, &QHotkey::activated, stopAutoScriptAction, &QAction::trigger);
     runAutoScriptMenu->addAction(stopAutoScriptAction);
     connect(stopAutoScriptAction, &QAction::triggered, subSSJJWidget->ui->endPushButton, &QPushButton::click);
-    // 脚本编辑器配置
+    // 脚本编辑器录制相关配置
+    scriptRecordOptionAction = new QAction(tr("脚本录制配置"), editorSettingsMenu);
+    editorSettingsMenu->addAction(scriptRecordOptionAction);
+    connect(scriptRecordOptionAction, &QAction::triggered, subSSJJWidget, &SubSSJJWidget::showScriptRecordOptionDialog);
+    // 脚本编辑器外观
     editorSettingsAction = new QAction(tr("外观"), editorSettingsMenu);
     editorSettingsMenu->addAction(editorSettingsAction);
-    connect(editorSettingsAction, &QAction::triggered, subSSJJWidget, &SubSSJJWidget::resetEditorsAppearances);
+    connect(editorSettingsAction, &QAction::triggered, subSSJJWidget, &SubSSJJWidget::showEditorSettingsDialog);
+    // 导入脚本数据至本地数据库
+    importScriptalFilesAction = new QAction(tr("导入脚本数据"), scriptFilesMenu);
+    scriptFilesMenu->addAction(importScriptalFilesAction);
+    connect(importScriptalFilesAction, &QAction::triggered, this, &SubSSJJWindow::importScriptalFiles);
+    // 导入任务数据
+    importTaskListAction = new QAction(tr("导入任务数据"), taskListMenu);
+    taskListMenu->addAction(importTaskListAction);
+    connect(importTaskListAction, &QAction::triggered, subSSJJWidget, &SubSSJJWidget::importTaskList);
+    //导出任务数据
+    exportTaskListAction = new QAction(tr("导出任务数据"), taskListMenu);
+    taskListMenu->addAction(exportTaskListAction);
+    connect(exportTaskListAction, &QAction::triggered, subSSJJWidget, &SubSSJJWidget::exportTaskList);
     // 设置房间密码模式
-    passWordModeAction = new QAction(tr("脚本房间密码设置"), fileMenu);
+    passWordModeAction = new QAction(tr("脚本房间密码设置"), autoScriptMenu);
     autoScriptMenu->addAction(passWordModeAction);
     connect(passWordModeAction, &QAction::triggered, this, &SubSSJJWindow::setPasswordMode);
-    // 导入脚本数据至本地数据库
-    importScriptalFilesAction = new QAction(tr("导入脚本数据"), fileMenu);
-    autoScriptMenu->addAction(importScriptalFilesAction);
-    connect(importScriptalFilesAction, &QAction::triggered, this, &SubSSJJWindow::importScriptalFiles);
 
     // 添加菜单栏
     menuBar->addMenu(fileMenu);
@@ -147,6 +187,9 @@ void SubSSJJWindow::addMenuBarAction()
     runMenu->addMenu(scriptTestMenu);
     runMenu->addMenu(bonusMenu);
     runMenu->addMenu(runAutoScriptMenu);
+
+    autoScriptMenu->addMenu(scriptFilesMenu);
+    autoScriptMenu->addMenu(taskListMenu);
 }
 
 
@@ -217,7 +260,7 @@ void SubSSJJWindow::setPasswordMode()
 void SubSSJJWindow::importScriptalFiles()
 {
     // 开启对话框，选择某一文件夹
-    QDir dir = QFileDialog::getExistingDirectory(this, tr("选择包含脚本文件的文件夹"), QDir::currentPath());
+    QDir dir = QFileDialog::getExistingDirectory(this, tr("选择包含脚本文件的*文件夹*"), QDir::currentPath());
     if (!dir.exists()) {
         return;
     }
@@ -235,10 +278,13 @@ void SubSSJJWindow::retranslateUi()
     settingMenu->setTitle(QCoreApplication::translate("SubSSJJWindow", "配置", nullptr));
     editorSettingsMenu->setTitle(QCoreApplication::translate("SubSSJJWindow", "脚本编辑器配置", nullptr));
     autoScriptMenu->setTitle(QCoreApplication::translate("SubSSJJWindow", "全自动脚本配置", nullptr));
+    scriptFilesMenu->setTitle(QCoreApplication::translate("SubSSJJWindow", "脚本文件", nullptr));
+    taskListMenu->setTitle(QCoreApplication::translate("SubSSJJWindow", "任务列表数据", nullptr));
 
     createNewFileAction->setText(QCoreApplication::translate("SubSSJJWindow", "新建", nullptr));
     openFileAction->setText(QCoreApplication::translate("SubSSJJWindow", "打开", nullptr));
     saveFileAction->setText(QCoreApplication::translate("SubSSJJWindow", "保存", nullptr));
+    recordScriptAction->setText(QCoreApplication::translate("SubSSJJWindow", "录制脚本 F9", nullptr));
     testScriptAction->setText(QCoreApplication::translate("SubSSJJWindow", "测试 F10", nullptr));
     stopTestScriptAction->setText(QCoreApplication::translate("SubSSJJWindow", "终止 F11", nullptr));
     singleBonusAction->setText(QCoreApplication::translate("SubSSJJWindow", "单次加成 F10", nullptr));
@@ -249,6 +295,15 @@ void SubSSJJWindow::retranslateUi()
     editorSettingsAction->setText(QCoreApplication::translate("SubSSJJWindow", "外观", nullptr));
     passWordModeAction->setText(QCoreApplication::translate("SubSSJJWindow", "脚本房间密码设置", nullptr));
     importScriptalFilesAction->setText(QCoreApplication::translate("SubSSJJWindow", "导入脚本数据", nullptr));
+    importTaskListAction->setText(QCoreApplication::translate("SubSSJJWindow", "导入任务数据", nullptr));
+    exportTaskListAction->setText(QCoreApplication::translate("SubSSJJWindow", "导出任务数据", nullptr));
+}
+
+void SubSSJJWindow::developerOption()
+{
+    if (developerMode == false) {
+        editorSettingsAction->setVisible(false);
+    }
 }
 
 void SubSSJJWindow::disableMenuAndActions(QMenu* menu)

@@ -1,6 +1,7 @@
 ﻿#ifndef SNAPSHOOT_H
 #define SNAPSHOOT_H
 
+#include <windows.h>
 #include <QApplication>
 #include <QScreen>
 #include <QGuiApplication>
@@ -14,5 +15,7 @@
 QPixmap captureFullScreen();
 
 cv::Point getScreenResolution();
+
+float getScreenScale();
 
 #endif // SNAPSHOOT_H

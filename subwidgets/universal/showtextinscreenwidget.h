@@ -12,18 +12,17 @@ class ShowTextInScreenWidget  : public QWidget
 	Q_OBJECT
 
 public:
-	ShowTextInScreenWidget(QWidget* parent, QString text, QPoint position, int durationMs);
+	ShowTextInScreenWidget(QWidget* parent, QString text, QPoint position, int durationMs, QString styleSheet = "");
 	~ShowTextInScreenWidget();
 
 	static void showText(QWidget* parent, const QString& text, const QPoint& position, int durationMs);
+	void showTextInScreen();
 
 private:
 	QString text_;
 	QPoint position_;
 	int durationMs_;
 	QLabel* label;
-
-    void showTextInScreen();
 };
 
 #endif // SHOWTEXTINSCREENWIDGET_H

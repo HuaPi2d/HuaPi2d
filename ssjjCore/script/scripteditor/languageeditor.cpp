@@ -5,6 +5,7 @@ LanguageEditor::LanguageEditor(QWidget *parent)
 	: QsciScintilla(parent)
 {
 	fileAttributes = QList<FileAttribute>();
+	m_signalsHelper = new LanguageEditorSignalsHelper(this);
 
 	// 显示行号
 	this->setMarginType(0, QsciScintilla::NumberMargin);
@@ -22,7 +23,10 @@ LanguageEditor::LanguageEditor(QWidget *parent)
 	this->setAutoCompletionCaseSensitivity(true);  // 设置自动补全的大小写敏感
 	this->setAutoIndent(true);             // 设置自动缩进
 	this->setBraceMatching(QsciScintilla::SloppyBraceMatch);  // 设置括号匹配
-	//this->setTabWidth(4);           // 设置 tab 宽度为四个空格
+	this->setTabWidth(4);           // 设置 tab 宽度为四个空格
+
+	// 连接信号和槽
+	connect(this->m_signalsHelper, &LanguageEditorSignalsHelper::resetStyles, this, &LanguageEditor::resetStyles);
 }
 
 LanguageEditor::~LanguageEditor()
@@ -178,6 +182,15 @@ QList<FileAttribute> LanguageEditor::getFileAttributes()
 	return fileAttributes;
 }
 
+void LanguageEditor::resetStyles()
+{
+	// 边框设置
+	this->setMarginsFont(this->m_signalsHelper->m_editorConfig.font.font);
+	this->setMarginsBackgroundColor(this->m_signalsHelper->m_editorConfig.margin.background_color);
+	this->setMarginsForegroundColor(this->m_signalsHelper->m_editorConfig.margin.line_number_color);
+	this->setCaretLineBackgroundColor(this->m_signalsHelper->m_editorConfig.color.caret_line_color);
+}
+
 char LanguageEditor::getCharAt(int pos) const
 {
 	return static_cast<char>(SendScintilla(SCI_GETCHARAT, pos));
@@ -206,6 +219,32 @@ void LanguageEditor::receiveFileInfo(const QString& fileName, const QString& sav
 	}
 
 	fileAttributes = attributes;
+}
+
+void LanguageEditor::receiveFileInfo(const QString& fileName, const QString& savePath)
+{
+	m_fileName = fileName;
+	m_savePath = savePath;
+	m_file = new QFile(m_savePath + "/" + m_fileName);
+	m_fileInfo = QFileInfo(m_savePath + "/" + m_fileName);
+
+	// 检测文件是否存在，不存在则创建，存在则读取内容
+	if (m_file->exists())
+	{
+		readFromFile();
+	}
+	else
+	{
+		createFile();
+	}
+}
+
+void LanguageEditor::receiveFileInfo(const QString& resourcesFilePath)
+{
+	m_file = new QFile(resourcesFilePath);
+	m_fileInfo = QFileInfo(resourcesFilePath);
+
+	readFromFile();
 }
 
 QString LanguageEditor::getFileName() const

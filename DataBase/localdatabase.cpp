@@ -3,8 +3,11 @@
 LocalDatabase::LocalDatabase(const QString& dbName, QObject* parent)
 	: QObject(parent)
 {
+    QString newDbName = dbName;
+    newDbName = "databases/" + newDbName;
+    check_file_path(newDbName);
     db = QSqlDatabase::addDatabase("QSQLITE");
-    db.setDatabaseName(dbName);
+    db.setDatabaseName(newDbName);
 
     if (!db.open()) {
         qCritical() << "Failed to open database:" << db.lastError().text();

@@ -12,10 +12,12 @@
 
 #include "otherwidgets/downloadlistwidget.h"
 #include "otherwidgets/singledownloadframe.h"
+#include "subwindow/submdwindow.h"
 #include "global/mainglobalvar.h"
 #include "QHotkey/qhotkey.h"
 #include "universal/file/userssettings.h"
 #include "struct/editor/EditorConfig.h"
+#include "otherwidgets/about/aboutsoftwaredialog.h"
 
 
 namespace Ui {
@@ -50,6 +52,8 @@ public:
     void createSSJJSubWindow();
     void createAASubWindow();
     void createFilesConvertSubWindow();
+    // 创建MD编辑器子窗口
+    void createMDSubWindow();
     void createHardwareDevelopmentSubWindow();
     void addDownloadTask(SingleDownloadFrame *singleDownloadFrame);
     // 切换语言
@@ -75,6 +79,7 @@ private slots:
     void testPythonCode();
     void developeModeChanged();
     void changeWindowTitle();
+    void showAboutSoftWareDialog();
 
 public: signals:
     void isAnyChildWindow();
