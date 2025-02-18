@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>ModifyTaskDialogClass</class>
+ <widget class="QDialog" name="ModifyTaskDialogClass">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>538</width>
+    <height>223</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>修改任务</string>
+  </property>
+  <layout class="QFormLayout" name="formLayout">
+   <item row="0" column="0">
+    <widget class="QLabel" name="taskLabel">
+     <property name="styleSheet">
+      <string notr="true">QLabel{
+	color:rgb(0, 0, 0);
+	min-height:30px;
+min-width:100px;
+max-height:30px;
+max-height:100px;
+margin-left:15px;
+}</string>
+     </property>
+     <property name="text">
+      <string>任务名称</string>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="1">
+    <widget class="QLabel" name="taskNameLabel">
+     <property name="text">
+      <string>TextLabel</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="0">
+    <widget class="QLabel" name="difficultyLabel">
+     <property name="styleSheet">
+      <string notr="true">QLabel{
+	color:rgb(0, 0, 0);
+	min-height:30px;
+min-width:100px;
+max-height:30px;
+max-height:100px;
+margin-left:15px;
+}</string>
+     </property>
+     <property name="text">
+      <string>难度</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="1">
+    <widget class="QComboBox" name="difficultyComboBox"/>
+   </item>
+   <item row="2" column="0">
+    <widget class="QLabel" name="runTimesLabel">
+     <property name="styleSheet">
+      <string notr="true">QLabel{
+	color:rgb(0, 0, 0);
+	min-height:30px;
+min-width:100px;
+max-height:30px;
+max-height:100px;
+margin-left:15px;
+}</string>
+     </property>
+     <property name="text">
+      <string>运行次数</string>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="1">
+    <widget class="QLineEdit" name="runTimesLineEdit"/>
+   </item>
+   <item row="3" column="0">
+    <widget class="QLabel" name="finishedTimesLabel">
+     <property name="styleSheet">
+      <string notr="true">QLabel{
+	color:rgb(0, 0, 0);
+	min-height:30px;
+min-width:100px;
+max-height:30px;
+max-height:100px;
+margin-left:15px;
+}</string>
+     </property>
+     <property name="text">
+      <string>当前运行次数</string>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="1">
+    <widget class="QLineEdit" name="finishedTimesLineEdit"/>
+   </item>
+   <item row="4" column="0">
+    <widget class="QLabel" name="scriptLabel">
+     <property name="styleSheet">
+      <string notr="true">QLabel{
+	color:rgb(0, 0, 0);
+	min-height:30px;
+min-width:100px;
+max-height:30px;
+max-height:100px;
+margin-left:15px;
+}</string>
+     </property>
+     <property name="text">
+      <string>脚本路径</string>
+     </property>
+    </widget>
+   </item>
+   <item row="4" column="1">
+    <widget class="QComboBox" name="scriptComboBox"/>
+   </item>
+   <item row="5" column="0">
+    <spacer name="verticalSpacer">
+     <property name="orientation">
+      <enum>Qt::Orientation::Vertical</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>40</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item row="5" column="1">
+    <layout class="QHBoxLayout" name="horizontalLayout_2">
+     <item>
+      <spacer name="horizontalSpacer">
+       <property name="orientation">
+        <enum>Qt::Orientation::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QPushButton" name="cancelPushButton">
+       <property name="text">
+        <string>取消修改</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="confirmPushButton">
+       <property name="text">
+        <string>确定修改</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+  </layout>
+ </widget>
+ <layoutdefault spacing="6" margin="11"/>
+ <resources/>
+ <connections/>
+</ui>

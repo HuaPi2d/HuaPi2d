@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>914</width>
-    <height>1247</height>
+    <height>1417</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -634,6 +634,120 @@ QPushButton:pressed {
                 <attribute name="title">
                  <string>Welcome</string>
                 </attribute>
+                <layout class="QGridLayout" name="gridLayout_4">
+                 <item row="3" column="1">
+                  <spacer name="verticalSpacer_4">
+                   <property name="orientation">
+                    <enum>Qt::Orientation::Vertical</enum>
+                   </property>
+                   <property name="sizeHint" stdset="0">
+                    <size>
+                     <width>20</width>
+                     <height>40</height>
+                    </size>
+                   </property>
+                  </spacer>
+                 </item>
+                 <item row="1" column="2">
+                  <spacer name="horizontalSpacer_6">
+                   <property name="orientation">
+                    <enum>Qt::Orientation::Horizontal</enum>
+                   </property>
+                   <property name="sizeHint" stdset="0">
+                    <size>
+                     <width>40</width>
+                     <height>20</height>
+                    </size>
+                   </property>
+                  </spacer>
+                 </item>
+                 <item row="0" column="1">
+                  <spacer name="verticalSpacer_3">
+                   <property name="orientation">
+                    <enum>Qt::Orientation::Vertical</enum>
+                   </property>
+                   <property name="sizeHint" stdset="0">
+                    <size>
+                     <width>20</width>
+                     <height>40</height>
+                    </size>
+                   </property>
+                  </spacer>
+                 </item>
+                 <item row="1" column="1">
+                  <widget class="QPushButton" name="createScpPushButton">
+                   <property name="text">
+                    <string>创建第一个脚本</string>
+                   </property>
+                   <property name="icon">
+                    <iconset resource="../resource.qrc">
+                     <normaloff>:/icon/resources/icons/RightArrow.svg</normaloff>:/icon/resources/icons/RightArrow.svg</iconset>
+                   </property>
+                   <property name="iconSize">
+                    <size>
+                     <width>32</width>
+                     <height>32</height>
+                    </size>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="1" column="0">
+                  <spacer name="horizontalSpacer_5">
+                   <property name="orientation">
+                    <enum>Qt::Orientation::Horizontal</enum>
+                   </property>
+                   <property name="sizeHint" stdset="0">
+                    <size>
+                     <width>40</width>
+                     <height>20</height>
+                    </size>
+                   </property>
+                  </spacer>
+                 </item>
+                 <item row="2" column="1">
+                  <widget class="QPushButton" name="openScpPushButton">
+                   <property name="text">
+                    <string>打开文件</string>
+                   </property>
+                   <property name="icon">
+                    <iconset resource="../resource.qrc">
+                     <normaloff>:/icon/resources/icons/PhFolderNotchOpen.svg</normaloff>:/icon/resources/icons/PhFolderNotchOpen.svg</iconset>
+                   </property>
+                   <property name="iconSize">
+                    <size>
+                     <width>30</width>
+                     <height>30</height>
+                    </size>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="2" column="2">
+                  <spacer name="horizontalSpacer_7">
+                   <property name="orientation">
+                    <enum>Qt::Orientation::Horizontal</enum>
+                   </property>
+                   <property name="sizeHint" stdset="0">
+                    <size>
+                     <width>40</width>
+                     <height>20</height>
+                    </size>
+                   </property>
+                  </spacer>
+                 </item>
+                 <item row="2" column="0">
+                  <spacer name="horizontalSpacer_8">
+                   <property name="orientation">
+                    <enum>Qt::Orientation::Horizontal</enum>
+                   </property>
+                   <property name="sizeHint" stdset="0">
+                    <size>
+                     <width>40</width>
+                     <height>20</height>
+                    </size>
+                   </property>
+                  </spacer>
+                 </item>
+                </layout>
                </widget>
               </widget>
              </item>
@@ -653,7 +767,7 @@ QPushButton:pressed {
           <item>
            <layout class="QVBoxLayout" name="verticalLayout_5">
             <item>
-             <widget class="QTableWidget" name="fileAttributesTableWidget">
+             <widget class="CustomizedTableWidget" name="fileAttributesTableWidget">
               <property name="maximumSize">
                <size>
                 <width>250</width>
@@ -922,46 +1036,6 @@ QPushButton:pressed {
               <string>王者乱斗</string>
              </attribute>
              <layout class="QGridLayout" name="gridLayout_2">
-              <item row="0" column="0">
-               <widget class="QRadioButton" name="teamPropRadioButton">
-                <property name="text">
-                 <string>团队道具赛</string>
-                </property>
-               </widget>
-              </item>
-              <item row="0" column="1">
-               <spacer name="horizontalSpacer_2">
-                <property name="orientation">
-                 <enum>Qt::Orientation::Horizontal</enum>
-                </property>
-                <property name="sizeHint" stdset="0">
-                 <size>
-                  <width>40</width>
-                  <height>20</height>
-                 </size>
-                </property>
-               </spacer>
-              </item>
-              <item row="3" column="0">
-               <widget class="QLabel" name="LDRunTimesLabel">
-                <property name="text">
-                 <string>运行次数</string>
-                </property>
-               </widget>
-              </item>
-              <item row="3" column="1">
-               <widget class="QLineEdit" name="LDRunTimesLineEdit"/>
-              </item>
-              <item row="3" column="2">
-               <widget class="QLabel" name="LDScriptLabel">
-                <property name="toolTip">
-                 <string>可选</string>
-                </property>
-                <property name="text">
-                 <string>脚本路径</string>
-                </property>
-               </widget>
-              </item>
               <item row="3" column="4">
                <widget class="QPushButton" name="chooseLDScriptPathPushButton">
                 <property name="styleSheet">
@@ -997,13 +1071,20 @@ QPushButton:pressed {
                 </property>
                </widget>
               </item>
-              <item row="3" column="3">
-               <widget class="QLineEdit" name="LDScriptPathLineEdit">
+              <item row="3" column="2">
+               <widget class="QLabel" name="LDScriptLabel">
                 <property name="toolTip">
                  <string>可选</string>
                 </property>
-                <property name="placeholderText">
-                 <string>点击右侧按钮选择脚本</string>
+                <property name="text">
+                 <string>脚本路径</string>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="0">
+               <widget class="QRadioButton" name="teamPropRadioButton">
+                <property name="text">
+                 <string>团队道具赛</string>
                 </property>
                </widget>
               </item>
@@ -1011,6 +1092,33 @@ QPushButton:pressed {
                <widget class="QRadioButton" name="challenHeroRadioButton">
                 <property name="text">
                  <string>挑战王者</string>
+                </property>
+               </widget>
+              </item>
+              <item row="3" column="1">
+               <widget class="QLineEdit" name="LDRunTimesLineEdit"/>
+              </item>
+              <item row="3" column="0">
+               <widget class="QLabel" name="LDRunTimesLabel">
+                <property name="text">
+                 <string>运行次数</string>
+                </property>
+               </widget>
+              </item>
+              <item row="3" column="3">
+               <widget class="QComboBox" name="LDScriptPathComboBox">
+                <property name="minimumSize">
+                 <size>
+                  <width>250</width>
+                  <height>0</height>
+                 </size>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="1">
+               <widget class="QRadioButton" name="otherLDModesRadioButton">
+                <property name="text">
+                 <string>其他模式</string>
                 </property>
                </widget>
               </item>
@@ -1118,7 +1226,7 @@ QPushButton:pressed {
            </widget>
           </item>
           <item>
-           <widget class="QTableWidget" name="taskTableWidget">
+           <widget class="CustomizedTableWidget" name="taskTableWidget">
             <property name="toolTip">
              <string>单击可清除任务</string>
             </property>
@@ -1144,7 +1252,7 @@ QPushButton:pressed {
             </column>
             <column>
              <property name="text">
-              <string>脚本</string>
+              <string>        脚本        </string>
              </property>
             </column>
             <column>
@@ -1205,6 +1313,13 @@ QPushButton:pressed {
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>CustomizedTableWidget</class>
+   <extends>QTableWidget</extends>
+   <header>customize/customizedTableWidget/customizedtablewidget.h</header>
+  </customwidget>
+ </customwidgets>
  <resources>
   <include location="../resource.qrc"/>
  </resources>

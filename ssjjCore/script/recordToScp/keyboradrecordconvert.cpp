@@ -9,9 +9,9 @@ QString convertRecordToScp(QString record)
     QMap<int, KeyEvent> keyMap;
     QRegularExpressionMatch match;
     // 点击型按键
-    enum ClickTypeKey{C = 0, E, Q, X, NUM1, NUM2, NUM3, NUM4, NUM5, KEY_NUM};
-    int ClickTypeKeyCode[KEY_NUM] = {67, 69, 81, 88, 49, 50, 51, 52, 53};
-    QString ClickTypeKeyStr[KEY_NUM] = {"C", "E", "Q", "X", "1", "2", "3", "4", "5"};
+    enum ClickTypeKey{C = 0, E, Q, V, X, NUM1, NUM2, NUM3, NUM4, NUM5, KEY_NUM};
+    int ClickTypeKeyCode[KEY_NUM] = {67, 69, 81, 86, 88, 49, 50, 51, 52, 53};
+    QString ClickTypeKeyStr[KEY_NUM] = {"C", "E", "Q", "V", "X", "1", "2", "3", "4", "5"};
     bool isShooting = false;
 	int flag_num = 0;
     int total_time = 0;
@@ -34,10 +34,12 @@ QString convertRecordToScp(QString record)
 				}
 			}
 			else if (action_type == "KEYUP") {
-				keyMap[87].type = "KEYUP";
-				scp += QString("sleep_ms(%1)\n").arg(total_time);
-				total_time = 0;
-				scp += QString("key_up(\"W\")\n");
+				if (keyMap[87].type != "KEYUP") {
+					keyMap[87].type = "KEYUP";
+					scp += QString("sleep_ms(%1)\n").arg(total_time);
+					total_time = 0;
+					scp += QString("key_up(\"W\")\n");
+				}
 			}
 		}
 		else if (key_code == 65) {
@@ -50,10 +52,12 @@ QString convertRecordToScp(QString record)
 				}
 			}
 			else if (action_type == "KEYUP") {
-				keyMap[65].type = "KEYUP";
-				scp += QString("sleep_ms(%1)\n").arg(total_time);
-				total_time = 0;
-				scp += QString("key_up(\"A\")\n");
+				if (keyMap[65].type != "KEYUP") {
+					keyMap[65].type = "KEYUP";
+					scp += QString("sleep_ms(%1)\n").arg(total_time);
+					total_time = 0;
+					scp += QString("key_up(\"A\")\n");
+				}
 			}
 		}
 		else if (key_code == 68) {
@@ -66,10 +70,12 @@ QString convertRecordToScp(QString record)
 				}
 			}
 			else if (action_type == "KEYUP") {
-				keyMap[68].type = "KEYUP";
-				scp += QString("sleep_ms(%1)\n").arg(total_time);
-				total_time = 0;
-				scp += QString("key_up(\"D\")\n");
+				if (keyMap[68].type != "KEYUP") {
+					keyMap[68].type = "KEYUP";
+					scp += QString("sleep_ms(%1)\n").arg(total_time);
+					total_time = 0;
+					scp += QString("key_up(\"D\")\n");
+				}
 			}
 		}
 		else if (key_code == 83) {
@@ -82,10 +88,12 @@ QString convertRecordToScp(QString record)
 				}
 			}
 			else if (action_type == "KEYUP") {
-				keyMap[83].type = "KEYUP";
-				scp += QString("sleep_ms(%1)\n").arg(total_time);
-				total_time = 0;
-				scp += QString("key_up(\"S\")\n");
+				if (keyMap[83].type != "KEYUP") {
+					keyMap[83].type = "KEYUP";
+					scp += QString("sleep_ms(%1)\n").arg(total_time);
+					total_time = 0;
+					scp += QString("key_up(\"S\")\n");
+				}
 			}
 		}
 		// "R"
@@ -99,10 +107,12 @@ QString convertRecordToScp(QString record)
 				}
 			}
 			else if (action_type == "KEYUP") {
-				keyMap[82].type = "KEYUP";
-				scp += QString("sleep_ms(%1)\n").arg(total_time);
-				total_time = 0;
-				scp += QString("key_up(\"R\")\n");
+				if (keyMap[82].type != "KEYUP") {
+					keyMap[82].type = "KEYUP";
+					scp += QString("sleep_ms(%1)\n").arg(total_time);
+					total_time = 0;
+					scp += QString("key_up(\"R\")\n");
+				}
 			}
 		}
 		// 鼠标

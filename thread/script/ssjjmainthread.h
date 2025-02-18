@@ -9,6 +9,7 @@
 #include <thread/script/settlementthread.h>
 #include "global/ssjjglobalvar.h"
 #include "thread/script/basic/basicscriptthread.h"
+#include "thread/checkthreadstate.h"
 
 
 class SSJJMainThread : public BasicScriptThread

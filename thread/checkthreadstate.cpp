@@ -7,7 +7,7 @@
 // 1 线程正在运行
 int checkThreadRunningState(QThread* thread)
 {
-	if (thread == nullptr || thread == new QThread()) {
+	if (thread == nullptr) {
 		return -1;
 	}
 	else {
@@ -22,17 +22,14 @@ int checkThreadRunningState(QThread* thread)
 
 void forceQuitThread(QThread* thread)
 {
-	if (checkThreadRunningState(thread) == 1)
-	{
-		qDebug() << "thread is running: " << thread->objectName();
-	}
-	if (checkThreadRunningState(thread) == 1)
+	int state = checkThreadRunningState(thread);
+	if (state == 1)
 	{
 		thread->terminate();
 	}
-	if (checkThreadRunningState(thread) == 1)
-	{
+	state = checkThreadRunningState(thread);
+	if (checkThreadRunningState(thread) == 0) {
 		thread->deleteLater();
 	}
-	thread = nullptr;
+	state = checkThreadRunningState(thread);
 }

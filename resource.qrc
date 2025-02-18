@@ -203,6 +203,19 @@
         <file>resources/pic/script/mouse.png</file>
         <file>resources/pic/script/difficulty_combox1_arrow.png</file>
         <file>resources/pic/script/difficulty_combox2_arrow.png</file>
+        <file>resources/pic/script/sl.jpg</file>
+        <file>resources/pic/script/sl_bjys.jpg</file>
+        <file>resources/pic/script/sl_bljy.jpg</file>
+        <file>resources/pic/script/sl_dlsy.jpg</file>
+        <file>resources/pic/script/sl_sksy.jpg</file>
+        <file>resources/pic/script/sl_tsjh.jpg</file>
+        <file>resources/pic/script/sl_yjsz.jpg</file>
+        <file>resources/pic/script/jq.jpg</file>
+        <file>resources/pic/script/jq_clyj.jpg</file>
+        <file>resources/pic/script/jq_jscx.jpg</file>
+        <file>resources/pic/script/jq_ttsy.jpg</file>
+        <file>resources/pic/script/sl_jq_start.jpg</file>
+        <file>resources/pic/script/confirm_rw.png</file>
     </qresource>
     <qresource prefix="/">
         <file>translations/zh_CN.qm</file>

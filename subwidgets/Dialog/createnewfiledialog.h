@@ -9,6 +9,7 @@
 #include <QModelIndex>
 #include <QMessageBox>
 #include <QStringList>
+#include <QMap>
 
 #include "ui_createnewfiledialog.h"
 #include "ssjjCore/zx/zxlevels.h"
@@ -45,12 +46,14 @@ public:
 	QString getFileName();
 	QString getSavePath();
 	QList<FileAttribute> getFileAttribute();
+	QMap<QString, QString> getFileAttributeMap();
 
 private:
 	Ui::CreateNewFileDialogClass *ui;
 
 	FileType selectedFileType;
 	FileType selectedChildFileType;
+	QList<FileType> childFileTypes;
 	QList<ZXLevel> zxLevels;
 	ZXLevel zxLevel;
 	QString parentDir;

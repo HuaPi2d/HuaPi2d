@@ -1,0 +1,39 @@
+# 脚本录制采用的武器配置：
+# 裁决 + 伏虎 + 墨韵 + 天枢(1) + 万象(2) + 灰核 + 魔童
+
+# 录制开始
+sleep_ms(0)
+turn_up_down(-30)
+sleep_ms(750)
+turn_up_down(-30)
+sleep_ms(938)
+turn_up_down(-30)
+sleep_ms(1000)
+middle_click()
+sleep_ms(3375)
+key_press("3")
+sleep_ms(656)
+key_press("4")
+sleep_ms(547)
+key_press("4")
+sleep_ms(719)
+key_press("4")
+sleep_ms(390)
+key_press("5")
+sleep_ms(532)
+key_press("E")
+sleep_ms(1297)
+key_press("X")
+sleep_ms(1453)
+key_press("2")
+sleep_ms(625)
+key_press("1")
+sleep_ms(1406)
+key_press("E")
+sleep_ms(1203)
+key_press("C")
+sleep_ms(563)
+left_down()
+# 录制结束
+
+@{chapter=工业区}@{difficulty=专家六}@{level=双子大厦}@{speed=375}

@@ -8,6 +8,8 @@
 #include <QKeyEvent>
 #include <QList>
 #include <QSettings>
+#include <QMessageBox>
+#include <QRegularExpression>
 
 #include "universal/file/fileattributes.h"
 #include "languageeditorsignalshelper.h"
@@ -32,6 +34,7 @@ private:
 	QFile* m_file;
 	QFileInfo m_fileInfo;
 	QList<FileAttribute> fileAttributes;
+	QMap<QString, QString> fileAttributeMap;
 	
 	void insertMatchingCharacter(const QString& openChar, const QString& closeChar);
 	bool deleteAction();
@@ -41,15 +44,18 @@ private:
 	void createFile();
 
 public slots:
-	virtual void receiveFileInfo(const QString& fileName, const QString& savePath, QList<FileAttribute> attributes);
+	virtual void receiveFileInfo(const QString& fileName, const QString& savePath, const QMap<QString, QString>& attributes);
 	virtual void receiveFileInfo(const QString& fileName, const QString& savePath);
 	virtual void receiveFileInfo(const QString& resourcesFilePath);
+	void setFileAttributes(QList<FileAttribute> attributes);
+	void setFileAttributesMap(const QMap<QString, QString>& attributes);
+	void setFileAttribute(const QString& key, const QString& value);
 	QString getFileName() const;
 	QString getSavePath() const;
 	QFileInfo getFileInfo() const;
+	bool renameFile(const QString& newFileName);
 	void saveFile();
-	void receiveFileAttributes(QList<FileAttribute> attributes);
-	QList<FileAttribute> getFileAttributes();
+	QMap<QString, QString> getFileAttributesMap();
 	void resetStyles();
 
 public:

@@ -23,7 +23,14 @@ void ScriptCompiler::runScript()
 	if (m_fileInfo.suffix() == "zscp") {
 		if (checkCurrentState() != "gamePage") {
 			if (m_task.taskType == Task::ZhuXian) {
-				enterGame(m_task, 20);
+				enterGame(m_task, m_loadTime);
+			}
+		}
+	}
+	else if (m_fileInfo.suffix() == "lscp") {
+		if (checkCurrentState() != "gamePage") {
+			if (m_task.taskType == Task::LuanDou) {
+				enterGame(m_task, m_loadTime);
 			}
 		}
 	}
@@ -260,7 +267,7 @@ bool ScriptCompiler::parseFunction(QString functionName, QString params)
 void ScriptCompiler::readFileContent()
 {
 	// 读取脚本文件属性
-	m_fileAttributes = readFileAttributes(m_scriptFilePath);
+	m_fileAttributesMap = readFileAttributesMap(m_scriptFilePath);
 	m_fileInfo = QFileInfo(m_scriptFilePath);
 	if (m_fileInfo.suffix() == "zscp") {
 		m_task.taskType = Task::ZhuXian;
@@ -271,19 +278,9 @@ void ScriptCompiler::readFileContent()
 
 	// 读取速度
 	m_task.script = m_scriptFilePath;
-	for (FileAttribute fileAttribute : m_fileAttributes)
-	{
-		if (fileAttribute.name == "speed")
-		{
-			m_scriptMoveSpeed = fileAttribute.value.toInt();
-		}
-		if (fileAttribute.name == "level") {
-			m_task.taskName = fileAttribute.value;
-		}
-		if (fileAttribute.name == "difficulty") {
-			m_task.difficulty = fileAttribute.value;
-		}
-	}
+	m_scriptMoveSpeed = m_fileAttributesMap["speed"].toInt();
+	m_task.taskName = m_fileAttributesMap["level"];
+	m_task.difficulty = m_fileAttributesMap["difficulty"];
 
 	QFile scriptFile(m_scriptFilePath);
 
@@ -370,6 +367,11 @@ void ScriptCompiler::extractFunction()
 			emit sendRunInfo("unknown functionName: " + functionName + " params: " + params);
 		}
 	}
+}
+
+void ScriptCompiler::setLoadTime(int time)
+{
+	m_loadTime = time;
 }
 
 StatementType ScriptCompiler::judgeStatementType(QString line)

@@ -48,6 +48,9 @@ SubSSJJWidget::SubSSJJWidget(QWidget *parent)
     /* 搭建图形编辑器 */
     createNodeEditor();
 
+    // 创建数据库
+    ssjjScriptalFilesDatabase = new SSJJScriptalFilesDatabase("ssjjScriptalFiles.db", this);
+
     up_arrow = new QHotkey(QKeySequence(Qt::Key_Up), this);
     down_arrow = new QHotkey(QKeySequence(Qt::Key_Down), this);
     left_arrow = new QHotkey(QKeySequence(Qt::Key_Left), this);
@@ -56,7 +59,6 @@ SubSSJJWidget::SubSSJJWidget(QWidget *parent)
     middle = new QHotkey(QKeySequence("/"), this);
 
     connect(left_arrow, &QHotkey::activated, [=]() {
-        qDebug() << "left arrow";
         turn_around(45, false);
         });
     connect(right_arrow, &QHotkey::activated, [=]() {
@@ -102,7 +104,6 @@ SubSSJJWidget::SubSSJJWidget(QWidget *parent)
     writeRemindInfo("<p>" + tr("欢迎使用") + "<b>" + tr("生死狙击脚本") + "</b>" + tr("工具") + "</p><p><span style=\"font-size: 13px; color: red;\">" 
         + tr("使用时注意本栏信息") + "</span></p><p>" + tr("请开启") + "<span style = \"font-size: 13px; color: red;\"><b>" + tr("自动登录") + "</b></span><br><span>游戏内鼠标灵敏度设为40</span><br></p>");
     ui->launcherPathLineEdit->setReadOnly(true);
-    ui->LDScriptPathLineEdit->setReadOnly(true);
     QIntValidator *validator = new QIntValidator(0, 999, this);
     ui->moveSpeedLineEdit->setValidator(validator);
     ui->LDRunTimesLineEdit->setValidator(validator);
@@ -131,6 +132,9 @@ SubSSJJWidget::SubSSJJWidget(QWidget *parent)
     connect(ui->longQiComboBox, &QComboBox::currentIndexChanged, this, &SubSSJJWidget::updateCurrentWeaponList);
     connect(textToShowInScreen, &GlobalVariableQString::valueChanged, this, &SubSSJJWidget::receiveDisplayText);
 
+    connect(ui->createScpPushButton, &QPushButton::clicked, this, &SubSSJJWidget::createNewScpFile);
+    connect(ui->openScpPushButton, &QPushButton::clicked, this, &SubSSJJWidget::openScpFile);
+
     /* 分辨率选择信息 */
     connect(ui->radioButton25601440, &QRadioButton::clicked, this, [=]() {resolutionPath = ""; });
     connect(ui->radioButton25601600, &QRadioButton::clicked, this, [=]() {resolutionPath = "2560-1600/"; });
@@ -157,6 +161,10 @@ SubSSJJWidget::SubSSJJWidget(QWidget *parent)
 
     /* 清除表格 */
     connect(ui->taskTableWidget, &QTableWidget::itemClicked, this, &SubSSJJWidget::clearRow);
+    connect(ui->taskTableWidget, &CustomizedTableWidget::deleteRow, this, &SubSSJJWidget::clearRow);
+    connect(ui->taskTableWidget, &CustomizedTableWidget::modifyRow, this, &SubSSJJWidget::modifyTask);
+    ui->fileAttributesTableWidget->setDeleteActionVisible(false);
+    connect(ui->fileAttributesTableWidget, &CustomizedTableWidget::modifyRow, this, &SubSSJJWidget::modifyFileAttributes);
 
     /* 设置脚本编辑界面 */
     // 设置标签页为可关闭
@@ -198,9 +206,6 @@ SubSSJJWidget::SubSSJJWidget(QWidget *parent)
 
     writeRemindInfo("<p><span style=\"color: red;\">" + tr("请确保在每次启动游戏时不会弹出以下图片") + "</p><br>");
     writeRemindInfo("<img src=\"" + tips_file_path("tips/ensure_ratio.png") + "\" width=\"250\" alt=\"" + tr("提示图片") + "\"><br>");
-
-    // 创建数据库
-    ssjjScriptalFilesDatabase = new SSJJScriptalFilesDatabase("ssjjScriptalFiles.db", this);
 }
 
 SubSSJJWidget::~SubSSJJWidget()
@@ -230,7 +235,7 @@ void SubSSJJWidget::saveSettings()
     settings.setValue("ssjjInstallPath", ssjjInstallPath);
     settings.setValue("moveSpeed", ui->moveSpeedLineEdit->text());
     settings.setValue("LDRunTimes", ui->LDRunTimesLineEdit->text());
-    settings.setValue("LDScriptPath", ui->LDScriptPathLineEdit->text());
+    settings.setValue("LDScriptPath", ui->LDScriptPathComboBox->currentText());
     settings.setValue("singleScriptTime", ui->singleScriptTimeLineEdit->text());
     settings.setValue("loadingTime", ui->loadingTimeLineEdit->text());
     settings.setValue("ifResetTimes", ui->ifResetTimesCheckBox->isChecked());
@@ -411,7 +416,8 @@ void SubSSJJWidget::loadSettings()
     // 乱斗次数
     ui->LDRunTimesLineEdit->setText(settings.value("LDRunTimes", "100").toString());
     // 乱斗脚本路径
-    ui->LDScriptPathLineEdit->setText(settings.value("LDScriptPath").toString());
+    ui->LDScriptPathComboBox->setCurrentText(settings.value("LDScriptPath").toString());
+    updateLDScriptPathComboBox();
     // 单次脚本超时时长
     ui->singleScriptTimeLineEdit->setText(settings.value("singleScriptTime", "5").toString());
     // 加载时间
@@ -535,14 +541,14 @@ void SubSSJJWidget::loadSettings()
                     }
                     else {
                         QFileInfo newfileInfo(newFilePath);
-                        this->creatNewScriptEditorTab(newfileInfo.fileName(), newfileInfo.path(), readFileAttributes(newfileInfo.absoluteFilePath()));
+                        this->creatNewScriptEditorTab(newfileInfo.fileName(), newfileInfo.path(), readFileAttributesMap(newfileInfo.absoluteFilePath()));
                     }
                 }
                 else {
                     return;
                 }
             }
-            this->creatNewScriptEditorTab(fileInfo.fileName(), fileInfo.path(), readFileAttributes(fileInfo.absoluteFilePath()));
+            this->creatNewScriptEditorTab(fileInfo.fileName(), fileInfo.path(), readFileAttributesMap(fileInfo.absoluteFilePath()));
         }
     }
     ui->scriptalTabWidget->setCurrentIndex(settings.value("currentScriptEditorTabIndex", "0").toInt());
@@ -619,6 +625,10 @@ void SubSSJJWidget::on_testPushButton_clicked()
 {
     //unregiseterDirectionHotkey();
     convertRecordResult();
+    QMap<QString, QString> map = readFileAttributesMap(currentScriptEditor->getFileInfo().absoluteFilePath());
+    for (QString key : map.keys()) {
+        qDebug() << key << map[key];
+    }
 }
 
 void SubSSJJWidget::on_closePushButton_clicked()
@@ -789,8 +799,8 @@ void SubSSJJWidget::on_addTaskPushButton_clicked()
         ui->taskTableWidget->setItem(currentRow - 1, 1, new QTableWidgetItem(tr("无")));
         ui->taskTableWidget->setItem(currentRow - 1, 2, new QTableWidgetItem(ui->LDRunTimesLineEdit->text()));
         ui->taskTableWidget->setItem(currentRow - 1, 3, new QTableWidgetItem("0"));
-        if (ui->LDScriptPathLineEdit->text() != "") {
-            ui->taskTableWidget->setItem(currentRow - 1, 4, new QTableWidgetItem(ui->LDScriptPathLineEdit->text()));
+        if (ui->LDScriptPathComboBox->currentText() != "") {
+            ui->taskTableWidget->setItem(currentRow - 1, 4, new QTableWidgetItem(getRelativePath(ui->LDScriptPathComboBox->currentText())));
         }
         else {
             ui->taskTableWidget->setItem(currentRow - 1, 4, new QTableWidgetItem("未选择"));
@@ -804,6 +814,10 @@ void SubSSJJWidget::on_addTaskPushButton_clicked()
         }
         else if (ui->challenHeroRadioButton->isChecked() == true) {
             ui->taskTableWidget->setItem(currentRow - 1, 0, new QTableWidgetItem("挑战王者"));
+        }
+        else if (ui->otherLDModesRadioButton->isChecked() == true)
+        {
+            ui->taskTableWidget->setItem(currentRow - 1, 0, new QTableWidgetItem("其他模式"));
         }
         ui->taskTableWidget->setItem(currentRow - 1, 5, new QTableWidgetItem("王者乱斗"));
     }
@@ -829,13 +843,7 @@ void SubSSJJWidget::on_addTaskPushButton_clicked()
         ui->taskTableWidget->setItem(currentRow - 1, 1, new QTableWidgetItem(ui->diffcultyChooseComboBox->currentText()));
         ui->taskTableWidget->setItem(currentRow - 1, 2, new QTableWidgetItem(ui->zxRunTimesLineEdit->text()));
         ui->taskTableWidget->setItem(currentRow - 1, 3, new QTableWidgetItem("0"));
-        if (ui->zxScriptPathComboBox->currentText().contains(qApp->applicationDirPath().replace("/x64/Release", "")))
-        {
-            ui->taskTableWidget->setItem(currentRow - 1, 4, new QTableWidgetItem(ui->zxScriptPathComboBox->currentText().replace(qApp->applicationDirPath().replace("/x64/Release", "") + "/", "")));
-        }
-        else {
-            ui->taskTableWidget->setItem(currentRow - 1, 4, new QTableWidgetItem(ui->zxScriptPathComboBox->currentText()));
-        }
+        ui->taskTableWidget->setItem(currentRow - 1, 4, new QTableWidgetItem(getRelativePath(ui->zxScriptPathComboBox->currentText())));
         ui->taskTableWidget->setItem(currentRow - 1, 5, new QTableWidgetItem("主线关卡"));
     }
 }
@@ -851,10 +859,9 @@ void SubSSJJWidget::on_chooseLDScriptPathPushButton_clicked()
 
     // 检查用户是否选择了文件
     if (!fileName.isEmpty()) {
-        ui->LDScriptPathLineEdit->setText(fileName);
-    }
-    else{
-        ui->LDScriptPathLineEdit->setText("");
+        ui->LDScriptPathComboBox->setCurrentText(fileName);
+        // 保存文件至数据库
+        ssjjScriptalFilesDatabase->readFileIntoDatabase(QFileInfo(fileName));
     }
 }
 
@@ -895,7 +902,6 @@ void SubSSJJWidget::on_startPushButton_clicked()
         }
     }
 
-    qDebug() << "开始运行脚本";
     if(checkThreadState() == 1) {
         writeRemindInfo("<p><span style=\"color:red;\"><b>" + tr("脚本正在运行中，请勿重复点击") + "</b></span></p><br>");
         return;
@@ -913,6 +919,14 @@ void SubSSJJWidget::on_startPushButton_clicked()
     connect(ssjjMainThread, &SSJJMainThread::singleTaskFinished, this, &SubSSJJWidget::sendNextTask);
     connect(ssjjMainThread, &SSJJMainThread::sendFatalError, this, &SubSSJJWidget::receiveFatalError);
     connect(ssjjMainThread, &SSJJMainThread::sendDisplayText, this, &SubSSJJWidget::receiveDisplayText);
+    connect(ssjjMainThread, &SSJJMainThread::finished, this, [=]() {
+        if (ssjjMainThread == nullptr) {
+            return;
+        }
+        else {
+            ssjjMainThread->deleteLater();
+        }
+        });
     /* 定义全局变量 */
     ssjjMainThread->receiveResolutionPath(this->resolutionPath);
     /* 开始执行 */
@@ -924,15 +938,13 @@ void SubSSJJWidget::on_startPushButton_clicked()
 void SubSSJJWidget::on_endPushButton_clicked()
 {
     // 检查是否有脚本正在运行
-    if(checkThreadRunningState(ssjjMainThread) != 1) {
+    if(!checkThreadState()) {
         writeRemindInfo("<p><span style=\"colorred;\"><b>" + tr("当前没有脚本运行") + "</b></span></p><br>");
         return;
     }
 
     // 强制停止逻辑
-    if(ssjjMainThread->isFinished() == false){
-        forceQuitSSJJThread();
-    }
+    terminateAllThreads();
 
     writeRemindInfo("<p><span style=\"color:lightgreen;\"><b>" + tr("脚本运行已结束") + "</b></span></p><br>");
 }
@@ -940,14 +952,6 @@ void SubSSJJWidget::on_endPushButton_clicked()
 void SubSSJJWidget::on_scriptRecordPushButton_clicked()
 {
     startScriptRecord();
-}
-
-void SubSSJJWidget::forceQuitSSJJThread()
-{
-    ssjjMainThread->stopThread();
-    ssjjMainThread->terminate();
-    ssjjMainThread->deleteLater();
-    ssjjMainThread = nullptr;
 }
 
 void SubSSJJWidget::receiveDisplayText(QString text)
@@ -984,6 +988,12 @@ void SubSSJJWidget::on_singleBonusPushButton_clicked()
     connect(weaponBonusThread, &QThread::finished, this, [=]() {
         ui->singleBonusPushButton->setEnabled(true);
         ui->contineBonusPushButton->setEnabled(true);
+        if (weaponBonusThread == nullptr) {
+            return;
+        }
+        else {
+            weaponBonusThread->deleteLater();
+        }
         });
     // 线程意外终止
     connect(weaponBonusThread, &QThread::destroyed, this, [=]() {
@@ -1035,6 +1045,12 @@ void SubSSJJWidget::on_contineBonusPushButton_clicked()
     connect(weaponBonusThread, &QThread::finished, this, [=]() {
         ui->contineBonusPushButton->setEnabled(true);
         ui->singleBonusPushButton->setEnabled(true);
+        if (weaponBonusThread == nullptr) {
+            return;
+        }
+        else {
+            weaponBonusThread->deleteLater();
+        }
         });
     // 线程意外终止
     connect(weaponBonusThread, &QThread::destroyed, this, [=]() {
@@ -1048,13 +1064,7 @@ void SubSSJJWidget::on_contineBonusPushButton_clicked()
 
 void SubSSJJWidget::on_stopBounsPushButton_clicked()
 {
-    if (weaponBonusThread != NULL)
-    {
-        if(weaponBonusThread->isFinished() == false)
-        {
-            weaponBonusThread->terminate();
-        }
-    }
+    terminateAllThreads();
 }
 
 /* 获取单个任务 */
@@ -1078,7 +1088,7 @@ void SubSSJJWidget::getSingleTask()
             // 检查脚本文件是否存在
             if (currentTask.script != tr("未选择") && !QFile::exists(currentTask.script))
             {
-                if (!QFile::exists(qApp->applicationDirPath().replace("/x64/Release", "") + "/" + currentTask.script)) {
+                if (!QFile::exists(getAbsolutePath(currentTask.script))) {
                     writeRemindInfo("<p><span style=\"color:red;\"><b>" + currentTask.script + tr("脚本文件不存在") + "</b></span></p><br>");
                     // 清除该行
                     ui->taskTableWidget->removeRow(i);
@@ -1086,7 +1096,7 @@ void SubSSJJWidget::getSingleTask()
                     continue;
                 }
                 else {
-                    currentTask.script = qApp->applicationDirPath().replace("/x64/Release", "") + "/" + currentTask.script;
+                    currentTask.script = getAbsolutePath(currentTask.script);
                 }
             }
             else
@@ -1094,13 +1104,13 @@ void SubSSJJWidget::getSingleTask()
                 return;
             }
         }
+        else {
+            ui->taskTableWidget->item(i, 3)->setText(QString::number(ui->taskTableWidget->item(i, 2)->text().toInt()));
+        }
     }
 
     // 运行结束
-    ssjjMainThread->stopThread();
-    ssjjMainThread->terminate();
-    ssjjMainThread->deleteLater();
-    ssjjMainThread = nullptr;
+    terminateAllThreads();
 }
 
 void SubSSJJWidget::receiveRemindInfo(QString remindInfo)
@@ -1149,6 +1159,48 @@ void SubSSJJWidget::clearRow(QTableWidgetItem *item)
 {
     int row = item->row();  // 获取当前点击的行
     ui->taskTableWidget->removeRow(row);  // 删除该行
+}
+
+void SubSSJJWidget::modifyTask(QTableWidgetItem* item)
+{
+    // 获取当前行
+    int row = item->row();
+    // 获取元素
+    QString taskName = ui->taskTableWidget->item(row, 0)->text();
+    QString difficulty = ui->taskTableWidget->item(row, 1)->text();
+    int runTimes = ui->taskTableWidget->item(row, 2)->text().toInt();
+    int finishedTimes = ui->taskTableWidget->item(row, 3)->text().toInt();
+    QString script = ui->taskTableWidget->item(row, 4)->text();
+    QString taskType = ui->taskTableWidget->item(row, 5)->text();
+    // 显示
+    ModifyTaskDialog* modifyTaskDialog = new ModifyTaskDialog(this);
+
+    modifyTaskDialog->setTaskName(taskName);
+    if (taskType == "王者乱斗")
+    {
+        modifyTaskDialog->setTaskType(Task::LuanDou);
+    }
+    else if (taskType == "主线关卡")
+    {
+        modifyTaskDialog->setTaskType(Task::ZhuXian);
+    }
+    modifyTaskDialog->setDifficultyMode(ZXGameData::getDifficultyByLevelName(taskName), difficulty);
+    modifyTaskDialog->setTimes(runTimes, finishedTimes);
+    if (taskType == "王者乱斗")
+    {
+        modifyTaskDialog->setScriptList(ssjjScriptalFilesDatabase->getAllFilesPath("ld"), getAbsolutePath(script));
+    }
+    else if (taskType == "主线关卡")
+    {
+        modifyTaskDialog->setScriptList(ssjjScriptalFilesDatabase->getFilesFromDatabase(taskName), getAbsolutePath(script));
+    }
+    modifyTaskDialog->updateUI();
+    if (modifyTaskDialog->exec() == QDialog::Accepted) {
+        ui->taskTableWidget->setItem(row, 1, new QTableWidgetItem(modifyTaskDialog->getDifficultyMode()));
+        ui->taskTableWidget->setItem(row, 2, new QTableWidgetItem(QString::number(modifyTaskDialog->getRunTimes())));
+        ui->taskTableWidget->setItem(row, 3, new QTableWidgetItem(QString::number(modifyTaskDialog->getFinishedTimes())));
+        ui->taskTableWidget->setItem(row, 4, new QTableWidgetItem(getRelativePath(modifyTaskDialog->getScript())));
+    }
 }
 
 void SubSSJJWidget::createNodeEditor()
@@ -1596,42 +1648,45 @@ void SubSSJJWidget::updateZXScriptPathComboBox()
     }
 }
 
+void SubSSJJWidget::updateLDScriptPathComboBox()
+{
+    ui->LDScriptPathComboBox->clear();
+    QStringList scriptPaths = ssjjScriptalFilesDatabase->getAllFilesPath("ld");
+    for (QString scriptPath : scriptPaths)
+    {
+        ui->LDScriptPathComboBox->addItem(scriptPath);
+    }
+}
+
 void SubSSJJWidget::currentTabChanged(int index)
 {
     if (index > 0) {
         // 获取当前标签页的编辑器
         ScpLanguageEditor* editor = scpLanguageEditors.at(index - 1);
         // 获取文件编辑器打开文件的文件属性
-        QList<FileAttribute> fileAttributes = editor->getFileAttributes();
+        QMap<QString, QString> fileAttributeMap = editor->getFileAttributesMap();
+        QString suffix = editor->getFileInfo().suffix();
         // 更新 fileAttributesTableWidget 内容
         ui->fileAttributesTableWidget->clearContents();
         ui->fileAttributesTableWidget->setRowCount(0);
-        for (FileAttribute attribute : fileAttributes) {
+        for (auto it = fileAttributeMap.begin(); it != fileAttributeMap.end(); ++it) {
             int row = ui->fileAttributesTableWidget->rowCount();
             ui->fileAttributesTableWidget->insertRow(row);
-            if (attribute.name == "speed") {
-                ui->fileAttributesTableWidget->setItem(row, 0, new QTableWidgetItem(attribute.name));
+            if (it.key() == "speed") {
+                ui->fileAttributesTableWidget->setItem(row, 0, new QTableWidgetItem(it.key()));
                 QLineEdit* speedLineEdit = new QLineEdit();
-                speedLineEdit->setText(attribute.value);
+                speedLineEdit->setText(it.value());
                 QValidator* speedValidator = new QIntValidator(0, 999, this);
                 speedLineEdit->setValidator(speedValidator);
                 ui->fileAttributesTableWidget->setCellWidget(row, 1, speedLineEdit);
                 connect(speedLineEdit, &QLineEdit::textChanged, [=]() {
-                    QList<FileAttribute> fileAttributes = editor->getFileAttributes();
-                    for (FileAttribute& attribute : fileAttributes) {
-                        if (attribute.name == "speed") {
-                            attribute.value = speedLineEdit->text();
-                            break;
-                        }
-                    }
-                    editor->receiveFileAttributes(fileAttributes);
+                    editor->setFileAttribute("speed", speedLineEdit->text());
                 });
             }
             else {
-                ui->fileAttributesTableWidget->setItem(row, 0, new QTableWidgetItem(attribute.name));
-                ui->fileAttributesTableWidget->setItem(row, 1, new QTableWidgetItem(attribute.value));
+                ui->fileAttributesTableWidget->setItem(row, 0, new QTableWidgetItem(it.key()));
+                ui->fileAttributesTableWidget->setItem(row, 1, new QTableWidgetItem(it.value()));
             }
-            
         }
     }
     else if (index == 0) {
@@ -1688,7 +1743,6 @@ void SubSSJJWidget::convertRecordResult()
 
 void SubSSJJWidget::regiseterMouseHotkey()
 {
-    qDebug() << "注册鼠标热键";
     // 当 ifCanControlMouse 为 true 时，说明鼠标热键已经被注册，不需要再次注册
     if (!ifCanControlMouse) {
         up_arrow->setRegistered(true);
@@ -1714,6 +1768,61 @@ void SubSSJJWidget::unregiseterMouseHotkey()
         middle->setRegistered(false);
         ifCanControlMouse = false;
         ui->testKeyMouseCheckBox->setChecked(false);
+    }
+}
+
+void SubSSJJWidget::modifyFileAttributes()
+{
+    ModifyFileAttributesDialog* modifyFileAttributesDialog = new ModifyFileAttributesDialog(this);
+    getCurrentScriptEditor();
+    QString oldFile = currentScriptEditor->getFileInfo().absoluteFilePath();
+    modifyFileAttributesDialog->setFilePath(oldFile);
+    modifyFileAttributesDialog->setFileName(currentScriptEditor->getFileInfo().baseName());
+    if (modifyFileAttributesDialog->exec() == QDialog::Accepted) {
+        QString fileName = modifyFileAttributesDialog->getFileName();
+        if (!currentScriptEditor->renameFile(fileName)) {
+            return;
+        }
+        else {
+            // 数据库更新文件名
+            ssjjScriptalFilesDatabase->updateZXFileInDatabase(oldFile, currentScriptEditor->getFileInfo().absoluteFilePath());
+        }
+        currentScriptEditor->setFileAttributesMap(modifyFileAttributesDialog->getFileAttributesMap());
+        modifyCurrentScriptEditorTab(currentScriptEditor->getFileName());
+    }
+}
+
+void SubSSJJWidget::terminateAllThreads()
+{
+    int state = checkThreadRunningState(testScriptThread);
+    if (state == 1)
+    {
+        forceQuitThread(testScriptThread);
+    }
+    else if (state == 0) {
+        testScriptThread->deleteLater();
+    }
+    state = checkThreadRunningState(scriptRecordThread);
+    if (state == 1) {
+        forceQuitThread(scriptRecordThread);
+    }
+    else if (state == 0) {
+        scriptRecordThread->deleteLater();
+    }
+    state = checkThreadRunningState(ssjjMainThread);
+    if (state == 1) {
+        ssjjMainThread->stopThread();
+        forceQuitThread(ssjjMainThread);
+    }
+    else if (state == 0) {
+        ssjjMainThread->deleteLater();
+    }
+    state = checkThreadRunningState(weaponBonusThread);
+    if (state == 1) {
+        forceQuitThread(weaponBonusThread);
+    }
+    else if (state == 0) {
+        weaponBonusThread->deleteLater();
     }
 }
 
@@ -1799,19 +1908,13 @@ void SubSSJJWidget::startScriptRecord()
         if (type == 1) {
             showTextOnScreen("请确保当前画面处于关卡界面", QPoint(500, 50), 5000, 
                 "QLabel{border: 2px solid red; border-radius: 5px; padding: 5px; background-color: white; color: black;}");
-            QList<FileAttribute> fileAttributes = currentScriptEditor->getFileAttributes();
+            QMap<QString, QString> fileAttributes = currentScriptEditor->getFileAttributesMap();
             SingleTask task;
-            for (FileAttribute attribute : fileAttributes) {
-                if (attribute.name == "difficulty") {
-                    task.difficulty = attribute.value;
-                }
-                if (attribute.name == "level") {
-                    task.taskName = attribute.value;
-                }
-            }
+            task.taskName = fileAttributes["level"];
+            task.difficulty = fileAttributes["difficulty"];
             task.taskType = Task::ZhuXian;
             task.script = currentScriptEditor->getFileInfo().absoluteFilePath();
-            scriptRecordThread = new ScriptRecordThread(this, task);
+            scriptRecordThread = new ScriptRecordThread(this, task, ui->loadingTimeLineEdit->text().toInt());
             scriptRecordThread->receiveLoadingTime(ui->loadingTimeLineEdit->text().toInt());
             connect(scriptRecordThread, &ScriptRecordThread::showRemindText, this, &SubSSJJWidget::showTextOnScreen);
             connect(scriptRecordThread, &ScriptRecordThread::unregiseterHotkey, this, &SubSSJJWidget::unregiseterHotkey);
@@ -1819,12 +1922,16 @@ void SubSSJJWidget::startScriptRecord()
             connect(scriptRecordThread, &ScriptRecordThread::regiseterMouseHotkey, this, &SubSSJJWidget::regiseterMouseHotkey);
             connect(scriptRecordThread, &ScriptRecordThread::unregiseterMouseHotkey, this, &SubSSJJWidget::unregiseterMouseHotkey);
             connect(scriptRecordThread, &ScriptRecordThread::forceQuitRecording, this, [=]() {
-                forceQuitThread(scriptRecordThread);
+                terminateAllThreads();
                 });
             connect(scriptRecordThread, &ScriptRecordThread::finished, this, [=]() {
                 receiveDisplayText("录制完成");
-                scriptRecordThread->deleteLater();
-
+                if (scriptRecordThread == nullptr) {
+                    return;
+                }
+                else {
+                    scriptRecordThread->deleteLater();
+                }
                 // 开始处理录制结果
                 convertRecordResult();
                 });
@@ -1853,8 +1960,31 @@ void SubSSJJWidget::exportTaskList()
     exportToXlsx(ui->taskTableWidget);
 }
 
-// 创建新的文件编辑标签页
-void SubSSJJWidget::creatNewScriptEditorTab(QString fileName, QString filePath, QList<FileAttribute> fileAttributes)
+void SubSSJJWidget::createNewScpFile()
+{
+    QList<FileType> fileTypes;
+    fileTypes << SCP;
+    // 弹出文本输入框
+    CreateNewFileDialog* createNewFileDialog = new CreateNewFileDialog(this, fileTypes, "scriptal");
+    createNewFileDialog->exec();
+    if (createNewFileDialog->result() == QDialog::Accepted) {
+        this->creatNewScriptEditorTab(createNewFileDialog->getFileName(),
+            createNewFileDialog->getSavePath(), createNewFileDialog->getFileAttributeMap(), true);
+    }
+}
+
+void SubSSJJWidget::openScpFile()
+{
+    // 弹出文件选择框
+    QString fileName = QFileDialog::getOpenFileName(this, tr("打开文件"), "", tr("空的脚本 (*.scp);; 乱斗脚本 (*.lscp);; 主线脚本 (*.zscp)"));
+    if (!fileName.isEmpty()) {
+        // 拆分为路径和文件名
+        QFileInfo fileInfo(fileName);
+        this->creatNewScriptEditorTab(fileInfo.fileName(), fileInfo.path(), readFileAttributesMap(fileInfo.absoluteFilePath()));
+    }
+}
+
+void SubSSJJWidget::creatNewScriptEditorTab(QString fileName, QString filePath, QMap<QString, QString> fileAttributes, bool newFile)
 {
     // 新建编辑器对象
     ScpLanguageEditor* newEditor = new ScpLanguageEditor(this);
@@ -1897,6 +2027,24 @@ void SubSSJJWidget::creatNewScriptEditorTab(QString fileName, QString filePath, 
 
     // 重设编辑器配色
     resetEditorsAppearances();
+
+    // 添加提示内容
+    if (newFile) {
+        if (newEditor->getFileInfo().suffix() == "lscp") {
+            newEditor->insert(tr("# 此脚本的内容会循环执行"));
+        }
+    }
+}
+
+void SubSSJJWidget::modifyCurrentScriptEditorTab(QString fileName)
+{
+    getCurrentScriptEditor();
+    if (currentScriptEditor == nullptr) {
+        return;  // 当前标签页无效，直接返回
+    }
+    int index = ui->scriptalTabWidget->indexOf(currentScriptEditor);
+    ui->scriptalTabWidget->setTabText(index, fileName);
+    emit currentTabChanged(index);
 }
 
 void SubSSJJWidget::readFilesIntoSSJJDatabase(QDir dir)
@@ -1935,25 +2083,33 @@ void SubSSJJWidget::testCurrentScript()
     }
      
     currentScriptEditor->saveFile();
-    testScriptThread = new TestScriptThread(currentScriptEditor->getFileInfo(), this);
+
+    if (currentScriptEditor->getFileInfo().suffix() == "zscp") {
+        QMap<QString, QString> fileAttributes = currentScriptEditor->getFileAttributesMap();
+        if (fileAttributes["speed"] == "") {
+            receiveWarningMessage("提示", "请在右侧属性栏设置脚本录制速度！");
+            return;
+        }
+    }
+
+    testScriptThread = new TestScriptThread(currentScriptEditor->getFileInfo(), ui->loadingTimeLineEdit->text().toInt(), this);
     connect(testScriptThread, &TestScriptThread::sendWarningMessage, this, &SubSSJJWidget::receiveWarningMessage);
     connect(testScriptThread, &TestScriptThread::sendRunInfo, this, [=](QString info) {
         ui->runInfoListWidget->addItem(info);
         });
 
     testScriptThread->start();
-    connect(testScriptThread, &TestScriptThread::finished, [=]() {testScriptThread->deleteLater(); });
+    connect(testScriptThread, &TestScriptThread::finished, [=]() {
+        if (testScriptThread == nullptr) {
+            return;
+        }
+        else {
+            testScriptThread->deleteLater();
+        }
+        });
 }
 
 void SubSSJJWidget::stopTestScript()
 {
-    int state = checkThreadRunningState(testScriptThread);
-    if (state == 1)
-    {
-        forceQuitThread(testScriptThread);
-    }
-    state = checkThreadRunningState(scriptRecordThread);
-    if (state == 1) {
-        forceQuitThread(scriptRecordThread);
-    }
+    terminateAllThreads();
 }

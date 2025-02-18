@@ -17,6 +17,7 @@ QString checkCurrentState(int waitTime)
 {
     QThread::msleep(waitTime);
 
+    // 排除焦点未在游戏窗口的情况
     cv::Point mousePicPos = findPicInFullScreen(":/pic/script/resources/pic/script/mouse.png");
     if (mousePicPos != cv::Point(-1, -1)) {
         mouseClick(mousePicPos.x, mousePicPos.y);
@@ -143,27 +144,27 @@ SSJJRunState restartSSJJ(QString ssjjInstallPath){
     QThread::msleep(1000);
     TerminateProcessByNameAndCheck("MicroClient.exe", 5);
     QThread::msleep(1000);
-    if (findProcessByName("MicroClient.exe") != DWORD() /*|| findProcessByName("SSJJ_BattleClient_Unity.exe") != DWORD()*/)
-    {
-        ssjjRunState.remindText = "<p>发生未知错误，进程销毁失败</p><br>";
-        ssjjRunState.errorType = "FatalError";
-        ssjjRunState.nextStep = "fatalError";
-        return ssjjRunState;
-    }
+    //if (findProcessByName("MicroClient.exe") != DWORD() /*|| findProcessByName("SSJJ_BattleClient_Unity.exe") != DWORD()*/)
+    //{
+    //    ssjjRunState.remindText = "<p>发生未知错误，进程销毁失败</p><br>";
+    //    ssjjRunState.errorType = "FatalError";
+    //    ssjjRunState.nextStep = "fatalError";
+    //    return ssjjRunState;
+    //}
 
-    for(i = 0; i < 30; i++){
-        if(findProcessByName("GameMon.des") == DWORD() && findProcessByName("GameGuard.des") == DWORD() && findProcessByName("GameMon64.des") == DWORD()){
-            break;
-        }
-        QThread::msleep(1000);
-    }
-    if (i == 29)
-    {
-        ssjjRunState.remindText = "<p>GameGuard 退出异常</p><br>";
-        ssjjRunState.errorType = "FatalError";
-        ssjjRunState.nextStep = "fatalError";
-        return ssjjRunState;
-    }
+    //for(i = 0; i < 30; i++){
+    //    if(findProcessByName("GameMon.des") == DWORD() && findProcessByName("GameGuard.des") == DWORD() && findProcessByName("GameMon64.des") == DWORD()){
+    //        break;
+    //    }
+    //    QThread::msleep(1000);
+    //}
+    //if (i == 29)
+    //{
+    //    ssjjRunState.remindText = "<p>GameGuard 退出异常</p><br>";
+    //    ssjjRunState.errorType = "FatalError";
+    //    ssjjRunState.nextStep = "fatalError";
+    //    return ssjjRunState;
+    //}
 
     runProgramAsAdmin(ssjjInstallPath, QStringList());
     QStringList picList;
@@ -331,18 +332,9 @@ SSJJRunState initiallizeGameScreen(SingleTask task){
         QThread::msleep(2000);
 
         // 读取脚本信息
-        QList<FileAttribute> scriptAttributes = readFileAttributes(task.script);
-        FileAttribute chapter;
-        FileAttribute level;
-        for (FileAttribute attribute : scriptAttributes)
-        {
-            if (attribute.name == "chapter") {
-                chapter = attribute;
-            }
-            if (attribute.name == "level") {
-                level = attribute;
-            }
-        }
+        QMap<QString, QString> scriptAttributes = readFileAttributesMap(task.script);
+        FileAttribute chapter("chapter", scriptAttributes["chapter"]);
+        FileAttribute level("level", scriptAttributes["level"]);
 
         // 转到指定关卡界面
         turnToPage(chapter, level);
@@ -410,7 +402,7 @@ SSJJRunState enterGame(SingleTask task, int loadingTimes){
             ssjjRunState.remindText = "<p><span style=\"color: red;\"><b>长时间停留在加载界面</b></span>，准备重启游戏</p><br>";
             return ssjjRunState;
         }
-        else if (task.taskName == "乱境鏖战" || task.taskName == "挑战王者")
+        else if (task.taskName == "乱境鏖战" || task.taskName == "挑战王者" || task.taskName == "其他模式")
         {
             findAndClickAndConfirm(":/pic/script/resources/pic/script/LD_begin.png", 3000);
             if (findAndClickAndCheck(":/pic/script/resources/pic/script/morningRemind.png", 3000) == false)
@@ -493,28 +485,27 @@ SSJJRunState enterGame(SingleTask task, int loadingTimes){
 
         // 主线关卡
         // 读取脚本信息
-        QList<FileAttribute> scriptAttributes = readFileAttributes(task.script);
-        FileAttribute chapter;
-        FileAttribute level;
-        for (FileAttribute attribute : scriptAttributes)
-        {
-            if (attribute.name == "chapter") {
-                chapter = attribute;
-            }
-            if (attribute.name == "level") {
-                level = attribute;
-            }
-        }
+        QMap<QString, QString> scriptAttributes = readFileAttributesMap(task.script);
+        FileAttribute chapter("chapter", scriptAttributes["chapter"]);
+        FileAttribute level("level", scriptAttributes["level"]);
 
         // 进入关卡
-        if (chapter.value == "工业区" || chapter.value == "城市突袭" || chapter.value == "玛雅迷踪" ||
-            chapter.value == "沙漠奇兵" || chapter.value == "地狱之城" || chapter.value == "海岛魅影")
+        if (chapter.value == "工业区" || chapter.value == "城市突袭" || chapter.value == "玛雅迷踪" || chapter.value == "沙漠奇兵" ||
+             chapter.value == "地狱之城" || chapter.value == "海岛魅影" || chapter.value == "勇者试炼" || chapter.value == "禁区")
         {
             enterZXGame();
-            QThread::msleep(loadingTimes * 1000 - 3000);
+            // 对于禁区等特殊关卡弹出选择战斗引擎的处理
+            if (chapter.value == "禁区" || chapter.value == "勇者试炼") {
+                QThread::msleep(1000);
+                point = findPicInFullScreen(":/pic/script/resources/pic/script/sl_jq_start.jpg");
+                if (point != cv::Point(-1, -1)) {
+                    mouseClick(point.x, point.y);
+                }
+            }
+            // 等待加载时间
+            QThread::msleep(loadingTimes * 1000);
             for (int i = 0; i < 20; i++) {
                 state = checkCurrentState(1000);
-                textToShowInScreen->setValue(QString("循环%1").arg(i));
                 textToShowInScreen->setValue(state);
                 if (state == "loadingPage") {
                 }
@@ -608,6 +599,39 @@ SSJJRunState runScript(SingleTask task, int speed)
                 }
             }
         }
+        else if (task.taskName == "其他模式") {
+            while (true) {
+                // 执行脚本
+                if (task.script != "未选择") {
+                    ScriptCompiler* scriptCompiler = new ScriptCompiler(task.script, speed);
+                    scriptCompiler->runScript();
+                    scriptCompiler->deleteLater();
+                }
+                QThread::msleep(3000);
+                DWORD handle = findProcessByName("SSJJ_BattleClient_Unity.exe");
+                if (handle == DWORD()) {
+                    keyRelease(0x51);
+                    ssjjRunState.errorType = "NoError";
+                    ssjjRunState.remindText = "";
+                    ssjjRunState.nextStep = "settlement";
+                    return ssjjRunState;
+                }
+                state = checkCurrentState();
+                if (state == "loadingPage" || state == "abnormalLoadingPage") {
+                    ssjjRunState.errorType = "Error";
+                    ssjjRunState.remindText = "";
+                    ssjjRunState.nextStep = "restartSSJJ";
+                    return ssjjRunState;
+                }
+                else if (state == "settlementPage" || state == "abnormalGamePage")
+                {
+                    ssjjRunState.errorType = "NoError";
+                    ssjjRunState.remindText = "";
+                    ssjjRunState.nextStep = "settlement";
+                    return ssjjRunState;
+                }
+            }
+        }
         else if (task.script == "未选择") {
             // 无脚本，如乱斗
             // 检测是否退出游戏
@@ -667,34 +691,14 @@ SSJJRunState settlement(SingleTask task)
 
     if (task.taskType == Task::LuanDou) {
         // 乱斗模式
-        if (task.taskName == "团队道具赛") {
+        if (task.taskName == "团队道具赛" || task.taskName == "乱境鏖战" || task.taskName == "挑战王者" || task.taskName == "其他模式") {
             QThread::msleep(5000);
             for (int i = 0; i < 3; i++) {
                 QThread::msleep(3000);
                 findAndClick(":/pic/script/resources/pic/script/use_energy.png", 3000);
             }
             findAndClick(":/pic/script/resources/pic/script/exit_LD.png", 3000);
-            if (findPicInLimitedTime(":/pic/script/resources/pic/script/LD_begin.png", 5000) != cv::Point(-1, -1)) {
-                ssjjRunState.remindText = "";
-                ssjjRunState.errorType = "Success";
-                ssjjRunState.nextStep = "enterGame";
-                return ssjjRunState;
-            }
-            else {
-                ssjjRunState.remindText = "";
-                ssjjRunState.errorType = "Error";
-                ssjjRunState.nextStep = "restartSSJJ";
-                return ssjjRunState;
-            }
-        }
-        else if (task.taskName == "乱境鏖战" || task.taskName == "挑战王者") {
-            QThread::msleep(5000);
-            for (int i = 0; i < 3; i++) {
-                QThread::msleep(3000);
-                findAndClick(":/pic/script/resources/pic/script/use_energy.png", 3000);
-            }
-            findAndClick(":/pic/script/resources/pic/script/exit_LD.png", 3000);
-            if (findPicInLimitedTime(":/pic/script/resources/pic/script/LD_begin.png", 5000) != cv::Point(-1, -1)) {
+            if (findPicInLimitedTime(":/pic/script/resources/pic/script/LD_begin.png", 10000) != cv::Point(-1, -1)) {
                 ssjjRunState.remindText = "";
                 ssjjRunState.errorType = "Success";
                 ssjjRunState.nextStep = "enterGame";
@@ -710,9 +714,10 @@ SSJJRunState settlement(SingleTask task)
     }
     else if (task.taskType == Task::ZhuXian) {
         // 主线关卡
-        findAndClick(":/pic/script/resources/pic/script/zx_settlementConfirm.png", 3000);
+        findAndClick(":/pic/script/resources/pic/script/confirm_rw.png", 3000);
         findAndClick(":/pic/script/resources/pic/script/zx_settlementConfirm.png", 3000);
         findAndClick(":/pic/script/resources/pic/script/zx_settlementExit.png", 3000);
+        QThread::msleep(5000);
         ssjjRunState.remindText = "";
         ssjjRunState.errorType = "Success";
         ssjjRunState.nextStep = "enterGame";
@@ -795,11 +800,79 @@ void turnToPage(FileAttribute chapter, FileAttribute level)
             }
         }
     }
+    else if (chapter.value == "勇者试炼") {
+        findAndClick(":/pic/script/resources/pic/script/sl.jpg", 3000);
+        cv::Point point = findPicInLimitedTime(":/pic/script/resources/pic/script/zx_RightPage.png", 3000);
+        if (level.value == "暴乱监狱" || level.value == "堕落废墟") {
+            for (int i = 0; i < 0; i++) {
+                mouseClick(point.x, point.y);
+                QThread::msleep(100);
+            }
+        }
+        else if (level.value == "边境要塞" || level.value == "失落祭坛") {
+            for (int i = 0; i < 1; i++) {
+                mouseClick(point.x, point.y);
+                QThread::msleep(100);
+            }
+        }
+        else if (level.value == "堕落深渊" || level.value == "绝望之谷") {
+            for (int i = 0; i < 2; i++) {
+                mouseClick(point.x, point.y);
+                QThread::msleep(100);
+            }
+        }
+        else if (level.value == "遗迹哨站" || level.value == "峡谷基地") {
+            for (int i = 0; i < 3; i++) {
+                mouseClick(point.x, point.y);
+                QThread::msleep(100);
+            }
+        }
+        else if (level.value == "天使计划" || level.value == "隧道恶魔") {
+            for (int i = 0; i < 4; i++) {
+                mouseClick(point.x, point.y);
+                QThread::msleep(100);
+            }
+        }
+        else if (level.value == "失控试验" || level.value == "地下惊魂") {
+            for (int i = 0; i < 5; i++) {
+                mouseClick(point.x, point.y);
+                QThread::msleep(100);
+            }
+        }
+    }
+    else if (chapter.value == "禁区") {
+        findAndClick(":/pic/script/resources/pic/script/jq.jpg", 3000);
+        cv::Point point = findPicInLimitedTime(":/pic/script/resources/pic/script/zx_RightPage.png", 3000);
+        if (level.value == "丛林遗迹" || level.value == "泰坦基地") {
+            for (int i = 0; i < 0; i++) {
+                mouseClick(point.x, point.y);
+                QThread::msleep(100);
+            }
+        }
+        else if (level.value == "泰坦试验场" || level.value == "阿布辛贝") {
+            for (int i = 0; i < 1; i++) {
+                mouseClick(point.x, point.y);
+                QThread::msleep(100);
+            }
+        }
+        else if (level.value == "寄生巢穴（一）" || level.value == "寄生巢穴（二）") {
+            for (int i = 0; i < 2; i++) {
+                mouseClick(point.x, point.y);
+                QThread::msleep(100);
+            }
+        }
+        else if (level.value == "绝命回收") {
+            for (int i = 0; i < 3; i++) {
+                mouseClick(point.x, point.y);
+                QThread::msleep(100);
+            }
+        }
+    }
 }
 
 bool clickLevel(FileAttribute level)
 {
-    cv::Point point;
+    cv::Point point = cv::Point(-1, -1);
     if (level.value == "工业一")
         point = findPicInLimitedTime(":/pic/script/resources/pic/script/gongye1.jpg", 3000);
     else if (level.value == "工业二")
@@ -936,6 +1009,45 @@ bool clickLevel(FileAttribute level)
         point = findPicInLimitedTime(":/pic/script/resources/pic/script/haidao12.jpg", 3000);
     else if (level.value == "F.N.R城堡废墟")
         point = findPicInLimitedTime(":/pic/script/resources/pic/script/haidao13.jpg", 3000);
+    else if (level.value == "暴乱监狱")
+        point = findPicInLimitedTime(":/pic/script/resources/pic/script/sl_bljy.jpg", 3000);
+    else if (level.value == "堕落废墟")
+        return true;
+    else if (level.value == "边境要塞")
+        point = findPicInLimitedTime(":/pic/script/resources/pic/script/sl_bjys.jpg", 3000);
+    else if (level.value == "失落祭坛")
+        return true;
+    else if (level.value == "堕落深渊")
+        point = findPicInLimitedTime(":/pic/script/resources/pic/script/sl_xlsg.jpg", 3000);
+    else if (level.value == "绝望之谷")
+        return true;
+    else if (level.value == "遗迹哨站")
+        point = findPicInLimitedTime(":/pic/script/resources/pic/script/sl_yjsz.jpg", 3000);
+    else if (level.value == "峡谷基地")
+        return true;
+    else if (level.value == "天使计划")
+        point = findPicInLimitedTime(":/pic/script/resources/pic/script/sl_tsjh.jpg", 3000);
+    else if (level.value == "隧道恶魔")
+        return true;
+    else if (level.value == "失控试验")
+        point = findPicInLimitedTime(":/pic/script/resources/pic/script/sl_sksy.jpg", 3000);
+    else if (level.value == "地下惊魂")
+        return true;
+    else if (level.value == "丛林遗迹")
+        point = findPicInLimitedTime(":/pic/script/resources/pic/script/sl_clyj.jpg", 3000);
+    else if (level.value == "泰坦基地")
+        return true;
+    else if (level.value == "泰坦试验场")
+        point = findPicInLimitedTime(":/pic/script/resources/pic/script/sl_ttsy.jpg", 3000);
+    else if (level.value == "阿布辛贝")
+        return true;
+    else if (level.value == "寄生巢穴（一）")
+        point = findPicInLimitedTime(":/pic/script/resources/pic/script/sl_jscx.jpg", 3000);
+    else if (level.value == "寄生巢穴（二）")
+        return true;
+    else if (level.value == "绝命回收")
+        return true;
+        
     
     // 点击坐标
     if (point != cv::Point(-1, -1)) {
@@ -951,7 +1063,7 @@ bool clickLevel(FileAttribute level)
 void chooseDifficulty(QString difficulty)
 {
     if (checkCurrentState() != "startPage") {
-        QThread::msleep(3000);
+        QThread::msleep(1000);
     }
     if (difficulty == "挑战" || difficulty == "普通" || difficulty == "困难" || difficulty == "噩梦" || difficulty == "极速"
         || difficulty == "专家一" || difficulty == "专家二" || difficulty == "专家三" || difficulty == "专家四"
@@ -1003,8 +1115,8 @@ void chooseDifficulty(QString difficulty)
 void enterZXGame()
 {
     if (passWordMode == 1 || passWordMode == 2) {
-        findAndClick(":/pic/script/resources/pic/script/zx_passWordPushButton.png", 3000);
-        findAndClick(":/pic/script/resources/pic/script/zx_passWordLineEdit.png", 3000);
+        findAndClick(":/pic/script/resources/pic/script/zx_passWordPushButton.png", 6000);
+        findAndClick(":/pic/script/resources/pic/script/zx_passWordLineEdit.png", 6000);
         if (passWordMode == 1) {
             inputString(enterGamePassWord);
         }

@@ -68,11 +68,6 @@ QString turn_around(int angle, bool isInGame)
 	}
 	MoveMouse(x - 20 * angle, y);
 	QThread::msleep(100);
-	if (findPicInFullScreen(oldScreen) != cv::Point(-1, -1)) {
-		if (isInGame) {
-			turn_around(angle, false);
-		}
-	}
 	return QString();
 }
 
@@ -87,11 +82,6 @@ QString turn_up_down(int angle, bool isInGame)
 	}
 	MoveMouse(x, y - 20 * angle);
 	QThread::msleep(100);
-	if (findPicInFullScreen(oldScreen) != cv::Point(-1, -1)) {
-		if (isInGame) {
-			turn_up_down(angle, false);
-		}
-	}
 	return QString();
 }
 

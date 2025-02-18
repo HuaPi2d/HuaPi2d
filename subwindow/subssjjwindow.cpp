@@ -1,5 +1,4 @@
 ﻿#include "subssjjwindow.h"
-#include "ui_subssjjwindow.h"
 
 SubSSJJWindow::SubSSJJWindow(QWidget *parent)
     : QMdiSubWindow(parent)
@@ -97,17 +96,29 @@ void SubSSJJWindow::addMenuBarAction()
     createNewFileAction = new QAction(tr("新建"), fileMenu);
     createNewFileAction->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_N));
     editMenu->addAction(createNewFileAction);
-    connect(createNewFileAction, &QAction::triggered, this, &SubSSJJWindow::createNewFile);
+    connect(createNewFileAction, &QAction::triggered, subSSJJWidget, &SubSSJJWidget::createNewScpFile);
     // 打开文件
     openFileAction = new QAction(tr("打开"), fileMenu);
     openFileAction->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_O));
     editMenu->addAction(openFileAction);
-    connect(openFileAction, &QAction::triggered, this, &SubSSJJWindow::openFile);
+    connect(openFileAction, &QAction::triggered, subSSJJWidget, &SubSSJJWidget::openScpFile);
     // 保存文件
     saveFileAction = new QAction(tr("保存"), fileMenu);
     saveFileAction->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_S));
     editMenu->addAction(saveFileAction);
     connect(saveFileAction, &QAction::triggered, this, &SubSSJJWindow::saveFile);
+    // 导入脚本数据至本地数据库
+    importScriptalFilesAction = new QAction(tr("导入脚本数据"), scriptFilesMenu);
+    scriptFilesMenu->addAction(importScriptalFilesAction);
+    connect(importScriptalFilesAction, &QAction::triggered, this, &SubSSJJWindow::importScriptalFiles);
+    // 导入任务数据
+    importTaskListAction = new QAction(tr("导入任务数据"), taskListMenu);
+    taskListMenu->addAction(importTaskListAction);
+    connect(importTaskListAction, &QAction::triggered, subSSJJWidget, &SubSSJJWidget::importTaskList);
+    //导出任务数据
+    exportTaskListAction = new QAction(tr("导出任务数据"), taskListMenu);
+    taskListMenu->addAction(exportTaskListAction);
+    connect(exportTaskListAction, &QAction::triggered, subSSJJWidget, &SubSSJJWidget::exportTaskList);
     // 录制脚本
     recordScriptAction = new QAction(tr("录制脚本 F9"), scriptTestMenu);
     connect(F9, &QHotkey::activated, recordScriptAction, &QAction::trigger);
@@ -156,18 +167,6 @@ void SubSSJJWindow::addMenuBarAction()
     editorSettingsAction = new QAction(tr("外观"), editorSettingsMenu);
     editorSettingsMenu->addAction(editorSettingsAction);
     connect(editorSettingsAction, &QAction::triggered, subSSJJWidget, &SubSSJJWidget::showEditorSettingsDialog);
-    // 导入脚本数据至本地数据库
-    importScriptalFilesAction = new QAction(tr("导入脚本数据"), scriptFilesMenu);
-    scriptFilesMenu->addAction(importScriptalFilesAction);
-    connect(importScriptalFilesAction, &QAction::triggered, this, &SubSSJJWindow::importScriptalFiles);
-    // 导入任务数据
-    importTaskListAction = new QAction(tr("导入任务数据"), taskListMenu);
-    taskListMenu->addAction(importTaskListAction);
-    connect(importTaskListAction, &QAction::triggered, subSSJJWidget, &SubSSJJWidget::importTaskList);
-    //导出任务数据
-    exportTaskListAction = new QAction(tr("导出任务数据"), taskListMenu);
-    taskListMenu->addAction(exportTaskListAction);
-    connect(exportTaskListAction, &QAction::triggered, subSSJJWidget, &SubSSJJWidget::exportTaskList);
     // 设置房间密码模式
     passWordModeAction = new QAction(tr("脚本房间密码设置"), autoScriptMenu);
     autoScriptMenu->addAction(passWordModeAction);
@@ -180,6 +179,8 @@ void SubSSJJWindow::addMenuBarAction()
 
 
     fileMenu->addMenu(editMenu);
+    fileMenu->addMenu(scriptFilesMenu);
+    fileMenu->addMenu(taskListMenu);
 
     settingMenu->addMenu(editorSettingsMenu);
     settingMenu->addMenu(autoScriptMenu);
@@ -187,35 +188,6 @@ void SubSSJJWindow::addMenuBarAction()
     runMenu->addMenu(scriptTestMenu);
     runMenu->addMenu(bonusMenu);
     runMenu->addMenu(runAutoScriptMenu);
-
-    autoScriptMenu->addMenu(scriptFilesMenu);
-    autoScriptMenu->addMenu(taskListMenu);
-}
-
-
-// 新建文件
-void SubSSJJWindow::createNewFile()
-{
-    QList<FileType> fileTypes;
-    fileTypes << SCP;
-    // 弹出文本输入框
-    CreateNewFileDialog* createNewFileDialog = new CreateNewFileDialog(this, fileTypes, "scriptal");
-    createNewFileDialog->exec();
-    if (createNewFileDialog->result() == QDialog::Accepted) {
-        subSSJJWidget->creatNewScriptEditorTab(createNewFileDialog->getFileName(), 
-            createNewFileDialog->getSavePath(), createNewFileDialog->getFileAttribute());
-    }
-}
-
-void SubSSJJWindow::openFile()
-{
-    // 弹出文件选择框
-    QString fileName = QFileDialog::getOpenFileName(this, tr("打开文件"), "", tr("空的脚本 (*.scp);; 乱斗脚本 (*.lscp);; 主线脚本 (*.zscp)"));
-    if (!fileName.isEmpty()) {
-        // 拆分为路径和文件名
-        QFileInfo fileInfo(fileName);
-        subSSJJWidget->creatNewScriptEditorTab(fileInfo.fileName(), fileInfo.path(), readFileAttributes(fileInfo.absoluteFilePath()));
-    }
 }
 
 void SubSSJJWindow::saveFile()
@@ -231,6 +203,8 @@ void SubSSJJWindow::updateMenuBar(QWidget *currentWidget)
     disableMenuAndActions(runAutoScriptMenu);
     disableMenuAndActions(bonusMenu);
     disableMenuAndActions(editorSettingsMenu);
+    disableMenuAndActions(scriptFilesMenu);
+    disableMenuAndActions(taskListMenu);
     if (currentWidget == subSSJJWidget->ui->writeScriptWidget)
     {
         enableMenuAndActions(editMenu);
@@ -241,6 +215,9 @@ void SubSSJJWindow::updateMenuBar(QWidget *currentWidget)
     {
         enableMenuAndActions(autoScriptMenu);
         enableMenuAndActions(runAutoScriptMenu);
+        enableMenuAndActions(taskListMenu);
+        enableMenuAndActions(scriptFilesMenu);
+
     }
     else if (currentWidget == subSSJJWidget->ui->bonusWidget)
     {

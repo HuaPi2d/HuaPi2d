@@ -185,9 +185,11 @@ void SSJJMainThread::receiveTask(SingleTask m_task, QString m_ssjjInstallPath, i
 
 void SSJJMainThread::stopThread()
 {
-    if (currentThread != nullptr) {
-        currentThread->quit();
-        currentThread->terminate();
+    if (checkThreadRunningState(currentThread) == 1) {
+        forceQuitThread(currentThread);
+    }
+    else if (checkThreadRunningState(currentThread) == 0) {
+        currentThread->deleteLater();
     }
     nextStep = "stopThread";
 }

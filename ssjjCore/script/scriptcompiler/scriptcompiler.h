@@ -32,6 +32,8 @@ public:
 	void removeComment();
 	// 提取函数内容
 	void extractFunction();
+	// 获取加载时间
+	void setLoadTime(int time);
 
 public: signals:
 	void sendRunInfo(QString info);
@@ -43,9 +45,10 @@ private:
 	QString m_scriptFilePath;
 	int m_userMoveSpeed;
 	int m_scriptMoveSpeed;
+	int m_loadTime;
 	QString m_fileContent;
 	QString m_code;
 	QFileInfo m_fileInfo;
-	QList<FileAttribute> m_fileAttributes;
+	QMap<QString, QString> m_fileAttributesMap;
 	struct SingleTask m_task;
 };

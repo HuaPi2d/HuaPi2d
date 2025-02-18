@@ -12,7 +12,6 @@
 
 #include "QHotkey/qhotkey.h"
 #include "subwidgets/subssjjwidget.h"
-#include "subwidgets/Dialog/createnewfiledialog.h"
 #include "subwidgets/Dialog/ssjj/passwordmodedialog.h"
 
 class SubSSJJWindow : public QMdiSubWindow
@@ -41,10 +40,6 @@ private:
     SubSSJJWidget* subSSJJWidget;
 
     void addMenuBarAction();
-    // 新建文件
-    void createNewFile();
-    // 打开文件
-    void openFile();
     // 保存文件
     void saveFile();
     // 菜单栏的更新
@@ -70,6 +65,11 @@ private:
     QAction* createNewFileAction;
     QAction* openFileAction;
     QAction* saveFileAction;
+    QMenu* scriptFilesMenu;
+    QAction* importScriptalFilesAction;
+    QMenu* taskListMenu;
+    QAction* importTaskListAction;
+    QAction* exportTaskListAction;
 
     QMenu* runMenu;
     QMenu* scriptTestMenu;
@@ -90,11 +90,7 @@ private:
     QAction* editorSettingsAction;
     QMenu* autoScriptMenu;
     QAction* passWordModeAction;
-    QMenu* scriptFilesMenu;
-    QAction* importScriptalFilesAction;
-    QMenu* taskListMenu;
-    QAction* importTaskListAction;
-    QAction* exportTaskListAction;
+    
 
 private:
     void disableMenuAndActions(QMenu* menu);

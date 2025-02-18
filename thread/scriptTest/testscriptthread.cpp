@@ -1,31 +1,21 @@
 ﻿#include "testscriptthread.h"
 
-TestScriptThread::TestScriptThread(QFileInfo scriptFileInfo, QObject* parent)
+TestScriptThread::TestScriptThread(QFileInfo scriptFileInfo, int loadingTime, QObject* parent)
 	: QThread(parent)
 {
 	m_fileInfo = scriptFileInfo;
+	m_loadingTime = loadingTime;
 	if (m_fileInfo.suffix() == "zscp") {
-		m_fileAttributes = readFileAttributes(m_fileInfo.absoluteFilePath());
-		for (FileAttribute fileAttribute : m_fileAttributes)
-		{
-			if (fileAttribute.name == "speed")
-			{
-				if (fileAttribute.value != "")
-				{
-					m_speed = fileAttribute.value.toInt();
-				}
-				else {
-					// 弹出警告，提示输入速度
-					emit sendWarningMessage("提示", "请在右侧属性栏设置脚本录制速度！");
-					return;
-				}
-			}
-		}
+		m_fileAttributesMap = readFileAttributesMap(m_fileInfo.absoluteFilePath());
+		m_speed = m_fileAttributesMap["speed"].toInt();
 	}
 	else if (m_fileInfo.suffix() == "scp") {
 		m_speed = -1;
 	}
 	m_compiler = new ScriptCompiler(m_fileInfo.absoluteFilePath(), m_speed);
+	if (m_fileInfo.suffix() == "zscp") {
+		m_compiler->setLoadTime(m_loadingTime);
+	}
 	connect(m_compiler, &ScriptCompiler::sendRunInfo, this, &TestScriptThread::sendRunInfo);
 }
 

@@ -11,6 +11,8 @@
 #include <propsys.h> // IPropertyStore, PropVariant
 #include <propkey.h> // Property keys (e.g., PKEY_Title)
 #include <shlobj.h>
+#include <QMap>
+#include <QRegularExpression>
 
 
 // 文件属性结构体
@@ -21,16 +23,20 @@ struct FileAttribute {
 
 
 // 读取文件属性(Qt接口)
-QList<FileAttribute> readFileAttributes(const QString& fullFilePath);
+//QList<FileAttribute> readFileAttributes(const QString& fullFilePath);
 
-QList<FileAttribute> readFileAttributes(const QString& filePath, const QString& fullFileName);
+//QList<FileAttribute> readFileAttributes(const QString& filePath, const QString& fullFileName);
 
-QList<FileAttribute> readFileAttributes(const QFile &file);
+//QList<FileAttribute> readFileAttributes(const QFile &file);
+
+QMap<QString, QString> readFileAttributesMap(const QString& fullFilePath);
 
 QList<FileAttribute> readZSCPFileAttributes(const std::wstring fullFilePath);
 
 // 为文件写入属性(Qt接口)
 void writeFileAttributes(const QString& fullFilePath, const QList<FileAttribute>& attributes);
+
+void writeFileAttributes(const QString& fullFilePath, const QMap<QString, QString>& attributes);
 
 // 检查扩展属性是否存在
 bool checkExtAttribute(const wchar_t* fullFilePath, const wchar_t* attributeName);

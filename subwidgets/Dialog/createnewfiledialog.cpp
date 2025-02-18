@@ -13,39 +13,16 @@ CreateNewFileDialog::CreateNewFileDialog(QWidget* parent, QList<FileType> fileTy
 {
 	ui->setupUi(this);
 
+	// 更新语言
+	connect(Language, &GlobalVariableQString::valueChanged, this, [=]() {
+		ui->retranslateUi(this);
+		});
+	reloadLanguage(Language->value());
+
 	/* 窗口设置 */
 	// 固定大小
 	ui->zxWidget->hide();
-	this->resize(400, 210);
-
-	// 加载文件类型列表至 combox
-	for (auto fileType : fileTypes) {
-		ui->fileTypeComboBox->addItem(fileType.description);
-	}
-
-	// 默认选择第一个文件类型
-	ui->fileTypeComboBox->setCurrentIndex(0);
-	selectedFileType = fileTypes[0];
-
-	// 子文件类型列表
-	QList<FileType> childFileTypes = selectedFileType.childTypes;
-
-	// 加载子文件类型列表至 combox
-	for (auto fileType : childFileTypes) {
-		ui->childFileTypesComboBox->addItem(fileType.description);
-	}
-
-	// 默认选择第一个子文件类型
-	ui->childFileTypesComboBox->setCurrentIndex(0);
-	selectedChildFileType = childFileTypes[0];
-	ui->fileTypeSuffix->setText(selectedChildFileType.suffix);
-
-	// 保存路径
-	// 将相对路径转换为绝对路径
-	QDir defaultSaveDir(defaultSavePath);
-	defaultSavePath = defaultSaveDir.absolutePath();
-	parentDir = defaultSavePath;
-	ui->savePathLineEdit->setText(parentDir);
+	this->resize(600, 210);
 
 	// 更新
 	QList<ZXChapter> zxChapters = ZXGameData::getChapters();
@@ -53,7 +30,6 @@ CreateNewFileDialog::CreateNewFileDialog(QWidget* parent, QList<FileType> fileTy
 	for (auto chapter : zxChapters) {
 		ui->zxChaptersComboBox->addItem(chapter.name);
 	}
-	ui->zxChaptersComboBox->setCurrentIndex(0);
 	connect(ui->zxChaptersComboBox, &QComboBox::currentTextChanged, this, [=](QString text) {
 		for (ZXChapter chapter : zxChapters) {
 			if (chapter.name == text) {
@@ -67,6 +43,9 @@ CreateNewFileDialog::CreateNewFileDialog(QWidget* parent, QList<FileType> fileTy
 		}
 		});
 	connect(ui->zxLevelsComboBox, &QComboBox::currentTextChanged, this, [=](QString text) {
+		if (selectedChildFileType.suffix == ".zscp") {
+			ui->fileNameLineEdit->setText(text);
+		}
 		for (ZXLevel level : zxLevels) {
 			if (level.name == text) {
 				zxLevel = level;
@@ -78,31 +57,56 @@ CreateNewFileDialog::CreateNewFileDialog(QWidget* parent, QList<FileType> fileTy
 			ui->zxDiffcultiesComboBox->addItem(modes.name);
 		}
 		});
-	ui->zxLevelsComboBox->setCurrentIndex(0);
-	// 信号与槽连接
-	connect(ui->fileTypeComboBox, &QComboBox::currentIndexChanged, this, [=](int index) {
-		FileType selectedFileType = fileTypes[index];
-		ui->childFileTypesComboBox->clear();
-		for (auto fileType : selectedFileType.childTypes) {
-			ui->childFileTypesComboBox->addItem(fileType.description);
-		}
-		});
-	connect(ui->childFileTypesComboBox, &QComboBox::currentTextChanged, this, [=](QString text) {
-		int index = ui->childFileTypesComboBox->findText(text);
+	emit ui->zxChaptersComboBox->currentTextChanged(ui->zxChaptersComboBox->currentText());
+
+	// 保存路径
+	// 将相对路径转换为绝对路径
+	QDir defaultSaveDir(defaultSavePath);
+	defaultSavePath = defaultSaveDir.absolutePath();
+	parentDir = defaultSavePath;
+	ui->savePathLineEdit->setText(parentDir);
+	
+	// 子文件类型
+	connect(ui->childFileTypesComboBox, &QComboBox::currentIndexChanged, this, [=](int index) {
+		if(index == -1)
+			return;
 		selectedChildFileType = childFileTypes[index];
-		ui->fileTypeSuffix->setText(selectedChildFileType.suffix);
+		ui->fileTypeSuffix->setText(selectedChildFileType.description);
 		if (selectedChildFileType.suffix == ".zscp") {
 			ui->zxWidget->show();
 			ui->savePathLineEdit->setText(parentDir + "/zx");
 		}
 		else if (selectedChildFileType.suffix == ".lscp") {
+			ui->zxWidget->hide();
 			ui->savePathLineEdit->setText(parentDir + "/ld");
+			this->resize(600, 210);
 		}
 		else {
 			ui->zxWidget->hide();
-			this->resize(400, 210);
+			ui->savePathLineEdit->setText(parentDir);
+			this->resize(600, 210);
 		}
 		});
+
+	// 顶级文件类型
+	for (auto fileType : fileTypes) {
+		ui->fileTypeComboBox->addItem(fileType.description);
+	}
+	connect(ui->fileTypeComboBox, &QComboBox::currentIndexChanged, this, [=](int index) {
+		if(index == -1)
+			return;
+		selectedFileType = fileTypes[index];
+		childFileTypes = selectedFileType.childTypes;
+		ui->childFileTypesComboBox->clear();
+		// 加载子文件类型列表至 combox
+		for (auto fileType : childFileTypes) {
+			ui->childFileTypesComboBox->addItem(fileType.description);
+		}
+		emit ui->childFileTypesComboBox->currentIndexChanged(0);
+		});
+
+	emit ui->fileTypeComboBox->currentIndexChanged(0);
+
 	connect(ui->cancelPushButton, &QPushButton::clicked, this, &QDialog::reject);
 	connect(ui->confirmPushButton, &QPushButton::clicked, this, [=]() {
 		// 检查文件名是否为空
@@ -118,12 +122,6 @@ CreateNewFileDialog::CreateNewFileDialog(QWidget* parent, QList<FileType> fileTy
 		}
 		accept();
 		});
-
-	// 更新语言
-	connect(Language, &GlobalVariableQString::valueChanged, this, [=]() {
-		ui->retranslateUi(this);
-		});
-	reloadLanguage(Language->value());
 }
 
 CreateNewFileDialog::~CreateNewFileDialog()
@@ -162,4 +160,17 @@ QList<FileAttribute> CreateNewFileDialog::getFileAttribute()
 	}
 
 	return QList<FileAttribute>();
+}
+
+QMap<QString, QString> CreateNewFileDialog::getFileAttributeMap()
+{
+	if (selectedChildFileType.suffix == ".zscp") {
+		QMap<QString, QString> attributeMap;
+		attributeMap["chapter"] = ui->zxChaptersComboBox->currentText();
+		attributeMap["level"] = ui->zxLevelsComboBox->currentText();
+		attributeMap["difficulty"] = ui->zxDiffcultiesComboBox->currentText();
+		attributeMap["speed"] = "";
+		return attributeMap;
+	}
+	return QMap<QString, QString>();
 }

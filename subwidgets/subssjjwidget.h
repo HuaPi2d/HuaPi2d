@@ -20,6 +20,7 @@
 #include <QComboBox>
 #include <QScrollBar>
 #include <qlayout.h>
+#include <QWeakPointer>
 
 #include "thread/script/ssjjmainthread.h"
 #include "thread/weapons/weaponbonusthread.h"
@@ -41,6 +42,10 @@
 #include "thread/scriptRecord/scriptrecordthread.h"
 #include "ssjjCore/script/recordToScp/keyboradrecordconvert.h"
 #include "universal/file/excel.h"
+#include "customize/customizedTableWidget/customizedtablewidget.h"
+#include "Dialog/ssjj/modifytaskdialog.h"
+#include "subwidgets/Dialog/createnewfiledialog.h"
+#include "Dialog/ssjj/modifyfileattributesdialog.h"
 
 
 namespace Ui {
@@ -65,7 +70,9 @@ public:signals:
 
 public slots:
     // 创建新的文件编辑标签页
-    void creatNewScriptEditorTab(QString fileName, QString filePath, QList<FileAttribute> fileAttributes);
+    void creatNewScriptEditorTab(QString fileName, QString filePath, QMap<QString, QString> fileAttributes, bool newFile = false);
+    // 修改文件编辑标签页
+    void modifyCurrentScriptEditorTab(QString fileName);
     void readFilesIntoSSJJDatabase(QDir dir);
     void saveFile();
     void testCurrentScript();
@@ -82,6 +89,8 @@ public slots:
     // 任务列表操作
     void importTaskList();
     void exportTaskList();
+    void createNewScpFile();
+    void openScpFile();
 
 protected:
     void closeEvent(QCloseEvent *event) override;
@@ -94,10 +103,10 @@ private:
     int runningState;
     SingleTask currentTask;
     QPointer<SSJJMainThread> ssjjMainThread;
-    QsciScintilla* scriptEditor;
     QPointer<WeaponBonusThread> weaponBonusThread;
     QPointer<TestScriptThread> testScriptThread;
     QPointer<ScriptRecordThread> scriptRecordThread;
+    QsciScintilla* scriptEditor;
     QString resolutionPath;
     QList<ScpLanguageEditor *> scpLanguageEditors;
     ZXChapter currentChoosedZXChapter;                    // 当前页面选中的章节
@@ -154,7 +163,6 @@ private slots:
     void on_endPushButton_clicked();
     // 录制脚本按钮按下
     void on_scriptRecordPushButton_clicked();
-    void forceQuitSSJJThread();
     void receiveDisplayText(QString text);
     void showTextOnScreen(QString text, QPoint pos, int time, QString labelStyleSheet);
     void on_singleBonusPushButton_clicked();
@@ -165,6 +173,8 @@ private slots:
     void sendNextTask(SSJJRunState res);
     void receiveFatalError();
     void clearRow(QTableWidgetItem *item);
+    // 修改任务内容
+    void modifyTask(QTableWidgetItem* item);
     void createNodeEditor();
     void updateCurrentWeaponList();
     void getBounsWeaponList();
@@ -176,6 +186,7 @@ private slots:
     void updateZXLevelChooseComboBox();
     void updateZXDiffcultyChooseComboBox();
     void updateZXScriptPathComboBox();
+    void updateLDScriptPathComboBox();
     void currentTabChanged(int index);
     void getCurrentScriptEditor();
     void receiveWarningMessage(QString title, QString message);
@@ -186,6 +197,10 @@ private slots:
     // 注册方向键
     void regiseterMouseHotkey();
     void unregiseterMouseHotkey();
+    // 更改文件的属性值
+    void modifyFileAttributes();
+    // 终止一切当前运行的线程
+    void terminateAllThreads();
 };
 
 #endif // SUBSSJJWIDGET_H

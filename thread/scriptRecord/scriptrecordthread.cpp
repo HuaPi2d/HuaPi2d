@@ -36,7 +36,7 @@ void ScriptRecordThread::run()
 		textToShowInScreen->valueChanged("正在等待切换至游戏界面...");
 		QThread::msleep(3000);
 	}
-	SSJJRunState res = enterGame(m_task, 20);
+	SSJJRunState res = enterGame(m_task, m_loadingTime);
 	if (res.errorType != "NoError")
 	{
 		showRemindText("进入游戏失败", QPoint(centerPoint.x() - 150, centerPoint.y() - 150), 3000,

@@ -54,6 +54,8 @@ void exportToXlsx(QTableWidget* tableWidget)
 void exportToXlsx(QTableWidget* tableWidget, QString fileName)
 {
     check_file_path(fileName);
+    if(tableWidget->rowCount() == 0 || tableWidget->columnCount() == 0)
+        return;
 
     QXlsx::Document xlsx;
 

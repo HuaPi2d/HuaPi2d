@@ -23,6 +23,35 @@ QList<FileAttribute> readFileAttributes(const QFile& file) {
     return readFileAttributes(file.fileName());
 }
 
+QMap<QString, QString> readFileAttributesMap(const QString& fullFilePath)
+{
+    QFile file(fullFilePath);
+    if (!file.open(QIODevice::ReadOnly))
+    {
+        std::wcerr << L"Failed to open file for reading: " << fullFilePath.toStdWString() << L"\n";
+    }
+
+    // 读取文件内容
+    QTextStream in(&file);
+    in.setEncoding(QStringConverter::Utf8);
+    QString text = in.readAll();
+    
+    // 解析属性
+    QMap<QString, QString> fileAttributeMap;
+    QRegularExpression re("(?<attribute>@{(?<name>.*?)=(?<value>.*?)})");
+    QRegularExpressionMatchIterator attributesIterator = re.globalMatch(text);
+    while (attributesIterator.hasNext()) {
+        QRegularExpressionMatch match = attributesIterator.next();
+        QString name = match.captured("name");
+        QString value = match.captured("value");
+        fileAttributeMap[name] = value;
+    }
+
+    file.close();
+    ;
+    return fileAttributeMap;
+}
+
 QList<FileAttribute> readZSCPFileAttributes(const std::wstring fullFilePath)
 {
     FileAttribute zscp_chapter = {
@@ -58,6 +87,25 @@ void writeFileAttributes(const QString& fullFilePath, const QList<FileAttribute>
     {
         writeExtAttribute(fullFilePathStd.c_str(), attribute.name.toStdWString().c_str(), attribute.value.toStdWString().c_str());
     }
+}
+
+void writeFileAttributes(const QString& fullFilePath, const QMap<QString, QString>& attributes)
+{
+    QFile file(fullFilePath);
+    // 追加写入
+    if (!file.open(QIODevice::Append))
+    {
+        std::wcerr << L"Failed to open file for writing: " << fullFilePath.toStdWString() << L"\n";
+        return;
+    }
+    // 编码为 UTF-8
+    QTextStream stream(&file);
+    stream.setEncoding(QStringConverter::Utf8);
+    for (auto it = attributes.begin(); it != attributes.end(); ++it) {
+        stream << "@{" << it.key() << "=" << it.value() << "}";
+    }
+    
+    file.close();
 }
 
 // 检查扩展属性是否存在

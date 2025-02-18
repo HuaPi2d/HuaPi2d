@@ -22,12 +22,17 @@ public:
 	// 根据关卡信息获取脚本文件
 	QStringList getFilesFromDatabase(QString level);
 	QStringList getAllFilesPath(QString type);
-
+	// 删除数据库中的文件
+	void deleteFileFromDatabase(QString filePath);
+	void updateZXFileInDatabase(QString oldFilePath, QString newfilePath);
 
 private:
 	QString zx_tableName;
 	QMap<QString, QString> zx_columns;
 	QString zx_defaultFileSavePath;
+	QString ld_tableName;
+	QMap<QString, QString> ld_columns;
+	QString ld_defaultFileSavePath;
 
 	void deleteEmptyFilesFromDatabase();
 };

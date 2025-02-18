@@ -10,7 +10,7 @@ class TestScriptThread  : public QThread
 	Q_OBJECT
 
 public:
-	TestScriptThread(QFileInfo scriptFileInfo, QObject *parent);
+	TestScriptThread(QFileInfo scriptFileInfo, int loadingTime = 20, QObject *parent=nullptr);
 	~TestScriptThread();
 
 public: signals:
@@ -19,9 +19,10 @@ public: signals:
 
 private:
 	QFileInfo m_fileInfo;
-	QList<FileAttribute> m_fileAttributes;
+	QMap<QString, QString> m_fileAttributesMap;
 	ScriptCompiler* m_compiler;
 	int m_speed;
+	int m_loadingTime;
 
 protected:
 	void run() override;

@@ -131,9 +131,20 @@ void LanguageEditor::readFromFile()
 	if (m_file->open(QIODevice::ReadOnly | QIODevice::Text))
 	{
 		QTextStream in(m_file);
-		this->setText(in.readAll());
+		QString text = in.readAll();
+		QRegularExpression re("(?<attribute>@{(?<name>.*?)=(?<value>.*?)})");
+		QRegularExpressionMatchIterator attributesIterator = re.globalMatch(text);
+		while (attributesIterator.hasNext()) {
+			QRegularExpressionMatch match = attributesIterator.next();
+			QString attribute = match.captured("attribute");
+			text.replace(attribute, "");
+		}
+		this->setText(text);
 		m_file->close();
 	}
+
+	// 读取文件属性
+	fileAttributeMap = readFileAttributesMap(m_fileInfo.absoluteFilePath());
 }
 
 void LanguageEditor::createFile()
@@ -169,17 +180,12 @@ void LanguageEditor::saveFile()
 	}
 
 	// 写入文件属性
-	writeFileAttributes(m_fileInfo.absoluteFilePath(), fileAttributes);
+	writeFileAttributes(m_fileInfo.absoluteFilePath(), fileAttributeMap);
 }
 
-void LanguageEditor::receiveFileAttributes(QList<FileAttribute> attributes)
+QMap<QString, QString> LanguageEditor::getFileAttributesMap()
 {
-	fileAttributes = attributes;
-}
-
-QList<FileAttribute> LanguageEditor::getFileAttributes()
-{
-	return fileAttributes;
+	return fileAttributeMap;
 }
 
 void LanguageEditor::resetStyles()
@@ -201,7 +207,7 @@ int LanguageEditor::getCurrentPos()
 	return static_cast<int>(SendScintilla(SCI_GETCURRENTPOS));
 }
 
-void LanguageEditor::receiveFileInfo(const QString& fileName, const QString& savePath, QList<FileAttribute> attributes)
+void LanguageEditor::receiveFileInfo(const QString& fileName, const QString& savePath, const QMap<QString, QString>& attributes)
 {
 	m_fileName = fileName;
 	m_savePath = savePath;
@@ -218,7 +224,7 @@ void LanguageEditor::receiveFileInfo(const QString& fileName, const QString& sav
 		createFile();
 	}
 
-	fileAttributes = attributes;
+	fileAttributeMap = attributes;
 }
 
 void LanguageEditor::receiveFileInfo(const QString& fileName, const QString& savePath)
@@ -247,6 +253,25 @@ void LanguageEditor::receiveFileInfo(const QString& resourcesFilePath)
 	readFromFile();
 }
 
+void LanguageEditor::setFileAttributes(QList<FileAttribute> attributes)
+{
+	for (FileAttribute attribute : attributes) {
+		fileAttributeMap[attribute.name] = attribute.value;
+	}
+}
+
+void LanguageEditor::setFileAttributesMap(const QMap<QString, QString>& attributes)
+{
+	for (auto it = attributes.begin(); it != attributes.end(); ++it) {
+		fileAttributeMap[it.key()] = it.value();
+	}
+}
+
+void LanguageEditor::setFileAttribute(const QString& key, const QString& value)
+{
+	fileAttributeMap[key] = value;
+}
+
 QString LanguageEditor::getFileName() const
 {
 	return m_fileName;
@@ -260,6 +285,33 @@ QString LanguageEditor::getSavePath() const
 QFileInfo LanguageEditor::getFileInfo() const
 {
 	return QFileInfo(m_savePath + "/" + m_fileName);
+}
+
+bool LanguageEditor::renameFile(const QString& newFileName)
+{
+	// 保存文件
+	saveFile();
+
+	// 重命名文件
+	if (m_fileInfo.baseName() == newFileName) {
+		return true;
+	}
+	bool ifSucceed = QFile::rename(m_fileInfo.absoluteFilePath(), m_fileInfo.absolutePath() + "/" + newFileName + "." + m_fileInfo.suffix());
+	if (ifSucceed) {
+		// 更新文件名
+		m_fileName = newFileName + "." + m_fileInfo.suffix();
+
+		// 重新打开文件
+		m_file = new QFile(m_savePath + "/" + m_fileName);
+		m_fileInfo = QFileInfo(m_savePath + "/" + m_fileName);
+		saveFile();
+		readFromFile();
+		return true;
+	}
+	else {
+		QMessageBox::warning(this, "重命名失败", "文件重命名失败，检查文件是否已存在");
+		return false;
+	}
 }
 
 

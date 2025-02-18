@@ -30,6 +30,8 @@ public:
 
     static const ZXChapter& getChapterByName(QString name);
 
+    static const QList<DifficultyMode>& getDifficultyByLevelName(QString name);
+
 private:
     static QList<ZXChapter> initializeChapters();
 
