@@ -36,7 +36,9 @@ MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
 {
-    ui->setupUi(this);
+    /* 构建界面 */
+    buildUIPanel();
+
     /* 加载主题 */
     loadThemes();
 
@@ -163,6 +165,9 @@ MainWindow::MainWindow(QWidget *parent)
 
     /* 读取用户配置 */
     loadSettings();
+
+    // 将文件导出到程序目录
+    exportFilesIntoApplicationDir();
 }
 
 MainWindow::~MainWindow()
@@ -242,9 +247,47 @@ void MainWindow::showAboutSoftWareDialog()
     
 }
 
+void MainWindow::exportFilesIntoApplicationDir()
+{
+    if (qApp->applicationDirPath() == QDir("D:/VS code/projects/HuaPi_so/x64/Release").absolutePath()) {
+        return;
+    }
+}
+
 void MainWindow::changeLanguage(QString language)
 {
     reloadLanguage(language);
+}
+
+void MainWindow::buildUIPanel()
+{
+    ui->setupUi(this);
+
+    this->setAttribute(Qt::WA_StaticContents, false);
+    // 加载背景图片
+    ui->centralwidget->setStyleSheet("#centralwidget{"
+        "background-image: url(:/pic/defaultPic/resources/pic/defaultPic/defaultBG.png);"
+        "}");
+
+
+    // 添加透明度属性
+    QGraphicsOpacityEffect *opacityEffect_main = new QGraphicsOpacityEffect(ui->mainWidget);
+    opacityEffect_main->setOpacity(0.9);
+    ui->mainWidget->setGraphicsEffect(opacityEffect_main);
+
+    QGraphicsOpacityEffect *opacityEffect_workArea = new QGraphicsOpacityEffect(ui->mutiWindowWidget);
+    opacityEffect_workArea->setOpacity(0.9);
+    ui->mutiWindowWidget->setGraphicsEffect(opacityEffect_workArea);
+
+    QTimer* refreshTimer = new QTimer(this);
+    connect(refreshTimer, &QTimer::timeout, this, [=]() {
+        emit this->repaint();
+        for (int i = 0; i < this->subWindowList->count(); i++)
+        {
+            this->subWindowList->at(i)->repaint();
+        }
+        });
+    refreshTimer->start(50);
 }
 
 // 保存配置

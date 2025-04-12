@@ -24,7 +24,8 @@ SSJJScriptalFilesDatabase::SSJJScriptalFilesDatabase(const QString& dbName, QObj
 	// 读取文件夹下的数据至数据库
 	zx_defaultFileSavePath = QDir::currentPath() + "/scriptal/zx";
 	ld_defaultFileSavePath = QDir::currentPath() + "/scriptal/ld";
-	deleteEmptyFilesFromDatabase();
+	deleteEmptyFilesFromDatabase(); 
+	updateDatabase();
 	readFilesIntoDatabase(QDir(zx_defaultFileSavePath));
 	readFilesIntoDatabase(QDir(ld_defaultFileSavePath));
 }
@@ -122,6 +123,32 @@ void SSJJScriptalFilesDatabase::updateZXFileInDatabase(QString oldFilePath, QStr
 {
 	deleteDataByProperty(zx_tableName, "fullfilepath", oldFilePath);
 	readFileIntoDatabase(QFileInfo(newfilePath));
+}
+
+void SSJJScriptalFilesDatabase::updateDatabase()
+{
+	QStringList zxFiles = getAllFilesPath("zx");
+	for (QString filePath : zxFiles) {
+		QFileInfo fileInfo(filePath);
+		if (fileInfo.suffix() == "zscp") {
+			QMap<QString, QString> attributes = readFileAttributesMap(filePath);
+			QMap<QString, QVariant> values;
+			values["chapter"] = attributes["chapter"];
+			values["level"] = attributes["level"];
+			values["difficulty"] = attributes["difficulty"];
+			values["fullfilepath"] = filePath;
+			updateData(zx_tableName, "fullfilepath", filePath, values);
+		}
+	}
+	QStringList ldFiles = getAllFilesPath("ld");
+	for (QString filePath : ldFiles) {
+		QFileInfo fileInfo(filePath);
+		if (fileInfo.suffix() == "lscp") {
+			QMap<QString, QVariant> values;
+			values["fullfilepath"] = filePath;
+			updateData(ld_tableName, "fullfilepath", filePath, values);
+		}
+	}
 }
 
 void SSJJScriptalFilesDatabase::deleteEmptyFilesFromDatabase()

@@ -26,6 +26,7 @@ public:
 	QVector<QMap<QString, QVariant>> queryData(const QString& tableName, const QString& column, const QVariant& value);
 	QVector<QVariant> extractColumn(const QVector<QMap<QString, QVariant>>& data, const QString& columnName);
 	bool deleteDataByProperty(const QString& tableName, const QString& columnName, const QVariant& value);
+	bool updateData(const QString& tableName, const QString& columnName, const QVariant& value, const QMap<QString, QVariant>& data);
 	QVector<QMap<QString, QVariant>> getAllData(const QString& tableName);
 
 private:

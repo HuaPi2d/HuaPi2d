@@ -1,11 +1,14 @@
 # 脚本录制采用的武器配置：
 # 裁决 + 伏虎 + 墨韵 + 天枢(1) + 万象(2) + 灰核
 
+t = 0
+throw_weapon = "4"
+
 # 录制开始
-sleep_ms(0)
-key_press("4")
+sleep_ms(t)
+key_press(throw_weapon)
 sleep_ms(2437)
-key_press("4")
+key_press(throw_weapon)
 sleep_ms(1532)
 key_press("5")
 sleep_ms(922)
@@ -143,4 +146,4 @@ key_press("E")
 sleep_ms(5719)
 # 录制结束
 
-@{chapter=工业区}@{difficulty=专家六}@{level=工业一}@{speed=375}
+@{chapter=工业区}@{difficulty=专家五}@{level=工业一}@{speed=375}

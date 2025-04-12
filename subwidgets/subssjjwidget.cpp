@@ -815,6 +815,9 @@ void SubSSJJWidget::on_addTaskPushButton_clicked()
         else if (ui->challenHeroRadioButton->isChecked() == true) {
             ui->taskTableWidget->setItem(currentRow - 1, 0, new QTableWidgetItem("挑战王者"));
         }
+        else if (ui->duoJinRadioButton->isChecked() == true) {
+            ui->taskTableWidget->setItem(currentRow - 1, 0, new QTableWidgetItem("夺金行动"));
+        }
         else if (ui->otherLDModesRadioButton->isChecked() == true)
         {
             ui->taskTableWidget->setItem(currentRow - 1, 0, new QTableWidgetItem("其他模式"));
@@ -1753,6 +1756,11 @@ void SubSSJJWidget::regiseterMouseHotkey()
         middle->setRegistered(true);
         ifCanControlMouse = true;
         ui->testKeyMouseCheckBox->setChecked(true);
+
+        if (checkThreadRunningState(scriptRecordThread) == 1) {
+            QThread::msleep(100);
+            key_press("1");
+        }
     }
 }
 

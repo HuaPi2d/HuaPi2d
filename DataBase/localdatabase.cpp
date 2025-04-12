@@ -133,6 +133,46 @@ bool LocalDatabase::deleteDataByProperty(const QString& tableName, const QString
     return true;
 }
 
+bool LocalDatabase::updateData(const QString& tableName, const QString& columnName, const QVariant& value, const QMap<QString, QVariant>& data)
+{
+    if (tableName.isEmpty() || columnName.isEmpty()) {
+        qWarning() << "Table name or column name cannot be empty.";
+        return false;
+    }
+
+    // Prepare the UPDATE SQL query
+    QString queryString = QString("UPDATE %1 SET ").arg(tableName);
+    QStringList setValues;
+    for (auto it = data.begin(); it != data.end(); ++it) {
+        setValues.append(QString("%1 = :%2").arg(it.key(), it.key()));
+    }
+    queryString += setValues.join(", ");
+    queryString += QString(" WHERE %1 = :value").arg(columnName);
+
+    // Bind query to database connection
+    QSqlQuery query(db);
+    if (!query.prepare(queryString)) {
+        qWarning() << "Failed to prepare SQL query:" << query.lastError().text();
+        return false;
+    }
+
+    // Bind the value for the condition
+    query.bindValue(":value", value);
+
+    // Bind the values for the SET clause
+    for (auto it = data.begin(); it != data.end(); ++it) {
+        query.bindValue(":" + it.key(), it.value());
+    }
+
+    // Execute the query
+    if (!query.exec()) {
+        qWarning() << "Failed to update data:" << query.lastError().text();
+        return false;
+    }
+
+    return true;
+}
+
 QVector<QMap<QString, QVariant>> LocalDatabase::getAllData(const QString& tableName)
 {
     QVector<QMap<QString, QVariant>> data;

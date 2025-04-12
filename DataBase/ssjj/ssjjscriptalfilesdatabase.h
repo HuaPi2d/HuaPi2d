@@ -25,6 +25,8 @@ public:
 	// 删除数据库中的文件
 	void deleteFileFromDatabase(QString filePath);
 	void updateZXFileInDatabase(QString oldFilePath, QString newfilePath);
+	// 更新数据库
+	void updateDatabase();
 
 private:
 	QString zx_tableName;

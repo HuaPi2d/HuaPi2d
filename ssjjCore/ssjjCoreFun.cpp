@@ -178,8 +178,8 @@ SSJJRunState restartSSJJ(QString ssjjInstallPath){
         return ssjjRunState;
     }
     else if(res.num == -1){
-        ssjjRunState.remindText = "<p>发生未知错误，请检查<span style=\"color: red;\"><b>网络连接</b></span></p><br>";
-        ssjjRunState.errorType = "Error";
+        ssjjRunState.remindText = "<p>多次进程销毁失败<span style=\"color: red;\"><b>已自动停止脚本</b></span></p><br>";
+        ssjjRunState.errorType = "FatalError";
         ssjjRunState.nextStep = "restartSSJJ";
         return ssjjRunState;
     }
@@ -478,7 +478,27 @@ SSJJRunState enterGame(SingleTask task, int loadingTimes){
             ssjjRunState.nextStep = "restartSSJJ";
             return ssjjRunState;
         }
+        else if (task.taskName == "夺金行动") {
+            findAndClickAndConfirm(":/pic/script/resources/pic/script/LD_begin.png", 3000);
+            if (findAndClickAndCheck(":/pic/script/resources/pic/script/morningRemind.png", 3000) == false) {
+                // 开启超背
+                findAndClick(":/pic/script/resources/pic/script/checkBox.png", 3000);
+                ssjjRunState.errorType = "Error";
+                ssjjRunState.remindText = "";
+                ssjjRunState.nextStep = "enterGame";
+                return ssjjRunState;
+            }
+            state = checkCurrentState(3000);
+            if (state == "startPage")
+            {
+                findAndClickAndConfirm(":/pic/script/resources/pic/script/LD_begin.png", 3000);
+                findAndClick(":/pic/script/resources/pic/script/morningRemind.png", 3000);
+            }
+            QThread::msleep(loadingTimes * 1000 - 3000);
+
+        }
     }
+
     if (task.taskType == Task::ZhuXian) {
         // 选择指定难度
         chooseDifficulty(task.difficulty);

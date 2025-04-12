@@ -46,6 +46,7 @@
 #include "Dialog/ssjj/modifytaskdialog.h"
 #include "subwidgets/Dialog/createnewfiledialog.h"
 #include "Dialog/ssjj/modifyfileattributesdialog.h"
+#include "ssjjCore/scriptApis/scplanfunction.h"
 
 
 namespace Ui {

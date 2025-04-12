@@ -1,0 +1,6 @@
+pos = findpic("D:/test.jpg")
+
+print(pos)
+
+left_click(pos)
+

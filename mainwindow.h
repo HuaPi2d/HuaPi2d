@@ -9,6 +9,9 @@
 #include <QMenu>
 #include <QtAdvancedStylesheet.h>
 #include <QmlStyleUrlInterceptor.h>
+#include <QGraphicsOpacityEffect>
+#include <qtimer.h>
+#include <QPalette>
 
 #include "otherwidgets/downloadlistwidget.h"
 #include "otherwidgets/singledownloadframe.h"
@@ -58,6 +61,7 @@ public:
     void addDownloadTask(SingleDownloadFrame *singleDownloadFrame);
     // 切换语言
     void changeLanguage(QString language);
+    void buildUIPanel();
 
 private:
     Ui::MainWindow *ui;
@@ -80,6 +84,8 @@ private slots:
     void developeModeChanged();
     void changeWindowTitle();
     void showAboutSoftWareDialog();
+    void exportFilesIntoApplicationDir();
+
 
 public: signals:
     void isAnyChildWindow();

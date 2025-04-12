@@ -21,7 +21,22 @@
    <string notr="true"/>
   </property>
   <widget class="QWidget" name="centralwidget">
+   <property name="styleSheet">
+    <string notr="true"/>
+   </property>
    <layout class="QVBoxLayout" name="verticalLayout">
+    <property name="leftMargin">
+     <number>0</number>
+    </property>
+    <property name="topMargin">
+     <number>0</number>
+    </property>
+    <property name="rightMargin">
+     <number>0</number>
+    </property>
+    <property name="bottomMargin">
+     <number>0</number>
+    </property>
     <item>
      <widget class="QWidget" name="mutiWindowWidget" native="true">
       <layout class="QHBoxLayout" name="horizontalLayout_2">
@@ -79,6 +94,9 @@ height:40px;
     </item>
     <item>
      <widget class="QWidget" name="mainWidget" native="true">
+      <property name="styleSheet">
+       <string notr="true"/>
+      </property>
       <layout class="QVBoxLayout" name="verticalLayout_2">
        <item>
         <widget class="QWidget" name="randomSentenceWidget" native="true">
@@ -105,7 +123,7 @@ height:40px;
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>694</width>
+               <width>712</width>
                <height>40</height>
               </rect>
              </property>

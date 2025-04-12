@@ -181,13 +181,13 @@ BYTE getVirtualKeyCode(QString key)
     if(key == "UP" || key == "up")return 0x26;
     if(key == "DOWN" || key == "down")return 0x28;
 
-    if(key == "SPACE" || key == "space")return 0x20;
-    if(key == "ENTER" || key == "enter")return 0x0D;
-    if(key == "ESC" || key == "esc")return 0x1B;
+    if(key == "SPACE" || key == "space" || key == "Space")return 0x20;
+    if(key == "ENTER" || key == "enter" || key == "Enter")return 0x0D;
+    if(key == "ESC" || key == "esc" || key == "Esc")return 0x1B;
 
-    if(key == "SHIFT" || key == "shift")return 0x10;
-    if(key == "CTRL" || key == "ctrl")return 0x11;
-    if(key == "ALT" || key == "alt")return 0x12;
+    if(key == "SHIFT" || key == "shift" || key == "Shift")return 0x10;
+    if(key == "CTRL" || key == "ctrl" || key == "Ctrl")return 0x11;
+    if(key == "ALT" || key == "alt" || key == "Alt")return 0x12;
 
     if(key == "F1")return 0x70;
     if(key == "F2")return 0x71;
@@ -202,10 +202,10 @@ BYTE getVirtualKeyCode(QString key)
     if(key == "F11")return 0x7A;
     if(key == "F12")return 0x7B;
 
-    if(key == "HOME" || key == "home")return 0x24;
-    if(key == "END" || key == "end")return 0x23;
-    if(key == "PAGEUP" || key == "pageup")return 0x21;
-    if(key == "PAGEDOWN" || key == "pagedown")return 0x22;
+    if(key == "HOME" || key == "home" || key == "Home")return 0x24;
+    if(key == "END" || key == "end" || key == "End")return 0x23;
+    if(key == "PAGEUP" || key == "pageup" || key == "Pageup")return 0x21;
+    if(key == "PAGEDOWN" || key == "pagedown" || key == "Pagedown")return 0x22;
 
     // 返回 * 的虚拟键码
     return 0x2A;
