@@ -57,6 +57,30 @@ DWORD findProcessByName(const std::string& processName) {
     return DWORD();
 }
 
+// 获取指定进程名的进程数量
+int getProcessCountByName(const std::string& processName)
+{
+    HANDLE snapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
+    if (snapshot == INVALID_HANDLE_VALUE) return 0;
+
+    PROCESSENTRY32W processEntry;
+    processEntry.dwSize = sizeof(PROCESSENTRY32W);
+
+    int count = 0;
+    // 遍历进程列表以查找进程名
+    if (Process32FirstW(snapshot, &processEntry)) {
+        do {
+            std::string exeFileName = ws2s(processEntry.szExeFile);  // 转换宽字符为 std::string
+            if (processName == exeFileName) {
+                count++;
+            }
+        } while (Process32NextW(snapshot, &processEntry));
+    }
+
+    CloseHandle(snapshot);
+    return count;
+}
+
 void TerminateProcessByID(DWORD processID) {
     HANDLE processHandle = OpenProcess(PROCESS_TERMINATE, FALSE, processID);
     if (processHandle) {

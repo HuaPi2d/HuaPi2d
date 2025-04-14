@@ -1,6 +1,6 @@
 ﻿#include "ssjjglobalvar.h"
 
-QString resolutionPath = "";
+// QString resolutionPath = "";
 bool isRunScriptThreadRunning = false;
 GlobalVariableQString* textToShowInScreen = new GlobalVariableQString(nullptr);
 int passWordMode = 1;

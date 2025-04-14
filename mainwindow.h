@@ -21,6 +21,7 @@
 #include "universal/file/userssettings.h"
 #include "struct/editor/EditorConfig.h"
 #include "otherwidgets/about/aboutsoftwaredialog.h"
+#include "otherwidgets/help/helpwidget.h"
 
 
 namespace Ui {
@@ -74,6 +75,8 @@ private:
     DownloadListWidget *downloadListWidget;
     acss::QtAdvancedStylesheet* advancedStyleSheet;
     EditorConfig editorConfig;
+
+    void showHelpWidget();
 
 private slots:
     void onThemeActionTriggered();

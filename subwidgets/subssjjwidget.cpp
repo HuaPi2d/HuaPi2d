@@ -101,8 +101,11 @@ SubSSJJWidget::SubSSJJWidget(QWidget *parent)
     /* 脚本框设置 */
     ui->remindTextEdit->setReadOnly(true);
     ui->taskTableWidget->setEditTriggers(QAbstractItemView::NoEditTriggers);
-    writeRemindInfo("<p>" + tr("欢迎使用") + "<b>" + tr("生死狙击脚本") + "</b>" + tr("工具") + "</p><p><span style=\"font-size: 13px; color: red;\">" 
-        + tr("使用时注意本栏信息") + "</span></p><p>" + tr("请开启") + "<span style = \"font-size: 13px; color: red;\"><b>" + tr("自动登录") + "</b></span><br><span>游戏内鼠标灵敏度设为40</span><br></p>");
+    writeRemindInfo("<h2><b>" + tr("生死狙击脚本") + "</b>" + tr("工具") + "</h2><p><span style=\"font-size: 13px; color: red;\">" 
+        + tr("使用时注意本栏信息") + "</span></p>" +
+        "<p>" + tr("1.请开启") + "<span style = \"font-size: 13px; color: red;\"><b>" + tr("自动登录") + "</b></span><br>" +
+        "<span>2.游戏内鼠标灵敏度设为40</span><br>" +
+        "3.用户请 < span style = \"color: red;\"><b>自行截图</b></span>替换软件安装路径下的image文件夹下的图片<br></p>");
     ui->launcherPathLineEdit->setReadOnly(true);
     QIntValidator *validator = new QIntValidator(0, 999, this);
     ui->moveSpeedLineEdit->setValidator(validator);
@@ -134,11 +137,6 @@ SubSSJJWidget::SubSSJJWidget(QWidget *parent)
 
     connect(ui->createScpPushButton, &QPushButton::clicked, this, &SubSSJJWidget::createNewScpFile);
     connect(ui->openScpPushButton, &QPushButton::clicked, this, &SubSSJJWidget::openScpFile);
-
-    /* 分辨率选择信息 */
-    connect(ui->radioButton25601440, &QRadioButton::clicked, this, [=]() {resolutionPath = ""; });
-    connect(ui->radioButton25601600, &QRadioButton::clicked, this, [=]() {resolutionPath = "2560-1600/"; });
-    connect(ui->radioButtonVM, &QRadioButton::clicked, this, [=]() {resolutionPath = "VM/"; });
 
     /* 连接配置文件点击信号 */
     connect(ui->bonusConfigListListView, &QListView::clicked, this, [=](const QModelIndex& index) {
@@ -203,9 +201,6 @@ SubSSJJWidget::SubSSJJWidget(QWidget *parent)
         updateZXDiffcultyChooseComboBox();
         updateZXScriptPathComboBox();
         });
-
-    writeRemindInfo("<p><span style=\"color: red;\">" + tr("请确保在每次启动游戏时不会弹出以下图片") + "</p><br>");
-    writeRemindInfo("<img src=\"" + tips_file_path("tips/ensure_ratio.png") + "\" width=\"250\" alt=\"" + tr("提示图片") + "\"><br>");
 }
 
 SubSSJJWidget::~SubSSJJWidget()
@@ -252,7 +247,6 @@ void SubSSJJWidget::saveSettings()
     settings.setValue("characterList", ui->characterComboBox->currentText());
     settings.setValue("longQiList", ui->longQiComboBox->currentText());
     settings.setValue("currentPage", widgetList.indexOf(currentWidget));
-    settings.setValue("resolutionPath", this->resolutionPath);
     QStringList weaponList;
     for (int i = 0; i < ui->currentWeaponListWidget->count(); i++)
     {
@@ -397,17 +391,17 @@ void SubSSJJWidget::loadSettings()
     if(settings.value("ssjjInstallPath").toString() != "")
     {
         ssjjInstallPath = settings.value("ssjjInstallPath").toString();
-        writeRemindInfo("<p>" + tr("生死狙击程序安装路径:") + "</p><b>" + ssjjInstallPath + "</b><br><br>");
+        writeRemindInfo("<p>" + tr("4.当前生死狙击程序安装路径:") + "<b>" + ssjjInstallPath + "</b></p><br>");
     }
     else
     {
         ssjjInstallPath = getRegDitValue("\\HKEY_CURRENT_USER\\Software\\Wooduan\\SSJJ-4399", "InstallPath") + "\\WDlauncher.exe";
         if( ssjjInstallPath == ""){
-            writeRemindInfo("<p><span style=\"font-size: 13px; color: red;\">" + tr("生死狙击程序安装路径读取失败，请手动添加") + "<b>WDlauncher.exe</b>" + tr("的路径") + "</span></p><br>");
+            writeRemindInfo("<p><span style=\"font-size: 13px; color: red;\">" + tr("4.生死狙击程序安装路径读取失败，请手动添加") + "<b>WDlauncher.exe</b>" + tr("的路径") + "</span></p><br>");
             writeRemindInfo("<br><img src=\"" + tips_file_path("tips/choose_launcher_tip.png") + "\" width=\"250\" alt=\"" + tr("提示图片") + "\"><br>");
         }
         else{
-            writeRemindInfo("<p>" + tr("生死狙击程序安装路径:") + "<b>" + ssjjInstallPath + "</b></p><br>");
+            writeRemindInfo("<p>" + tr("4.检测到生死狙击程序安装路径:") + "<b>" + ssjjInstallPath + "</b></p><br>");
         }
     }
     ui->launcherPathLineEdit->setText(ssjjInstallPath);
@@ -513,14 +507,6 @@ void SubSSJJWidget::loadSettings()
     // 转到上次关闭时界面
     currentWidget = widgetList[settings.value("currentPage", "0").toInt()];
     updateScreen();
-    // 选中分辨率
-    this->resolutionPath = settings.value("resolutionPath").toString();
-    if (this->resolutionPath == "")
-        ui->radioButton25601440->setChecked(true);
-    else if (this->resolutionPath == "2560-1600/")
-        ui->radioButton25601600->setChecked(true);
-    else if (this->resolutionPath == "VM/")
-        ui->radioButtonVM->setChecked(true);
     settings.endGroup();
 
     settings.beginGroup("scriptEditor");
@@ -897,6 +883,9 @@ void SubSSJJWidget::on_startPushButton_clicked()
         return;
     }
 
+    // 检查文件完整性
+    checkFilesExists();
+
     // 重置任务次数
     if (ui->ifResetTimesCheckBox->isChecked() == true)
     {
@@ -930,8 +919,6 @@ void SubSSJJWidget::on_startPushButton_clicked()
             ssjjMainThread->deleteLater();
         }
         });
-    /* 定义全局变量 */
-    ssjjMainThread->receiveResolutionPath(this->resolutionPath);
     /* 开始执行 */
     ssjjMainThread->start();
     /* 发送任务 */
@@ -2120,4 +2107,18 @@ void SubSSJJWidget::testCurrentScript()
 void SubSSJJWidget::stopTestScript()
 {
     terminateAllThreads();
+}
+
+// 检查文件完整性
+void SubSSJJWidget::checkFilesExists()
+{
+    QStringList fileNames = {"image/script/loading_pic.png", "image/script/inGamePlayingPage.png",
+        "image/script/zx_inGamePlayingPage.png", "image/script/waitPeriod.png", "image/script/ensure_ratio.png",};
+    for (QString fileName : fileNames) {
+        QFile file(fileName);
+        if (!file.exists()) {
+            QString oldPath = fileName;
+            copyFile(fileName.replace("image/", ":/pic/script/resources/pic/"), oldPath);
+        }
+    }
 }

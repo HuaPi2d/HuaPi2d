@@ -911,38 +911,6 @@ QPushButton:pressed {
             </layout>
            </item>
            <item>
-            <layout class="QHBoxLayout" name="resolutionPathHorizontalLayout">
-             <item>
-              <widget class="QLabel" name="label">
-               <property name="text">
-                <string>游戏内分辨率</string>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QRadioButton" name="radioButton25601440">
-               <property name="text">
-                <string>2560-1440</string>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QRadioButton" name="radioButton25601600">
-               <property name="text">
-                <string>2560-1600</string>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QRadioButton" name="radioButtonVM">
-               <property name="text">
-                <string>VM</string>
-               </property>
-              </widget>
-             </item>
-            </layout>
-           </item>
-           <item>
             <widget class="QPushButton" name="terminateWDLaucherPushButton">
              <property name="text">
               <string>销毁WDLauncher.exe进程</string>

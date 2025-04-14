@@ -114,6 +114,9 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->mdFilesPushButton, &QPushButton::clicked, this, &MainWindow::createMDSubWindow);
     // 关于软件
     connect(ui->aboutSoftwareAction, &QAction::triggered, this, &MainWindow::showAboutSoftWareDialog);
+    // 帮助
+    connect(ui->helpAction, &QAction::triggered, this, &MainWindow::showHelpWidget);
+    ui->helpAction->setShortcut(QKeySequence(Qt::Key_F1));
 
     // 开发者模式
     QHotkey* HUA = new QHotkey(QKeySequence("Ctrl+Shift+H"), true);
@@ -176,6 +179,16 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
+void MainWindow::showHelpWidget()
+{
+    HelpWidget *helpWidget = new HelpWidget();
+
+    //helpWidget->setupHelpSystem(":/doc/resources/doc/help.qhc");
+    helpWidget->setupHelpSystem("resources/doc/help.qhc");
+
+    helpWidget->show();
+}
+
 void MainWindow::onThemeActionTriggered()
 {
     auto action = qobject_cast<QAction*>(sender());
@@ -186,7 +199,8 @@ void MainWindow::onThemeActionTriggered()
 
 void MainWindow::onStyleManagerStylesheetChanged()
 {
-    qApp->setStyleSheet(advancedStyleSheet->styleSheet());
+    QString styleSheet = advancedStyleSheet->styleSheet();
+    qApp->setStyleSheet(styleSheet);
 }
 
 void MainWindow::receiveDsizeInfo(int dwidth, int dheight)

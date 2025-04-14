@@ -239,8 +239,3 @@ void SSJJMainThread::receiveSettlementStates(SSJJRunState ssjjRunState)
         nextStep = "initializeGameScreen";
     }
 }
-
-void SSJJMainThread::receiveResolutionPath(QString m_resolution_path)
-{
-    resolutionPath = m_resolution_path;
-}

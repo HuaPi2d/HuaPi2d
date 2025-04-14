@@ -8,7 +8,7 @@
 #include <QPoint>
 #include "global/basicGlobalVar/globalvariableqstring.h"
 
-extern QString resolutionPath;
+// extern QString resolutionPath;
 extern bool isRunScriptThreadRunning;
 extern GlobalVariableQString* textToShowInScreen;
 // 密码模式

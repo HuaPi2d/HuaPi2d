@@ -59,7 +59,6 @@ public slots:
     void receiveEnterGameStates(SSJJRunState ssjjRunState);
     void receiveRunScriptStates(SSJJRunState ssjjRunState);
     void receiveSettlementStates(SSJJRunState ssjjRunState);
-    void receiveResolutionPath(QString m_resolution_path);
 };
 
 #endif // SSJJMAINTHREAD_H

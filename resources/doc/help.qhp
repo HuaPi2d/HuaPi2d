@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<QtHelpProject version="1.0">
+    <namespace>huapi2d.com.helpdoc</namespace>
+    <virtualFolder>doc</virtualFolder>
+    <customFilter name="huapi2d 1.0">
+        <filterAttribute>huapi2d</filterAttribute>
+        <filterAttribute>1.0</filterAttribute>
+    </customFilter>
+    <filterSection>
+        <filterAttribute>huapi2d</filterAttribute>
+        <filterAttribute>1.0</filterAttribute>
+        <toc>
+            <section title="画皮的百宝箱" ref="index.html">
+                <section title="概览" ref="doc.html"/>
+                <section title="生死狙击脚本工具" ref="ssjj.html">
+                    <section title="脚本初始配置" ref="config_ssjj.html"/>
+                    <section title="常见脚本错误" ref="error_ssjj.html"/>
+                </section>
+                <section title="音乐盒" ref="music.html"/>
+            </section>
+        </toc>
+        <tokenizer>
+            <language>zh</language>
+            <language>en</language>
+        </tokenizer>
+        <keywords>
+            <keyword name="脚本初始配置" ref="config_ssjj.html"/>
+            <keyword name="常见脚本错误" ref="error_ssjj.html"/>
+            <keyword name="overview" ref="doc.html"/>
+            <keyword name="0" ref="index.html"/>
+        </keywords>
+        <files>
+            <file>*.html</file>
+            <file>images/*.png</file>
+        </files>
+    </filterSection>
+</QtHelpProject>

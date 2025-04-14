@@ -27,6 +27,8 @@ std::string ws2s(const std::wstring& wstr);
 
 DWORD findProcessByName(const std::string& processName);
 
+int getProcessCountByName(const std::string& processName);
+
 void TerminateProcessByID(DWORD processID);
 
 void TerminateProcessByName(const std::string& processName);

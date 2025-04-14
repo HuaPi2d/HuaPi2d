@@ -24,29 +24,30 @@
 
 #include "thread/script/ssjjmainthread.h"
 #include "thread/weapons/weaponbonusthread.h"
-#include "universal/timeFun/pctime.h"
 #include "thread/checkthreadstate.h"
 #include "subwidgets/universal/showtextinscreenwidget.h"
+#include "subwidgets/Dialog/createnewfiledialog.h"
+#include "subwidgets/Dialog/editor/editorsettingsdialog.h"
 #include "ui_subssjjwidget.h"
-#include "ssjjCore/zx/zxlevels.h"
 #include "DataBase/ssjj/ssjjscriptalfilesdatabase.h"
 #include "thread/scriptTest/testscriptthread.h"
-#include "universal/file/userssettings.h"
+#include "thread/scriptRecord/scriptrecordthread.h"
 #include "ssjjCore/script/scripteditor/scplanguageeditor.h"
-#include "subwidgets/Dialog/editor/editorsettingsdialog.h"
+#include "ssjjCore/scriptApis/scplanfunction.h"
+#include "ssjjCore/zx/zxlevels.h"
+#include "ssjjCore/script/recordToScp/keyboradrecordconvert.h"
 #include "struct/editor/EditorConfig.h"
 #include "global/mainglobalvar.h"
 #include "Dialog/ssjj/scriptrecordoptiondialog.h"
 #include "Dialog/ssjj/recordteachingdialog.h"
-#include "universal/filepath/filepath.h"
-#include "thread/scriptRecord/scriptrecordthread.h"
-#include "ssjjCore/script/recordToScp/keyboradrecordconvert.h"
-#include "universal/file/excel.h"
-#include "customize/customizedTableWidget/customizedtablewidget.h"
 #include "Dialog/ssjj/modifytaskdialog.h"
-#include "subwidgets/Dialog/createnewfiledialog.h"
 #include "Dialog/ssjj/modifyfileattributesdialog.h"
-#include "ssjjCore/scriptApis/scplanfunction.h"
+#include "universal/filepath/filepath.h"
+#include "universal/file/excel.h"
+#include "universal/filepro.h"
+#include "universal/timeFun/pctime.h"
+#include "universal/file/userssettings.h"
+#include "customize/customizedTableWidget/customizedtablewidget.h"
 
 
 namespace Ui {
@@ -108,7 +109,6 @@ private:
     QPointer<TestScriptThread> testScriptThread;
     QPointer<ScriptRecordThread> scriptRecordThread;
     QsciScintilla* scriptEditor;
-    QString resolutionPath;
     QList<ScpLanguageEditor *> scpLanguageEditors;
     ZXChapter currentChoosedZXChapter;                    // 当前页面选中的章节
     ZXLevel currentChoosedZXLevel;                        // 当前页面选中的关卡
@@ -129,6 +129,8 @@ private:
     QHotkey* middle;
     // 当前键盘是否可以控制鼠标
     bool ifCanControlMouse;
+
+    void checkFilesExists();
 
 private: signals:
     void widgetClosed();

@@ -509,6 +509,10 @@ QPushButton:pressed {
      <property name="title">
       <string>语言</string>
      </property>
+     <property name="icon">
+      <iconset resource="resource.qrc">
+       <normaloff>:/icon/resources/icons/Language16Solid.png</normaloff>:/icon/resources/icons/Language16Solid.png</iconset>
+     </property>
      <addaction name="chineseAction"/>
      <addaction name="englishAction"/>
     </widget>
@@ -537,6 +541,8 @@ QPushButton:pressed {
     </property>
     <addaction name="aboutMakerAction"/>
     <addaction name="aboutSoftwareAction"/>
+    <addaction name="separator"/>
+    <addaction name="helpAction"/>
    </widget>
    <addaction name="function_menu"/>
    <addaction name="menu_settings"/>
@@ -794,6 +800,15 @@ QPushButton:pressed {
   <action name="englishAction">
    <property name="text">
     <string>English</string>
+   </property>
+  </action>
+  <action name="helpAction">
+   <property name="icon">
+    <iconset resource="resource.qrc">
+     <normaloff>:/icon/resources/icons/HelpIcon.png</normaloff>:/icon/resources/icons/HelpIcon.png</iconset>
+   </property>
+   <property name="text">
+    <string>帮助</string>
    </property>
   </action>
  </widget>

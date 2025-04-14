@@ -25,7 +25,7 @@ QString checkCurrentState(int waitTime)
     }
 
     // 声明返回对象
-    if (findPicInFullScreen(":/pic/script/resources/pic/script/" + resolutionPath + "loading_pic.png") != cv::Point(-1, -1))
+    if (findPicInFullScreen("image/script/loading_pic.png") != cv::Point(-1, -1))
     {
         // 处于加载界面
         if (findProcessByName("SSJJ_BattleClient_Unity.exe") != DWORD())
@@ -72,8 +72,8 @@ QString checkCurrentState(int waitTime)
     else if (findProcessByName("SSJJ_BattleClient_Unity.exe") != DWORD())
     {
         // 检测到游戏进程
-        if (findPicInFullScreen(":/pic/script/resources/pic/script/" + resolutionPath + "inGamePlayingPage.png") != cv::Point(-1, -1)
-            || findPicInFullScreen(":/pic/script/resources/pic/script/" + resolutionPath + "zx_inGamePlayingPage.png") != cv::Point(-1, -1))
+        if (findPicInFullScreen("image/script/inGamePlayingPage.png") != cv::Point(-1, -1)
+            || findPicInFullScreen("image/script/zx_inGamePlayingPage.png") != cv::Point(-1, -1))
         {
             // 处于游戏界面
             return "gamePage";
@@ -144,31 +144,21 @@ SSJJRunState restartSSJJ(QString ssjjInstallPath){
     QThread::msleep(1000);
     TerminateProcessByNameAndCheck("MicroClient.exe", 5);
     QThread::msleep(1000);
-    //if (findProcessByName("MicroClient.exe") != DWORD() /*|| findProcessByName("SSJJ_BattleClient_Unity.exe") != DWORD()*/)
-    //{
-    //    ssjjRunState.remindText = "<p>发生未知错误，进程销毁失败</p><br>";
-    //    ssjjRunState.errorType = "FatalError";
-    //    ssjjRunState.nextStep = "fatalError";
-    //    return ssjjRunState;
-    //}
 
-    //for(i = 0; i < 30; i++){
-    //    if(findProcessByName("GameMon.des") == DWORD() && findProcessByName("GameGuard.des") == DWORD() && findProcessByName("GameMon64.des") == DWORD()){
-    //        break;
-    //    }
-    //    QThread::msleep(1000);
-    //}
-    //if (i == 29)
-    //{
-    //    ssjjRunState.remindText = "<p>GameGuard 退出异常</p><br>";
-    //    ssjjRunState.errorType = "FatalError";
-    //    ssjjRunState.nextStep = "fatalError";
-    //    return ssjjRunState;
-    //}
+    // 检查进程销毁是否成功
+    if (getProcessCountByName("WDlauncher.exe") == 3) {
+        ssjjRunState.remindText = "<p>多次进程销毁失败<span style=\"color: red;\"><b>已自动停止脚本</b></span></p><br>";
+        ssjjRunState.errorType = "FatalError";
+        ssjjRunState.nextStep = "restartSSJJ";
+        return ssjjRunState;
+    }
 
     runProgramAsAdmin(ssjjInstallPath, QStringList());
+
+    // 游戏启动
     QStringList picList;
     picList.append(":/pic/script/resources/pic/script/loaded_cover.png");
+    picList.append("image/script/ensure_ratio.png");
     picList.append(":/pic/script/resources/pic/script/first_server.png");
     CompeteRes res = competeFindPic(picList, 60000, 1000);
     if(res.num == 0){
@@ -177,15 +167,27 @@ SSJJRunState restartSSJJ(QString ssjjInstallPath){
         ssjjRunState.nextStep = "fatalError";
         return ssjjRunState;
     }
+    else if (res.num == 1) {
+        mouseClick(res.point.x, res.point.y);
+        QThread::msleep(3000);
+        CompeteRes res = competeFindPic(picList, 60000, 1000);
+        if (res.num == 0) {
+            ssjjRunState.remindText = "<p>请开启<span style=\"color: red;\"><b>自动登录</b></span></p><br>";
+            ssjjRunState.errorType = "FatalError";
+            ssjjRunState.nextStep = "fatalError";
+            return ssjjRunState;
+        }
+    }
     else if(res.num == -1){
-        ssjjRunState.remindText = "<p>多次进程销毁失败<span style=\"color: red;\"><b>已自动停止脚本</b></span></p><br>";
+        ssjjRunState.remindText = "<p>请确保按要求替换image目录下的图片</p><br>";
         ssjjRunState.errorType = "FatalError";
         ssjjRunState.nextStep = "restartSSJJ";
         return ssjjRunState;
     }
+
     mouseClick(res.point.x, res.point.y);
 
-    /* 寻找是否登录 */
+    /* 是否登录成功 */
     picList.clear();
     picList.append(":/pic/script/resources/pic/script/close_activity.png");
     picList.append(":/pic/script/resources/pic/script/hall.png");
@@ -367,7 +369,7 @@ SSJJRunState enterGame(SingleTask task, int loadingTimes){
             findAndClick(":/pic/script/resources/pic/script/morningRemind.png", 3000);
             QThread::msleep(loadingTimes * 1000);
             for (int i = 0; i < 20; i++) {
-                point = findPicInFullScreen(":/pic/script/resources/pic/script/" + resolutionPath + "loading_pic.png");
+                point = findPicInFullScreen("image/script/loading_pic.png");
                 DWORD handle = findProcessByName("SSJJ_BattleClient_Unity.exe");
                 if (point == cv::Point(-1, -1) && handle != DWORD()) {
                     ssjjRunState.errorType = "NoError";
@@ -402,7 +404,7 @@ SSJJRunState enterGame(SingleTask task, int loadingTimes){
             ssjjRunState.remindText = "<p><span style=\"color: red;\"><b>长时间停留在加载界面</b></span>，准备重启游戏</p><br>";
             return ssjjRunState;
         }
-        else if (task.taskName == "乱境鏖战" || task.taskName == "挑战王者" || task.taskName == "其他模式")
+        else if (task.taskName == "乱境鏖战" || task.taskName == "挑战王者" || task.taskName == "其他模式" || task.taskName == "夺金行动")
         {
             findAndClickAndConfirm(":/pic/script/resources/pic/script/LD_begin.png", 3000);
             if (findAndClickAndCheck(":/pic/script/resources/pic/script/morningRemind.png", 3000) == false)
@@ -477,25 +479,6 @@ SSJJRunState enterGame(SingleTask task, int loadingTimes){
             ssjjRunState.remindText = "<p><span style=\"color: red;\"><b>发生未知错误，加载超时</b></span>，准备重启游戏</p><br>";
             ssjjRunState.nextStep = "restartSSJJ";
             return ssjjRunState;
-        }
-        else if (task.taskName == "夺金行动") {
-            findAndClickAndConfirm(":/pic/script/resources/pic/script/LD_begin.png", 3000);
-            if (findAndClickAndCheck(":/pic/script/resources/pic/script/morningRemind.png", 3000) == false) {
-                // 开启超背
-                findAndClick(":/pic/script/resources/pic/script/checkBox.png", 3000);
-                ssjjRunState.errorType = "Error";
-                ssjjRunState.remindText = "";
-                ssjjRunState.nextStep = "enterGame";
-                return ssjjRunState;
-            }
-            state = checkCurrentState(3000);
-            if (state == "startPage")
-            {
-                findAndClickAndConfirm(":/pic/script/resources/pic/script/LD_begin.png", 3000);
-                findAndClick(":/pic/script/resources/pic/script/morningRemind.png", 3000);
-            }
-            QThread::msleep(loadingTimes * 1000 - 3000);
-
         }
     }
 
@@ -582,7 +565,7 @@ SSJJRunState runScript(SingleTask task, int speed)
         // 乱斗模式
         if (task.taskName == "乱境鏖战" || task.taskName == "挑战王者") {
             while (true) {
-                point = findPicInFullScreen(":/pic/script/resources/pic/script/" + resolutionPath + "waitPeriod.png");
+                point = findPicInFullScreen("image/script/waitPeriod.png");
                 if (point == cv::Point(-1, -1)) {
                     break;
                 }
@@ -619,7 +602,7 @@ SSJJRunState runScript(SingleTask task, int speed)
                 }
             }
         }
-        else if (task.taskName == "其他模式") {
+        else if (task.taskName == "其他模式" || task.taskName == "夺金行动") {
             while (true) {
                 // 执行脚本
                 if (task.script != "未选择") {
@@ -711,7 +694,7 @@ SSJJRunState settlement(SingleTask task)
 
     if (task.taskType == Task::LuanDou) {
         // 乱斗模式
-        if (task.taskName == "团队道具赛" || task.taskName == "乱境鏖战" || task.taskName == "挑战王者" || task.taskName == "其他模式") {
+        if (task.taskName == "团队道具赛" || task.taskName == "乱境鏖战" || task.taskName == "挑战王者" || task.taskName == "其他模式" || task.taskName == "夺金行动") {
             QThread::msleep(5000);
             for (int i = 0; i < 3; i++) {
                 QThread::msleep(3000);
